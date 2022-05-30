@@ -17,7 +17,6 @@ const color = ["#ff00ff", "#ff0000", "#ff6f00", "#fff200", "#33ff00", "#00c8ff",
 const { Webhook, MessageBuilder } = require('discord-webhook-node');
 const hook = new Webhook("https://discord.com/api/webhooks/980816057419833365/w4ui_9JDKRbyZC8qRsDTDZDthb6m-2_aCD4jYe26Z3u0b-wgMNgZUweYZKTg2_JWrByP");
 
-hook.send("᲼");
 
 const embed = new MessageBuilder()
     .setTitle(`"${randomQuote}"`)
@@ -26,3 +25,4 @@ const embed = new MessageBuilder()
     .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
     .setTimestamp(date);
 hook.send(embed);
+hook.send("᲼");
