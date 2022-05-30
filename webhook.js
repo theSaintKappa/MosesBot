@@ -26,5 +26,5 @@ const embed = new MessageBuilder()
     .setTimestamp(date);
 
 // hook.send(embed);
-// setTimeout(() => { hook.send("᲼"); }, 500);
-// hook.send("᲼");
+hook.send("᲼");
+setTimeout(() => { hook.send("᲼"); }, 500);
