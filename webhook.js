@@ -4,8 +4,7 @@ let jsonRawData = fs.readFileSync('quotes.json');
 let jsonParsed = JSON.parse(jsonRawData);
 
 const quotesArray = Object.values(jsonParsed)
-    // const randomIndex = Math.floor(Math.random() * quotesArray.length);
-const randomIndex = 14;
+const randomIndex = Math.floor(Math.random() * quotesArray.length);
 const randomQuote = quotesArray[randomIndex][0];
 const date = new Date(quotesArray[randomIndex][1]);
 console.log(randomIndex);
