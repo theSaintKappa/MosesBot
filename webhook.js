@@ -25,6 +25,6 @@ const embed = new MessageBuilder()
     .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
     .setTimestamp(date);
 
-// hook.send(embed);
-hook.send("᲼");
+hook.send(embed);
 setTimeout(() => { hook.send("᲼"); }, 500);
+// hook.send("᲼");
