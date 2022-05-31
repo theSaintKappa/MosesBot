@@ -1,1 +1,1 @@
-worker: node db.js
+worker: node dmq.js
