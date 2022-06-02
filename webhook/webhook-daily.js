@@ -38,7 +38,7 @@ module.exports = function sendQuote() {
                     .setTimestamp(date);
 
                 console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"\nIt was said: ${date}\n`);
-                // hook.send(embed);
+                hook.send(embed);
 
 
             } finally {
