@@ -1,5 +1,5 @@
 const fs = require('fs');
-const quotesSchema = require('./quotes-schema');
+// const quotesSchema = require('./quotes-schema');
 
 module.exports = function sendQuote() {
     let jsonRawData = fs.readFileSync('bullshit/quotes.json');
@@ -13,12 +13,19 @@ module.exports = function sendQuote() {
     console.log(`\nSending quote #${randomIndex + 1}\n"${randomQuote}"\nIt was said: ${date}\n`);
 
 
-    const asd = async() => {
-        // let dbArray = await quotesSchema.find({});
+    // const asd = async() => {
+    //     // console.log(`The connection state is "${state}"`);
 
-        console.log(await quotesSchema.find({}));
-    };
-    asd();
+    //     let dbArray = await quotesSchema.find({});
+    //     const quotesArray = [];
+    //     dbArray.forEach(quote => {
+    //         quotesArray.push(quote);
+    //     });
+    //     const randomDocumentIndex = Math.floor(Math.random() * dbArray.length);
+    //     console.log(randomDocumentIndex);
+    //     console.log(quotesArray[randomDocumentIndex]['quote']);
+    // };
+    // asd()
 
 
 
@@ -37,5 +44,5 @@ module.exports = function sendQuote() {
         .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
         .setTimestamp(date);
 
-    // hook.send(embed);
+    hook.send(embed);
 };

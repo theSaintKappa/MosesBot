@@ -2,6 +2,7 @@ const DiscordJS = require('discord.js');
 const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
+const quotesSchema = require('./quotes-schema')
 
 const { Intents } = DiscordJS;
 
@@ -21,12 +22,26 @@ client.on('ready', () => {
         useUnifiedTopology: true,
     };
 
-    new WOKCommands(client, {
+    const wok = new WOKCommands(client, {
         commandsDir: path.join(__dirname, 'commands'),
         testServers: ['980813190780841984'],
         botOwners: ['315531146953752578'],
         mongoUri: process.env.MONGO_URI,
-        // dbOptions,
+        dbOptions,
+    });
+    wok.on('databaseConnected', async(connection, state) => {
+        console.log(`The connection state is "${state}"`);
+
+        let dbArray = await quotesSchema.find({});
+        const quotesArray = [];
+        dbArray.forEach(quote => {
+            quotesArray.push(quote);
+        });
+        const randomDocumentIndex = Math.floor(Math.random() * dbArray.length);
+        console.log(randomDocumentIndex);
+        console.log(quotesArray[randomDocumentIndex]['quote']);
+
+
     });
 });
 
