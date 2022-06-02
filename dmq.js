@@ -29,7 +29,7 @@ client.on('ready', () => {
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
-    wok.on('databaseConnected', async(state) => {
+    wok.on('databaseConnected', async(connection, state) => {
         console.log(`The connection state is "${state}"`);
     });
 });

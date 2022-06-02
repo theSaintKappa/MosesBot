@@ -16,23 +16,14 @@ module.exports = function sendQuote() {
                 console.log('Connected to mongodb!');
 
                 let dbArray = await quotesSchema.find({});
-                const quotesArray = [];
-                dbArray.forEach(quote => {
-                    quotesArray.push(quote);
-                });
 
-                console.log(quotesArray);
                 randomDocumentIndex = Math.floor(Math.random() * dbArray.length);
 
-                randomQuote = quotesArray[randomDocumentIndex]['quote'];
-                date = quotesArray[randomDocumentIndex]['date'];
+                randomQuote = dbArray[randomDocumentIndex]['quote'];
+                date = dbArray[randomDocumentIndex]['date'];
 
 
                 console.log(`\nChose: ${randomQuote}\nSaid: ${date}\n`);
-
-                console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"\nIt was said: ${date}\n`);
-
-
 
                 const color = ["#ff00ff", "#ff0000", "#ff6f00", "#fff200", "#33ff00", "#00c8ff", "#8c00ff"];
                 //sun mon tue wed thu fri sat
@@ -46,6 +37,7 @@ module.exports = function sendQuote() {
                     .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
                     .setTimestamp(date);
 
+                console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"\nIt was said: ${date}\n`);
                 // hook.send(embed);
 
 
