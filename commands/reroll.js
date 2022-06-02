@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const sendQuote = require('../webhook/webhook-daily');
 
 module.exports = {
     category: 'Moses quotes',

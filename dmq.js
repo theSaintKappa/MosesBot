@@ -29,19 +29,8 @@ client.on('ready', () => {
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
-    wok.on('databaseConnected', async(connection, state) => {
+    wok.on('databaseConnected', async(state) => {
         console.log(`The connection state is "${state}"`);
-
-        let dbArray = await quotesSchema.find({});
-        const quotesArray = [];
-        dbArray.forEach(quote => {
-            quotesArray.push(quote);
-        });
-        const randomDocumentIndex = Math.floor(Math.random() * dbArray.length);
-        console.log(randomDocumentIndex);
-        console.log(quotesArray[randomDocumentIndex]['quote']);
-
-
     });
 });
 
