@@ -15,10 +15,18 @@ const client = new DiscordJS.Client({
 })
 
 client.on('ready', () => {
+    const dbOptions = {
+        keepAlive: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    };
+
     new WOKCommands(client, {
         commandsDir: path.join(__dirname, 'commands'),
         testServers: ['980813190780841984'],
         botOwners: ['315531146953752578'],
+        mongoUri: process.env.MONGO_URI,
+        // dbOptions,
     });
 });
 
