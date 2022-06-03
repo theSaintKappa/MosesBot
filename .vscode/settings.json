@@ -1,0 +1,12 @@
+{
+    "files.exclude": {
+        ".env": true
+    },
+    "cSpell.words": [
+        "addquote",
+        "Thonk",
+        "viewquotes",
+        "wokcommands"
+    ]
+    
+}
