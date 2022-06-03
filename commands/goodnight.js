@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const client = require('../dmq')
 
 module.exports = {
     category: 'Moses quotes',
@@ -30,9 +31,12 @@ module.exports = {
                     ephemeral: true
                 });
                 embed.setDescription(`**${gnMessage}\nHe also has something to share with you:\n\`${text}\`**`);
-                channel.send({
-                    embeds: [embed]
+                const message = await channel.send({
+                    embeds: [embed],
+                    fetchReply: true
                 });
+                message.react(':mosesThonk:981867313806602241');
+
                 return;
             }
             embed.setDescription(`You just wished the whole server a good night sleep`);
@@ -41,9 +45,11 @@ module.exports = {
                 ephemeral: true
             });
             embed.setDescription(`**${gnMessage}**`);
-            channel.send({
+            const message = await channel.send({
                 embeds: [embed],
+                fetchReply: true
             });
+            message.react(':mosesThonk:981867313806602241');
         }
     }
 };

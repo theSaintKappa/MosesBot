@@ -32,7 +32,7 @@ module.exports = {
 
         },
         {
-            name: 'status', // Must be lower case
+            name: 'status',
             description: 'Status',
             required: true,
             type: 'STRING',

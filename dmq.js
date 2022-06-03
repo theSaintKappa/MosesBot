@@ -2,7 +2,7 @@ const DiscordJS = require('discord.js');
 const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
-const quotesSchema = require('./quotes-schema')
+// const quotesSchema = require('./quotes-schema')
 
 const { Intents } = DiscordJS;
 
@@ -33,5 +33,6 @@ client.on('ready', () => {
         console.log(`The connection state is "${state}"`);
     });
 });
+module.exports = client
 
 client.login(process.env.CLIENT_TOKEN);
