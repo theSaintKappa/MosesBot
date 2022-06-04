@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-    category: 'Moses quotes',
+    category: 'MosesUtilities',
     description: 'Wish everyone a good night sleep!',
 
     aliases: ['gn'],

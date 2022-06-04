@@ -2,7 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const quotesSchema = require('../quotes-schema');
 
 module.exports = {
-    category: 'Moses quotes',
+    category: 'MosesDB',
     description: 'Display all the currently stored Moses Quotes',
 
     slash: true,

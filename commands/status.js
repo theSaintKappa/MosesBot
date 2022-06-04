@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-    category: 'Moses utilities',
+    category: 'MosesUtilities',
     description: 'Change the bot status',
     options: [{
             name: 'type',
