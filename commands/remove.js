@@ -3,7 +3,7 @@ const quotesSchema = require('../quotes-schema');
 const counterSchema = require('../counter-schema');
 
 module.exports = {
-    category: 'Moses quotes',
+    category: 'MosesDB',
     description: 'Remove a specified quote from the MosesDB',
 
     slash: true,
