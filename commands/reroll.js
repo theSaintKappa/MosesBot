@@ -3,7 +3,7 @@ const sendQuote = require('../webhook/webhook-daily');
 
 module.exports = {
     category: 'Moses quotes',
-    description: 'Re-roll today\'s quote',
+    description: 'Re-roll today\'s daily quote',
 
     slash: true,
     testOnly: true,

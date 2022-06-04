@@ -2,3 +2,4 @@ node_modules/
 .env
 .vscode/
 .slugignore
+webhook-template.js

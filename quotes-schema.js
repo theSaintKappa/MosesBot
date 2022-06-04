@@ -8,6 +8,10 @@ const schema = new mongoose.Schema({
     date: {
         type: Date,
         required: true
+    },
+    quoteId: {
+        type: Number,
+        required: false
     }
 });
 

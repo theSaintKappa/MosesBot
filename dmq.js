@@ -2,7 +2,6 @@ const DiscordJS = require('discord.js');
 const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
-// const quotesSchema = require('./quotes-schema')
 
 const { Intents } = DiscordJS;
 
@@ -15,7 +14,7 @@ const client = new DiscordJS.Client({
     ],
 })
 
-client.on('ready', () => {
+client.on('ready', async() => {
     const dbOptions = {
         keepAlive: true,
         useNewUrlParser: true,
@@ -32,7 +31,32 @@ client.on('ready', () => {
     wok.on('databaseConnected', async(connection, state) => {
         console.log(`The connection state is "${state}"`);
     });
+
+
+    // const activities = [
+    //     '/help',
+    //     `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} moses fans!`
+    // ];
+
+    // let i = 0;
+    // setInterval(() => client.user.setActivity(`${activities[i++ % activities.length]}`, { type: 'WATCHING' }), 15000);
+
+
+    client.user.setActivity('/help', { type: 'WATCHING' });
 });
-module.exports = client
+
+
+const quotesChannel = '980813191556780064';
+client.on('messageCreate', async(message) => {
+    if (message.channel.id === quotesChannel) {
+        try {
+            await message.react('<:upvote:982630993997496321>');
+            await message.react('<:downvote:982630978566639616>');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+});
+
 
 client.login(process.env.CLIENT_TOKEN);

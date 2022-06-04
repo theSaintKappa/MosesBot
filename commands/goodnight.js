@@ -1,5 +1,4 @@
 const { MessageEmbed } = require('discord.js');
-const client = require('../dmq')
 
 module.exports = {
     category: 'Moses quotes',
