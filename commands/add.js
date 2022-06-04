@@ -3,7 +3,7 @@ const quotesSchema = require('../quotes-schema');
 const leaderboardSchema = require('../quote-leaderboard-schema');
 
 module.exports = {
-    category: 'Moses quotes',
+    category: 'MosesDB',
     description: 'Add a new quote to the MosesDB',
 
     slash: true,
