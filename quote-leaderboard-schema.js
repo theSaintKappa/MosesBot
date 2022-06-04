@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    quote: {
+    userId: {
         type: String,
         required: true
     },
-    date: {
-        type: Date,
+    userName: {
+        type: String,
         required: true
     },
-    quoteId: {
+    count: {
         type: Number,
-        required: false
+        required: true
     }
 });
 
-module.exports = mongoose.model('quotes', schema, 'quotes');
+module.exports = mongoose.model('quote-leaderboard', schema, 'quote-leaderboard');

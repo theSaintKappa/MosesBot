@@ -24,10 +24,6 @@ module.exports = {
                     name: "Competing in",
                     value: "COMPETING"
                 },
-                {
-                    name: "Custom status",
-                    value: "CUSTOM_STATUS"
-                },
             ]
 
         },
