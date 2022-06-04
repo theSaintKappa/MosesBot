@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const quotesSchema = require('../quotes-schema');
+const leaderboardSchema = require('../quote-leaderboard-schema');
 
 module.exports = {
     category: 'Moses quotes',
@@ -16,7 +17,7 @@ module.exports = {
     }],
 
 
-    callback: async({ interaction, args }) => {
+    callback: async({ interaction, args, user }) => {
         const addquoteEmbed = new MessageEmbed()
             .setColor('RANDOM')
             .setTitle(`Added:\n\n\`${args}\`\n\nto the Moses Quotes DB!`)
@@ -29,9 +30,27 @@ module.exports = {
                 embeds: [addquoteEmbed]
             });
         }
+
+
         await new quotesSchema({
             quote: args.toString(),
             date: new Date()
         }).save();
+
+
+        const leaderboard = await leaderboardSchema.find({ userId: user.id });
+        if (leaderboard == '') {
+            await new leaderboardSchema({
+                userId: user.id,
+                userName: user.username,
+                count: 1
+            }).save();
+            return;
+        }
+        await leaderboardSchema.updateOne({
+            userId: user.id
+        }, {
+            $inc: { count: 1 }
+        });
     }
 };
