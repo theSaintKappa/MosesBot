@@ -14,9 +14,9 @@ module.exports = {
         var quotesString = '';
 
         quotesArray.every(quote => {
-            quotesString += `**#${quote['quoteId']}** \`${quote['quote']}\`\n`;
+            quotesString += `**#${quote['quoteId']}** \`${quote['quote']}\`(submitted by <@${quote['submitterId']}>)\n`;
             if (quotesString.length > 4000) {
-                quotesString += '**+more**';
+                quotesString += '***+more***';
                 return false;
             } else return true;
         });

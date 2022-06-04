@@ -1,6 +1,7 @@
-const { MessageEmbed } = require('discord.js');
+// const { MessageEmbed } = require('discord.js');
 const quotesSchema = require('../quotes-schema');
 const counterSchema = require('../counter-schema');
+const leaderboardSchema = require('../quote-leaderboard-schema');
 
 module.exports = {
     category: 'MosesDB',
@@ -17,22 +18,38 @@ module.exports = {
     }],
 
 
-    callback: async({ interaction, args }) => {
-        // Deleting specified document from the "quotes" collection
-        await quotesSchema.deleteOne({
-            quoteId: args
-        });
+    callback: async({ interaction, args, user }) => {
 
-        // Subtracting 1 from the auto increment counter in the "quote-counter" collection so that when you add a new quote it doesn't skip a number
-        // Like id does in fucking SQL
-        await counterSchema.updateOne({}, {
-            seq_value: args - 1
-        });
+        let response = '';
 
+        // Check if document exists
+        if (await quotesSchema.find({ quoteId: args }) != '') {
+            response = `Removed quote **\`${args}\`**.`;
+
+            // Deleting specified document from the "quotes" collection
+            await quotesSchema.deleteOne({
+                quoteId: args
+            });
+
+            // Subtracting 1 from the auto increment counter in the "quote-counter" collection so that when you add a new quote it doesn't skip a number
+            // Like id does in fucking SQL
+            await counterSchema.updateOne({}, {
+                $inc: { seq_value: -1 }
+            });
+
+            // Update the leaderboards cause no free points
+            await leaderboardSchema.updateOne({
+                userId: user.id
+            }, {
+                $inc: { count: -1 }
+            });
+        } else {
+            response = `Quote with the id **\`${args}\`** doesn't exist.`;
+        }
 
         if (interaction) {
             interaction.reply({
-                content: `Removed quote ${args}`
+                content: response
             });
         }
     }

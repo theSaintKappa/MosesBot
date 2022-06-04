@@ -12,6 +12,14 @@ const schema = new mongoose.Schema({
     quoteId: {
         type: Number,
         required: false
+    },
+    submitterName: {
+        type: String,
+        required: true
+    },
+    submitterId: {
+        type: String,
+        required: true
     }
 });
 
