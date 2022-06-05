@@ -28,7 +28,7 @@ module.exports = function sendQuote() {
                 const color = ["#ff00ff", "#ff0000", "#ff6f00", "#fff200", "#33ff00", "#00c8ff", "#8c00ff"];
                 //sun mon tue wed thu fri sat
 
-                const hook = new Webhook("https://discord.com/api/webhooks/980816057419833365/w4ui_9JDKRbyZC8qRsDTDZDthb6m-2_aCD4jYe26Z3u0b-wgMNgZUweYZKTg2_JWrByP");
+                const hook = new Webhook(process.env.DAILY_WEBHOOK_URL);
 
                 const embed = new MessageBuilder()
                     .setTitle(`"${randomQuote}"`)

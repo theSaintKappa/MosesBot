@@ -1,25 +1,70 @@
 const quotesSchema = require('../quotes-schema');
+const { Permissions } = require('discord.js');
 
 module.exports = {
     category: 'MosesDB',
-    description: 'Edit a specified quote from the MosesDB',
-
+    description: 'Edit a quote from the MosesDB',
     slash: true,
     testOnly: true,
-
     options: [{
-        name: 'quote-id',
-        description: 'Provide an id for the quote you would like to edit. To check a quote\'s id run: /quotes',
-        required: true,
-        type: 'NUMBER',
-    }],
+            name: 'quote-id',
+            description: 'Provide an id for the quote you would like to edit. To check a quote\'s id run: /quotes',
+            required: true,
+            type: 'NUMBER',
+        },
+        {
+            name: 'new-quote',
+            description: 'What would you like to edit the quote to?',
+            required: true,
+            type: 'STRING',
+        }
+    ],
+    callback: async({ interaction, args, member }) => {
+        const quoteToEdit = await quotesSchema.findOne({
+            quoteId: args[0]
+        });
+
+        let response = '';
+
+        // TODO: clean up this mess of a code
+
+        if (!member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+
+            if (quoteToEdit['submitterId'] == member.id) {
+
+                await quotesSchema.updateOne({
+                    quoteId: args[0]
+                }, {
+                    quote: args[1]
+                });
+
+                response += `Quote **#${args[0]}** was updated to "\`${args[1]}\`"`;
+
+            } else {
+
+                response += `Unfortunately quote **#${args[0]}** was submitted by <@${quoteToEdit['submitterId']}>.\nIf you want it edited ask them or a server admin.`;
+
+            }
+
+        } else {
+
+            await quotesSchema.updateOne({
+                quoteId: args[0]
+            }, {
+                quote: args[1]
+            });
+
+            response += `Quote **#${args[0]}** was updated to "\`${args[1]}\`" (admin mode)`;
+
+        }
 
 
-    callback: async({ interaction, args, user }) => {
+
         if (interaction) {
             interaction.reply({
-                content: 'This command is work in progress.'
+                content: response
             });
         }
+
     }
 };
