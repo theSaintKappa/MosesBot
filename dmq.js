@@ -43,6 +43,9 @@ client.on('ready', async() => {
 
 
     client.user.setActivity('/help', { type: 'WATCHING' });
+
+    // let pingSpamActive = false;
+    // module.exports = pingSpamActive;
 });
 
 
