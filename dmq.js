@@ -58,6 +58,21 @@ client.on('messageCreate', async(message) => {
         } catch (err) {
             console.error(err);
         }
+        return;
+    }
+    if (message.content === 'moses' && !message.author.bot) {
+
+        const mosesReply = ['moses indeed', 'ey yo moses', 'moses where?', 'm0535'];
+        const randomReply = Math.floor(Math.random() * mosesReply.length);
+
+        try {
+            message.channel.send('checking latency...').then(m => {
+                m.edit(`${mosesReply[randomReply]}\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${Math.round(client.ws.ping)}\`**ms**`);
+            });
+            message.react('<:mosesThonk:981867313806602241>');
+        } catch (err) {
+            console.log(err);
+        }
     }
 });
 
