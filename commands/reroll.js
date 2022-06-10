@@ -11,7 +11,7 @@ module.exports = {
     callback: async({ interaction }) => {
         const viewquotesEmbed = new MessageEmbed()
             .setColor('RANDOM')
-            .addField('Re-rolled today\'s quote', '**TODO:** Delete previous quote automatically (optional arg)', true)
+            .addField('```🔄 Re-rolled today\'s quote```', '**TODO:** Delete previous quote automatically (optional arg)', true)
             .setTimestamp()
             .setFooter({ text: 'Daily Moses Quote', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' });
         if (interaction) {
