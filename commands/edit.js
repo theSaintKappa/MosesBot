@@ -1,4 +1,4 @@
-const quotesSchema = require('../quotes-schema');
+const quotesSchema = require('../schemas/quotes-schema');
 const { Permissions } = require('discord.js');
 
 module.exports = {

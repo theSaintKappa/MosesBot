@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const leaderboardSchema = require('../quote-leaderboard-schema');
+const leaderboardSchema = require('../schemas/quote-leaderboard-schema');
 
 module.exports = {
     category: 'MosesDB',

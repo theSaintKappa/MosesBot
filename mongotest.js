@@ -1,13 +1,15 @@
 const mongo = require('./webhook/mongo');
+const quotesSchema = require('./schemas/quotes-schema')
 
 const connectToMongoDB = async() => {
     await mongo().then(async(mongoose) => {
         try {
             console.log('Connected to mongodb!');
 
-            const db = mongo.db("test");
+            await quotesSchema.updateMany({}, {
+                lastUsed: new Date(0).getTime()
+            });
 
-            db.createCollection("quote-counter");
         } finally {
             mongoose.connection.close();
         }
