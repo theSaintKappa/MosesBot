@@ -52,6 +52,8 @@ ${(Date.now() - lastUsed.getTime()) / 1000} s ago
 ${(Date.now() - lastUsed.getTime()) / (1000 * 60)} min ago
 ${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60)} h ago
 ${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60 * 24)} days ago`);
+
+
                 hook.send(embed);
 
 
