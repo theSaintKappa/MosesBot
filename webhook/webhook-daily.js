@@ -40,8 +40,8 @@ module.exports = function sendQuote() {
 
                 const embed = new MessageBuilder()
                     .setTitle(`"${randomQuote}"`)
-                    // .setText(` <@&980815178813820988> Here is a random Moses quote for today!\`#${randomDocumentIndex + 1}\``)
-                    .setText("<@&980815178813820988> Here is a random Moses quote for today!`${quoteId}`")
+                    .setText(` <@&980815178813820988> Here is a random Moses quote for today!\`#${randomDocumentIndex + 1}\``)
+                    // .setText("<@&980815178813820988> Here is a random Moses quote for today!`${quoteId}`")
                     .setColor(color[new Date().getDay()])
                     .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
                     .setTimestamp(date);
