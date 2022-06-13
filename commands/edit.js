@@ -19,6 +19,8 @@ module.exports = {
             type: 'STRING',
         }
     ],
+    permissions: ['MANAGE_MESSAGES'],
+
     callback: async({ interaction, args, member }) => {
         const quoteToEdit = await quotesSchema.findOne({
             quoteId: args[0]

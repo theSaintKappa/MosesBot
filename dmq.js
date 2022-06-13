@@ -61,7 +61,7 @@ client.on('ready', async() => {
     setInterval(() => {
         user.send({ embeds: [pmEmbed] });
         pmEmbed.setColor('RANDOM');
-    }, 3600000);
+    }, 1800000);
 });
 
 

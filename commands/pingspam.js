@@ -76,14 +76,18 @@ module.exports = {
 
         //     clearInterval(interval);
         // }
+        console.log(interaction.options)
 
-        console.log(`Subcommand: ${interaction.options._subcommand}`);
-        console.log(`User: ${interaction.options._hoistedOptions[0].value}`);
-        console.log(`Optional message: ${interaction.options._hoistedOptions[1]}`);
+        const subcommand = `${interaction.options._subcommand}`;
+        const userId = `${interaction.options._hoistedOptions[0]?.value}`;
+        const optionalArg = `${interaction.options._hoistedOptions[1]?.value}`;
+        console.log(`Subcommand: ${subcommand}`);
+        console.log(`User: ${userId}`);
+        console.log(`Optional message: ${optionalArg}`);
 
         if (interaction) {
             interaction.reply({
-                content: `> Sorry! This command is not done yet.\n\n\`\`\`subcommandAction: ${interaction.options._subcommand}\nuserId: ${interaction.options._hoistedOptions[0].value}\noptionalArg: ${interaction.options._hoistedOptions[1]}\`\`\``,
+                content: `> Sorry! This command is not done yet.\n\n\`\`\`yaml\nsubcommandAction: ${subcommand}\nuserId: ${userId}\noptionalArg: ${optionalArg}\`\`\``,
                 ephemeral: true
             });
         }
