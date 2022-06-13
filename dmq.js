@@ -3,7 +3,7 @@ const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
 
-const { Intents } = DiscordJS;
+const { Intents, MessageEmbed } = DiscordJS;
 
 const client = new DiscordJS.Client({
     intents: [
@@ -46,6 +46,22 @@ client.on('ready', async() => {
 
     // let pingSpamActive = false;
     // module.exports = pingSpamActive;
+
+
+    const user = await client.users.fetch('389021335285661707');
+    // user.send('content');
+
+    const pmEmbed = new MessageEmbed()
+        .setColor('RANDOM')
+        .setDescription('> ***Hey Moses! <:mosesThonk:981867313806602241>***\nJust a friendly reminder to use **\`/goodnight\`** in the <#982195725637156906> channel **before** you go to sleep**!**\n\nI don\'t feel like I\'m asking for much am I? :thinking:\n*Have a good one*!')
+        .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
+        .setTimestamp();
+
+
+    setInterval(() => {
+        user.send({ embeds: [pmEmbed] });
+        pmEmbed.setColor('RANDOM');
+    }, 3600000);
 });
 
 
