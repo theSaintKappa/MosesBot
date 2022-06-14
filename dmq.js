@@ -11,6 +11,7 @@ const client = new DiscordJS.Client({
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.GUILD_PRESENCES,
+        Intents.FLAGS.GUILD_MEMBERS,
     ],
 })
 
@@ -33,6 +34,8 @@ client.on('ready', async() => {
     });
 
 
+
+    client.user.setActivity('/help', { type: 'WATCHING' });
     // const activities = [
     //     '/help',
     //     `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} moses fans!`
@@ -42,27 +45,56 @@ client.on('ready', async() => {
     // setInterval(() => client.user.setActivity(`${activities[i++ % activities.length]}`, { type: 'WATCHING' }), 15000);
 
 
-    client.user.setActivity('/help', { type: 'WATCHING' });
+
 
     // let pingSpamActive = false;
     // module.exports = pingSpamActive;
 
 
-    const user = await client.users.fetch('389021335285661707');
-    // user.send('content');
+    // const user = await client.users.fetch('389021335285661707');
+    // const pmEmbed = new MessageEmbed()
+    //     .setColor('RANDOM')
+    //     .setDescription('> ***Hey Moses! <:mosesThonk:981867313806602241>***\nJust a friendly reminder to use **\`/goodnight\`** in the <#982195725637156906> channel **before** you go to sleep**!**\n\nI don\'t feel like I\'m asking for much am I? :thinking:\n*Have a good one*!')
+    //     .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
+    //     .setTimestamp();
+    // setInterval(() => {
+    //     user.send({ embeds: [pmEmbed] });
+    //     pmEmbed.setColor('RANDOM');
+    // }, 1800000);
 
-    const pmEmbed = new MessageEmbed()
-        .setColor('RANDOM')
-        .setDescription('> ***Hey Moses! <:mosesThonk:981867313806602241>***\nJust a friendly reminder to use **\`/goodnight\`** in the <#982195725637156906> channel **before** you go to sleep**!**\n\nI don\'t feel like I\'m asking for much am I? :thinking:\n*Have a good one*!')
-        .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
-        .setTimestamp();
 
 
-    setInterval(() => {
-        user.send({ embeds: [pmEmbed] });
-        pmEmbed.setColor('RANDOM');
-    }, 1800000);
+
+
+
+
+
+    client.on('guildMemberAdd', (member) => {
+        const author = { name: 'MosesBot', iconURL: `https://cdn.discordapp.com/avatars/${client.user.id}/${client.user.avatar}.png?size=4096`, url: 'https://thesaintkappa.github.io/dmqbot' };
+        const pmWelcomeEmbed = new MessageEmbed()
+            .setColor('#ff3fec')
+            .setAuthor(author)
+            .setThumbnail('https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif?size=4096')
+            .setTitle(`> :wave: Greetings ${member.user.username}!`)
+            .setDescription('My name is **\`MosesBot\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Addoration!***')
+            .addFields({ name: '\u200B', value: 'Every day at **8pm** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Dont like pings? You can toggle them in <#980839919972921374>.', inline: false }, { name: '\u200B', value: '**If you are missing the context on why you got invited here and don\'t know what this is all about, here is a quick introduction to our community:**\nGino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses\' stupid "quotes" in a database.\n\u200B', inline: false })
+            .setFooter({ text: 'Moses Before Hoes(es)!' });
+        const welcomeEmbed = new MessageEmbed()
+            .setColor('RANDOM')
+            .setAuthor(author)
+            .setDescription(`> :wave: <@${member.user.id}> **has just joined \`${member.guild.name}\`**!`)
+            .setThumbnail(`https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png?size=4096`)
+            .addFields({ name: '\u200B', value: '**ONE OF US!**', inline: true }, { name: '\u200B', value: '**ONE OF US!**', inline: true }, { name: '\u200B', value: '**ONE OF US!**', inline: true });
+
+        member.send({ embeds: [pmWelcomeEmbed] });
+        client.channels.cache.get('986301246048722955').send({ embeds: [welcomeEmbed] });
+    });
 });
+
+
+
+
+
 
 
 const quotesChannel = '980813191556780064';
