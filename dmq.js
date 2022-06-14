@@ -97,9 +97,9 @@ client.on('ready', async() => {
 
 
 
-const quotesChannel = '980813191556780064';
+const reactChannel = ['980813191556780064', '986333955286511656'];
 client.on('messageCreate', async(message) => {
-    if (message.channel.id === quotesChannel) {
+    if (reactChannel.includes(message.channel.id)) {
         try {
             await message.react('<:upvote:982630993997496321>');
             await message.react('<:downvote:982630978566639616>');
