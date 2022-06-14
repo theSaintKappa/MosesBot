@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 let pingSpamActive = require('../dmq');
+let spamCtrl = require('../spamCtrl');
 
 module.exports = {
     category: 'MosesUtilities',
@@ -35,64 +36,51 @@ module.exports = {
     slash: true,
     testOnly: true,
 
-    callback: async({ interaction }) => {
+    callback: async({ interaction, channel }) => {
 
-        // console.log(pingSpamActive);
-
-        // if (args[0] === 'Start') {
-        //     let contentReply = `<:mosesThonk:981867313806602241> Now torturing <@${args[1].toString()}>`;
-        //     let contentSpam = `<@${args[1]}>`;
-
-        //     if (args[2] !== undefined) {
-        //         contentReply += ` with message: **\`${args[2]}\`**`;
-        //         contentSpam += ` ${args[2]}`;
-        //     }
-
-        //     const embed = new MessageEmbed()
-        //         .setDescription(contentReply)
-        //         .setColor('RANDOM');
-
-
-        //     if (interaction) {
-        //         interaction.reply({
-        //             embeds: [embed],
-        //             ephemeral: true
-        //         });
-        //     }
-
-        //     var interval = setInterval(async() => {
-        //         const pingSpam = await channel.send({
-        //             content: contentSpam
-        //         });
-        //         pingSpam.delete();
-        //     }, 2000);
-        // } else if (args[0] === 'Stop') {
-        //     if (interaction) {
-        //         interaction.reply({
-        //             content: 'stopped',
-        //             ephemeral: true
-        //         });
-        //     }
-
-        //     clearInterval(interval);
-        // }
-        console.log(interaction.options)
-
-        const subcommand = `${interaction.options._subcommand}`;
+        const subcommand = `${interaction.options._subcommand.toString()}`;
         const userId = `${interaction.options._hoistedOptions[0]?.value}`;
         const optionalArg = `${interaction.options._hoistedOptions[1]?.value}`;
-        console.log(`Subcommand: ${subcommand}`);
-        console.log(`User: ${userId}`);
-        console.log(`Optional message: ${optionalArg}`);
 
-        if (interaction) {
-            interaction.reply({
-                content: `> Sorry! This command is not done yet.\n\n\`\`\`yaml\nsubcommandAction: ${subcommand}\nuserId: ${userId}\noptionalArg: ${optionalArg}\`\`\``,
-                ephemeral: true
-            });
+        const pingEmote = '<:pingReee:986375066998698034>'
+
+        let response;
+        switch (subcommand) {
+            case 'start':
+
+                if (!spamCtrl.getStatus()) {
+                    response = `> ${pingEmote} Started torturing <@${userId}>!`;
+                } else {
+                    response = `> ${pingEmote} Updated pingspam! Now torturing <@${userId}>!`;
+                }
+
+                spamCtrl.setReceiver(userId);
+                spamCtrl.setChannel(channel);
+                spamCtrl.setStatus(true);
+
+                // Only set the optional msg if optional arg is defined
+                if (optionalArg !== 'undefined') {
+                    spamCtrl.setMessage(` ${optionalArg}`);
+                    break;
+                }
+                spamCtrl.setMessage('');
+                break;
+            case 'stop':
+                if (!spamCtrl.getStatus()) { response = `There is no active pingspam to stop!`; break; }
+                response = `> ${pingEmote} Stopped torturing <@${spamCtrl.getReceiver()}>.`;
+
+                spamCtrl.setStatus(false);
+                break;
+            default:
+                response = `Something went wrong!`;
         }
 
 
+        if (interaction) {
+            interaction.reply({
+                content: response,
+            });
+        }
 
     }
 };
