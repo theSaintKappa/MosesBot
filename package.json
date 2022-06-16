@@ -1,19 +1,18 @@
 {
-  "name": "dmqbot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "discord-webhook-node": "^1.1.8",
-    "discord.js": "^13.7.0",
-    "dotenv": "^16.0.1",
-    "mongoose": "^6.3.5",
-    "wokcommands": "^1.5.3"
-  }
+    "name": "dmqbot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "client.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "discord.js": "^13.7.0",
+        "dotenv": "^16.0.1",
+        "mongoose": "^6.3.5",
+        "wokcommands": "^1.5.3"
+    }
 }
