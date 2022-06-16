@@ -1,5 +1,3 @@
-const { MessageEmbed } = require('discord.js');
-let pingSpamActive = require('../dmq');
 let spamCtrl = require('../spamCtrl');
 
 module.exports = {
