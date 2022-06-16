@@ -75,6 +75,13 @@ client.on('ready', async() => {
         member.send({ embeds: [pmWelcomeEmbed] });
         client.channels.cache.get('986301246048722955').send({ embeds: [welcomeEmbed] });
     });
+
+    client.on('guildMemberUpdate', (oldMember, newMember) => {
+        if (oldMember.pending === newMember.pending) return;
+
+        console.log(`${newMember.user.username} just accepted the server rules!`);
+        newMember.roles.add('980815178813820988');
+    });
 });
 
 

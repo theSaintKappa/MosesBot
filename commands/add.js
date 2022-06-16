@@ -18,20 +18,15 @@ module.exports = {
 
 
     callback: async({ interaction, args, user }) => {
-        const addquoteEmbed = new MessageEmbed()
+        const addEmbed = new MessageEmbed()
             .setColor('RANDOM')
             .setTitle(`Added:\n"**\`${args}\`**"\nto the MosesDB!`)
             .setDescription('*You can view all Moses Quotes by using* **`/quotes`**')
             .setTimestamp()
             .setFooter({ text: 'MosesDB', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' });
 
-        if (interaction) {
-            interaction.reply({
-                embeds: [addquoteEmbed]
-            });
-        }
 
-
+        // Save to db
         await new quotesSchema({
             quote: args.toString(),
             date: new Date(),
@@ -41,6 +36,7 @@ module.exports = {
         }).save();
 
 
+        // If user doesn't exist in leaderboard
         const leaderboard = await leaderboardSchema.find({ userId: user.id });
         if (leaderboard == '') {
             await new leaderboardSchema({
@@ -48,12 +44,21 @@ module.exports = {
                 userName: user.username,
                 count: 1
             }).save();
-            return;
+            // If user already present in leaderboard
+        } else {
+            await leaderboardSchema.updateOne({
+                userId: user.id
+            }, {
+                $inc: { count: 1 }
+            });
         }
-        await leaderboardSchema.updateOne({
-            userId: user.id
-        }, {
-            $inc: { count: 1 }
-        });
+
+
+
+        if (interaction) {
+            interaction.reply({
+                embeds: [addEmbed]
+            });
+        }
     }
 };
