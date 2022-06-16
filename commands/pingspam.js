@@ -56,14 +56,15 @@ module.exports = {
 
                 spamCtrl.setReceiver(userId);
                 spamCtrl.setChannel(channel);
-                spamCtrl.setStatus(true);
 
                 // Only set the optional msg if optional arg is defined
                 if (optionalArg !== 'undefined') {
                     spamCtrl.setMessage(` ${optionalArg}`);
+                    spamCtrl.setStatus(true);
                     break;
                 }
                 spamCtrl.setMessage('');
+                spamCtrl.setStatus(true);
                 break;
             case 'stop':
                 if (!spamCtrl.getStatus()) { response = `There is no active pingspam to stop!`; break; }

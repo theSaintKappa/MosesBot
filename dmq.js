@@ -34,21 +34,14 @@ client.on('ready', async() => {
     });
 
 
-
     client.user.setActivity('/help', { type: 'WATCHING' });
     // const activities = [
     //     '/help',
     //     `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} moses fans!`
     // ];
-
     // let i = 0;
     // setInterval(() => client.user.setActivity(`${activities[i++ % activities.length]}`, { type: 'WATCHING' }), 15000);
 
-
-
-
-    // let pingSpamActive = false;
-    // module.exports = pingSpamActive;
 
 
     // const user = await client.users.fetch('389021335285661707');
@@ -63,21 +56,14 @@ client.on('ready', async() => {
     // }, 1800000);
 
 
-
-
-
-
-
-
     client.on('guildMemberAdd', (member) => {
-        const author = { name: 'MosesBot', iconURL: `https://cdn.discordapp.com/avatars/${client.user.id}/${client.user.avatar}.png?size=4096`, url: 'https://thesaintkappa.github.io/dmqbot' };
+        const author = { name: member.guild.name, iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`, url: 'https://thesaintkappa.github.io/MosesBot/' };
         const pmWelcomeEmbed = new MessageEmbed()
             .setColor('#ff3fec')
             .setAuthor(author)
             .setThumbnail('https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif?size=4096')
             .setTitle(`> :wave: Greetings ${member.user.username}!`)
-            .setDescription('My name is **\`MosesBot\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Addoration!***')
-            .addFields({ name: '\u200B', value: 'Every day at **8pm** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Dont like pings? You can toggle them in <#980839919972921374>.', inline: false }, { name: '\u200B', value: '**If you are missing the context on why you got invited here and don\'t know what this is all about, here is a quick introduction to our community:**\nGino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses\' stupid "quotes" in a database.\n\u200B', inline: false })
+            .setDescription('My name is **\`MosesBot\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don\'t know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses\' stupid "quotes" in a database.\nEvery day at **8pm** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don\'t like pings? You can toggle them in <#980839919972921374>.\n\u200B')
             .setFooter({ text: 'Moses Before Hoes(es)!' });
         const welcomeEmbed = new MessageEmbed()
             .setColor('RANDOM')
@@ -93,20 +79,15 @@ client.on('ready', async() => {
 
 
 
-
-
-
-
-const reactChannel = ['980813191556780064', '986333955286511656'];
+const reactChannels = ['980813191556780064', '986333955286511656'];
 client.on('messageCreate', async(message) => {
-    if (reactChannel.includes(message.channel.id)) {
+    if (reactChannels.includes(message.channel.id)) {
         try {
             await message.react('<:upvote:982630993997496321>');
             await message.react('<:downvote:982630978566639616>');
         } catch (err) {
             console.error(err);
         }
-        return;
     }
     if (message.content === 'moses' && !message.author.bot) {
 
@@ -114,10 +95,10 @@ client.on('messageCreate', async(message) => {
         const randomReply = Math.floor(Math.random() * mosesReply.length);
 
         try {
-            message.channel.send('checking latency...').then(m => {
+            message.channel.send('pong! and shit').then(m => {
                 m.edit(`${mosesReply[randomReply]}\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${Math.round(client.ws.ping)}\`**ms**`);
+                m.react('<:mosesThonk:981867313806602241>');
             });
-            message.react('<:mosesThonk:981867313806602241>');
         } catch (err) {
             console.log(err);
         }
