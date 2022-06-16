@@ -63,7 +63,7 @@ client.on('ready', async() => {
             .setAuthor(author)
             .setThumbnail('https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif?size=4096')
             .setTitle(`> :wave: Greetings ${member.user.username}!`)
-            .setDescription('My name is **\`MosesBot\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don\'t know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses\' stupid "quotes" in a database.\nEvery day at **8pm** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don\'t like pings? You can toggle them in <#980839919972921374>.\n\u200B')
+            .setDescription('My name is **\`MosesBot\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don\'t know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses\' stupid "quotes" in a database.\nEvery day at **8am** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don\'t like pings? You can toggle them in <#980839919972921374>.\n\u200B')
             .setFooter({ text: 'Moses Before Hoes(es)!' });
         const welcomeEmbed = new MessageEmbed()
             .setColor('RANDOM')
@@ -80,7 +80,7 @@ client.on('ready', async() => {
         if (oldMember.pending === newMember.pending) return;
 
         console.log(`${newMember.user.username} just accepted the server rules!`);
-        newMember.roles.add('980815178813820988');
+        newMember.roles.add('980814138869698641');
     });
 });
 

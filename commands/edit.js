@@ -1,6 +1,8 @@
 const quotesSchema = require('../schemas/quotes-schema');
 const { Permissions } = require('discord.js');
 
+// TODO: clean this up this mess
+
 module.exports = {
     category: 'MosesDB',
     description: 'Edit a quote from the MosesDB',
@@ -19,7 +21,6 @@ module.exports = {
             type: 'STRING',
         }
     ],
-    permissions: ['MANAGE_MESSAGES'],
 
     callback: async({ interaction, args, member }) => {
         const quoteToEdit = await quotesSchema.findOne({
