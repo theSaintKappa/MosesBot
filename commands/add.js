@@ -9,6 +9,8 @@ module.exports = {
     slash: true,
     testOnly: true,
 
+    cooldown: '1h',
+
     options: [{
         name: 'quote',
         description: 'Provide a quote to add to the MosesDB',
