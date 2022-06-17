@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
+require('dotenv').config();
 
 module.exports = {
     category: 'MentalBreakdown',
@@ -19,8 +20,13 @@ module.exports = {
 
     callback: async({ interaction, args }) => {
 
+        const config = {
+            headers: {
+                Authorization: `token ${process.env.GITHUB_GET_TOKEN}`,
+            }
+        }
 
-        await axios.get('https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/?GITHUB_TOKEN=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')
+        await axios.get('https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/', config)
             .then(async response => {
 
 
