@@ -20,6 +20,15 @@ module.exports = {
 
     callback: async({ interaction, args }) => {
 
+        function reply(content, ephemeral = false) {
+            if (interaction) {
+                interaction.reply({
+                    content,
+                    ephemeral
+                });
+            }
+        }
+
         const config = {
             headers: {
                 Authorization: `token ${process.env.GITHUB_GET_TOKEN}`,
@@ -45,24 +54,16 @@ module.exports = {
 
                 const chosen = args[0] === undefined ? randomLanguage : languagesArray.find(lang => lang.name === args[0].toUpperCase());
 
-                let content;
-
+                if (chosen === undefined) {
+                    reply(`**Language** \`${args[0]}\` **does not exist in the repo.**`, true);
+                    return;
+                }
 
                 await axios.get(chosen.url)
                     .then(async response => {
                         randomPicIndex = Math.floor(Math.random() * (response.data.length));
 
-                        if (chosen !== undefined) {
-                            content = `**Here is your waifu holding a** \`${chosen.path}\` **book.**\n${response.data[randomPicIndex].download_url}`;
-                        } else {
-                            content = `**Language** \`${args[0]}\` **does not exist in the repo.**`;
-                        }
-
-                        if (interaction) {
-                            interaction.reply({
-                                content
-                            });
-                        }
+                        reply(`**Here is your waifu holding a** \`${chosen.path}\` **book.**\n${response.data[randomPicIndex].download_url}`);
                     })
                     .catch(error => {
                         console.error(error);
