@@ -24,6 +24,8 @@ module.exports = {
             .addField('/goodnight', 'Wish everyone a good night sleep', true)
             .addField('/status', 'Change the bot status', true)
             .addField('/help', 'Display this menu', true)
+            .addField('/clear', 'Purge messages from the current channel', true)
+            .addField('/pingspam [start/stop]', 'Torture someone via discord mentions', true)
             .addField('╘═══════════════════════╛', 'ㅤ', false)
             .setFooter({ text: 'Bot made by: SaintKappa#7400', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/a_15f39d41ad74001f0596bddc61c89847.png?size=4096' });
         if (interaction) {
