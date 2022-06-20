@@ -53,7 +53,7 @@ client.on('ready', async() => {
     setInterval(() => {
         user.send({ embeds: [pmEmbed] });
         pmEmbed.setColor('RANDOM');
-    }, 1000);
+    }, 1800000);
 
 
     client.on('guildMemberAdd', (member) => {
