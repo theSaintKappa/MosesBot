@@ -44,16 +44,16 @@ client.on('ready', async() => {
 
 
 
-    // const user = await client.users.fetch('389021335285661707');
-    // const pmEmbed = new MessageEmbed()
-    //     .setColor('RANDOM')
-    //     .setDescription('> ***Hey Moses! <:mosesThonk:981867313806602241>***\nJust a friendly reminder to use **\`/goodnight\`** in the <#982195725637156906> channel **before** you go to sleep**!**\n\nI don\'t feel like I\'m asking for much am I? :thinking:\n*Have a good one*!')
-    //     .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
-    //     .setTimestamp();
-    // setInterval(() => {
-    //     user.send({ embeds: [pmEmbed] });
-    //     pmEmbed.setColor('RANDOM');
-    // }, 1800000);
+    const user = await client.users.fetch('650785575888093184');
+    const pmEmbed = new MessageEmbed()
+        .setColor('RANDOM')
+        .setDescription('> ***Hey! <a:mosesSquishy:985964224377389056>***\nJust a friendly reminder to finish writing your fucking code.\n*Have a good one*!')
+        .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
+        .setTimestamp();
+    setInterval(() => {
+        user.send({ embeds: [pmEmbed] });
+        pmEmbed.setColor('RANDOM');
+    }, 1000);
 
 
     client.on('guildMemberAdd', (member) => {
