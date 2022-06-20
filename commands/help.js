@@ -10,7 +10,7 @@ module.exports = {
     callback: async({ interaction }) => {
         const embed = new MessageEmbed()
             .setTitle('MosesBot command help:')
-            .setURL('https://thesaintkappa.github.io/MosesBot/')
+            .setURL('https://moses.gq/')
             .setThumbnail('https://cdn.discordapp.com/attachments/980813644948463656/982458232306032700/3.jpg?size=4096')
             .setDescription('ㅤ')
             .addField('MosesDB related commands', '╒═══════════════════════╕', false)

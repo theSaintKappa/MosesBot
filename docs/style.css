@@ -7,6 +7,12 @@
     font-family: 'Lato', sans-serif;
 }
 
+canvas.webgl {
+    top: 0;
+    right: 0;
+    position: fixed;
+}
+
 body {
     min-height: 100vh;
     display: grid;
@@ -15,12 +21,15 @@ body {
 }
 
 h1 {
-    color: #f674ff;
+    color: #00a14b;
     font-size: 4rem;
     letter-spacing: .1rem;
     backdrop-filter: blur(3px);
     border-radius: .5em;
-    padding: .2em;
+    padding: .1em .2em .2em .3em;
+    outline: 1px solid #fff;
+    text-align: center;
+    z-index: 1;
 }
 
 .hentai {
@@ -32,13 +41,14 @@ h1 {
     color: #003cc7;
     transition: 400ms;
     display: inline-block;
-    transform-origin: bottom;
+    transform-origin: center;
 }
 
 .link:hover {
-    color: #175dff;
+    color: #2f6eff;
     cursor: pointer;
     transform: scale(1.05) translateY(-5px);
+    text-shadow: 0 0 5px #175dff;
 }
 
 .explanation {
@@ -47,7 +57,7 @@ h1 {
 }
 
 .quotes {
-    color: #ff1c51;
+    color: #44ff00;
     font-style: italic;
 }
 

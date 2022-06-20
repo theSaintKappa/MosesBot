@@ -57,7 +57,7 @@ client.on('ready', async() => {
 
 
     client.on('guildMemberAdd', (member) => {
-        const author = { name: member.guild.name, iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`, url: 'https://thesaintkappa.github.io/MosesBot/' };
+        const author = { name: member.guild.name, iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`, url: 'https://moses.gq/' };
         const pmWelcomeEmbed = new MessageEmbed()
             .setColor('#ff3fec')
             .setAuthor(author)

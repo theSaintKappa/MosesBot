@@ -1,3 +1,5 @@
+import Typewriter from 'typewriter-effect/dist/core';
+
 var app = document.querySelector('h1');
 
 var typewriter = new Typewriter(app, {

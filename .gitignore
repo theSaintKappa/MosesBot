@@ -1,6 +1,6 @@
 node_modules/
 .env
 .vscode/
-.slugignore
 mongotest.js
 webhook-template.js
+docs/
