@@ -17,7 +17,7 @@ body {
     min-height: 100vh;
     display: grid;
     place-content: center;
-    background: radial-gradient(#14141f, #0a0a10);
+    background: radial-gradient(#14141f, #000000);
 }
 
 h1 {
