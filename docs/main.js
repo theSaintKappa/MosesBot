@@ -32,7 +32,7 @@ const torusMaterial = new THREE.PointsMaterial({ size: 0.005 })
 const torus = new THREE.Points(torusGeometry, torusMaterial);
 // scene.add(torus);
 
-const mosesMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('/moses.jpg') })
+const mosesMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('/moses.png') });
 const mosesGeometry = new THREE.BoxGeometry(16, 16, 16);
 const moses = new THREE.Mesh(mosesGeometry, mosesMaterial)
 scene.add(moses);
@@ -60,7 +60,7 @@ document.addEventListener('mouseout', () => {
 let mouseX = 0
 let mouseY = 0
 
-const smokeTexture = new THREE.TextureLoader().load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/95637/Smoke-Element.png');
+const smokeTexture = new THREE.TextureLoader().load('/smoke.png');
 const smokeGeo = new THREE.PlaneGeometry(300, 300);
 let smokeParticles = [];
 
@@ -74,6 +74,7 @@ for (let p = 0; p < 100; p++) {
     scene.add(particle);
     smokeParticles.push(particle);
 }
+moses.rotateZ(Math.PI - .1);
 
 const clock = new THREE.Clock()
 const animate = () => {
@@ -92,8 +93,8 @@ const animate = () => {
         particlesMesh.rotation.y += mouseX * 0.001;
     }
     moses.rotation.y = 1 * elapsedTime;
-    moses.rotation.z = 0.5 * elapsedTime;
-    moses.rotation.x = 1 * elapsedTime;
+    moses.rotation.x = 0.5 * elapsedTime;
+    // moses.rotation.z = 0.5 * elapsedTime;
 
     renderer.render(scene, camera)
     window.requestAnimationFrame(animate);
