@@ -9,7 +9,7 @@ module.exports = {
     slash: true,
     testOnly: true,
 
-    cooldown: '1h',
+    // cooldown: '1h',
 
     options: [{
         name: 'quote',
@@ -19,7 +19,7 @@ module.exports = {
     }],
 
 
-    callback: async({ interaction, args, user }) => {
+    callback: async({ interaction, args, user, client }) => {
         const addEmbed = new MessageEmbed()
             .setColor('RANDOM')
             .setTitle(`Added:\n"**\`${args}\`**"\nto the MosesDB!`)
@@ -56,11 +56,13 @@ module.exports = {
         }
 
 
-
         if (interaction) {
             interaction.reply({
                 embeds: [addEmbed]
             });
         }
+
+        const quotesCount = await quotesSchema.countDocuments({})
+        await client.channels.cache.get('990343138268819497').setName(`Quotes ›› ${quotesCount.toLocaleString()}`)
     }
 };

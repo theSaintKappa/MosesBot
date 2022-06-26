@@ -2,7 +2,6 @@ const DiscordJS = require('discord.js');
 const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
-const quotesSchema = require('./schemas/quotes-schema');
 
 const { Intents, MessageEmbed } = DiscordJS;
 
@@ -111,11 +110,6 @@ client.on('messageCreate', async(message) => {
             console.log(err);
         }
     }
-});
-
-client.on("interactionCreate", async(interaction) => {
-    if(interaction.type !== 'APPLICATION_COMMAND') return
-    await quotesSchema.find({}).then(quotesArray => {client.channels.cache.get('990343138268819497').setName(`Quotes ›› ${quotesArray.length.toString()}`)}).catch(error => {console.log(error);})
 });
 
 

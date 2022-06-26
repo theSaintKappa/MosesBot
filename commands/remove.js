@@ -21,7 +21,7 @@ module.exports = {
     }],
 
 
-    callback: async({ interaction, args, user, member }) => {
+    callback: async({ interaction, args, user, member, client }) => {
 
         let response = '';
 
@@ -88,10 +88,14 @@ module.exports = {
             response = `Quote with the id **\`${args}\`** doesn't exist.`;
         }
 
+        
         if (interaction) {
             interaction.reply({
                 content: response
             });
         }
+
+        const quotesCount = await quotesSchema.countDocuments({})
+        await client.channels.cache.get('990343138268819497').setName(`Quotes ›› ${quotesCount.toLocaleString()}`)
     }
 };
