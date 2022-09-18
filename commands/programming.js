@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { AttachmentBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 require('dotenv').config();
 
@@ -10,7 +10,7 @@ module.exports = {
     options: [{
         type: 'STRING',
         name: "language",
-        description: "Choose programing language. If left blank a random language will be selected.",
+        description: "Choose programing language. If left blank a Random language will be selected.",
         required: false
     }],
 
@@ -18,7 +18,7 @@ module.exports = {
     slash: true,
     testOnly: true,
 
-    callback: async({ interaction, args }) => {
+    callback: async({ interaction, args, channel }) => {
 
         function reply(content, ephemeral = false) {
             if (interaction) {
@@ -49,10 +49,10 @@ module.exports = {
                     }
                 }
 
-                randomLanguageIndex = Math.floor(Math.random() * (languagesArray.length));
-                randomLanguage = languagesArray[randomLanguageIndex];
+                RandomLanguageIndex = Math.floor(Math.random() * (languagesArray.length));
+                RandomLanguage = languagesArray[RandomLanguageIndex];
 
-                const chosen = args[0] === undefined ? randomLanguage : languagesArray.find(lang => lang.name === args[0].toUpperCase());
+                const chosen = args[0] === undefined ? RandomLanguage : languagesArray.find(lang => lang.name === args[0].toUpperCase());
 
                 if (chosen === undefined) {
                     reply(`**Language** \`${args[0]}\` **does not exist in the repo.**`, true);
@@ -61,9 +61,19 @@ module.exports = {
 
                 await axios.get(chosen.url)
                     .then(async response => {
-                        randomPicIndex = Math.floor(Math.random() * (response.data.length));
+                        RandomPicIndex = Math.floor(Math.random() * (response.data.length));
 
-                        reply(`**Here is your waifu holding a** \`${chosen.path}\` **book.**\n${response.data[randomPicIndex].download_url}`);
+                        // reply(`**Here is your waifu holding a** \`${chosen.path}\` **book.**\n${response.data[RandomPicIndex].download_url}`);
+
+                        const attachment = new AttachmentBuilder(response.data[RandomPicIndex].download_url);
+
+
+                        interaction.reply({
+                            content: `**Here is your waifu holding a** \`${chosen.path}\` **book.**`,
+                            // attachments: response.data[RandomPicIndex].download_url,
+                            files: [attachment]
+                        });
+                        // await channel.send({ files: [attachment] });
                     })
                     .catch(error => {
                         console.error(error);

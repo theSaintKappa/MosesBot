@@ -3,15 +3,15 @@ const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
 
-const { Intents, MessageEmbed } = DiscordJS;
+const { GatewayIntentBits, EmbedBuilder } = DiscordJS;
 
 const client = new DiscordJS.Client({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_PRESENCES,
-        Intents.FLAGS.GUILD_MEMBERS,
+        GatewayIntentBits.Guilds,
+        // GatewayIntentBits.GUILD_MESSAGES,
+        // GatewayIntentBits.GUILD_MESSAGE_REACTIONS,
+        // GatewayIntentBits.GUILD_PRESENCES,
+        // GatewayIntentBits.GUILD_MEMBERS,
     ],
 })
 
@@ -44,16 +44,16 @@ client.on('ready', async() => {
 
 
 
-    const user = await client.users.fetch('650785575888093184');
-    const pmEmbed = new MessageEmbed()
-        .setColor('RANDOM')
-        .setDescription('> ***Hey! <a:mosesSquishy:985964224377389056>***\nJust a friendly reminder to finish writing your fucking code.\n*Have a good one*!')
-        .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
-        .setTimestamp();
-    setInterval(() => {
-        user.send({ embeds: [pmEmbed] });
-        pmEmbed.setColor('RANDOM');
-    }, 1800000);
+    // const user = await client.users.fetch('650785575888093184');
+    // const pmEmbed = new MessageEmbed()
+    //     .setColor('RANDOM')
+    //     .setDescription('> ***Hey! <a:mosesSquishy:985964224377389056>***\nJust a friendly reminder to finish writing your fucking code.\n*Have a good one*!')
+    //     .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
+    //     .setTimestamp();
+    // setInterval(() => {
+    //     user.send({ embeds: [pmEmbed] });
+    //     pmEmbed.setColor('RANDOM');
+    // }, 1800000);
 
 
     client.on('guildMemberAdd', (member) => {

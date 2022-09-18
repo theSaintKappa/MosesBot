@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const sendQuote = require('../webhook/webhook-daily');
 
 module.exports = {
@@ -9,8 +9,8 @@ module.exports = {
     testOnly: true,
 
     callback: async({ interaction }) => {
-        const viewquotesEmbed = new MessageEmbed()
-            .setColor('RANDOM')
+        const viewquotesEmbed = new EmbedBuilder()
+            .setColor('Random')
             .addField('```🔄 Re-rolled today\'s quote```', '**TODO:** Delete previous quote automatically (optional arg)', true)
             .setTimestamp()
             .setFooter({ text: 'Daily Moses Quote', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' });

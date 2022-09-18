@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
@@ -21,12 +21,14 @@ module.exports = {
     callback: async({ interaction, channel, user }) => {
 
         let subcommand = `${interaction.options._subcommand.toString()}`;
+        let content
         switch (subcommand) {
             case 'sfw':
                 subcommand = 'false';
                 break;
             case 'nsfw':
                 subcommand = 'true';
+                content = '|| https://moses.gq ||'
                 break;
         }
 
@@ -40,23 +42,28 @@ module.exports = {
                 }
 
 
-                const waifuEmbed = new MessageEmbed()
+                const waifuEmbed = new EmbedBuilder()
                     .setColor(res.dominant_color)
                     .setAuthor({ name: 'SaintKappa Waifu Viewer', iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` })
                     .addFields({ name: 'Original source:', value: res.source, inline: true }, { name: 'Dimensions:', value: `${res.width}x${res.height}`, inline: true }, { name: 'Tags:', value: tags.join(', '), inline: true })
+                    .setImage(res.url);
 
                 if (res.is_nsfw) waifuEmbed.setAuthor({ name: 'NSFW SaintKappa Waifu Viewer', iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` });
 
                 if (interaction) {
-                    interaction.reply(`API responded with: **${response.status} ${response.statusText}**`);
-                    interaction.deleteReply();
+                    interaction.reply({
+                        content,
+                        embeds: [waifuEmbed]
+                    });
                 }
-
-                await channel.send({ embeds: [waifuEmbed], content: '\u200B' });
-                await channel.send({ content: res.url });
             })
             .catch(error => {
                 console.error(error);
+                if (interaction) {
+                    interaction.reply({
+                        content: `An error occurred while fetching data. Please try again later or contact an server admin.\n\`${error.response.status} - ${error.response.statusText}\``
+                    });
+                }
             });
 
 

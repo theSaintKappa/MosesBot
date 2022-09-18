@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     category: 'MosesUtilities',
@@ -19,8 +19,8 @@ module.exports = {
     callback: async({ interaction, channel, user, text }) => {
         const gnMessage = `<@${user.id}> Wanted to wish you a good night sleep!`;
 
-        const embed = new MessageEmbed()
-            .setColor('RANDOM');
+        const embed = new EmbedBuilder()
+            .setColor('Random');
 
         if (interaction) {
             if (text !== '') {

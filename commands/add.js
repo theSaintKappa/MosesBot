@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const quotesSchema = require('../schemas/quotes-schema');
 const leaderboardSchema = require('../schemas/quote-leaderboard-schema');
 
@@ -20,9 +20,12 @@ module.exports = {
 
 
     callback: async({ interaction, args, user, client }) => {
-        const addEmbed = new MessageEmbed()
-            .setColor('RANDOM')
-            .setTitle(`Added:\n"**\`${args}\`**"\nto the MosesDB!`)
+        const lastQuoteCount = await quotesSchema.find().sort({ quoteId: -1 }).limit(1);
+        // console.log(lastQuoteCount[0]['quoteId'] + 1);
+
+        const addEmbed = new EmbedBuilder()
+            .setColor('Random')
+            .setTitle(`Added quote #${lastQuoteCount[0]['quoteId'] + 1}: "**\`${args}\`**" to the MosesDB!`)
             .setDescription('*You can view all Moses Quotes by using* **`/quotes`**')
             .setTimestamp()
             .setFooter({ text: 'MosesDB', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' });

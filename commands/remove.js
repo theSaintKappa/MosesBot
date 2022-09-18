@@ -1,8 +1,8 @@
-// const { MessageEmbed } = require('discord.js');
+// const { EmbedBuilder } = require('discord.js');
 const quotesSchema = require('../schemas/quotes-schema');
 const counterSchema = require('../schemas/counter-schema');
 const leaderboardSchema = require('../schemas/quote-leaderboard-schema');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 // TODO: clean this up this mess
 
@@ -32,7 +32,7 @@ module.exports = {
         // Check if document exists
         if (await quotesSchema.find({ quoteId: args }) != '') {
 
-            if (!member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+            if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 
                 if (quoteToEdit['submitterId'] == member.id) {
 
@@ -88,7 +88,7 @@ module.exports = {
             response = `Quote with the id **\`${args}\`** doesn't exist.`;
         }
 
-        
+
         if (interaction) {
             interaction.reply({
                 content: response

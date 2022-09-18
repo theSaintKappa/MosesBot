@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const leaderboardSchema = require('../schemas/quote-leaderboard-schema');
 
 module.exports = {
@@ -18,8 +18,8 @@ module.exports = {
 
 
 
-        const leaderboardEmbed = new MessageEmbed()
-            .setColor('RANDOM')
+        const leaderboardEmbed = new EmbedBuilder()
+            .setColor('Random')
             .setTitle('Here is the current state of the leaderboard:')
             .setDescription(leaderboardString)
             .setTimestamp()

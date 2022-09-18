@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const quotesSchema = require('../schemas/quotes-schema');
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
         if (interaction) {
             interaction.reply({ content });
             for (const quote of quotesArray) {
-                const embed = new MessageEmbed().setDescription(`**Q #${quote['quoteId']}** \`${quote['quote']}\`\n**Submitter**: <@${quote['submitterId']}>\n**Last Used**: \`${quote['lastUsed'].toUTCString()}\` **->** \`${quote['lastUsed'].getTime()}\`\n\n`);
+                const embed = new EmbedBuilder().setDescription(`**Q #${quote['quoteId']}** \`${quote['quote']}\`\n**Submitter**: <@${quote['submitterId']}>\n**Last Used**: \`${quote['lastUsed'].toUTCString()}\` **->** \`${quote['lastUsed'].getTime()}\`\n\n`);
 
                 channel.send({ embeds: [embed] });
             }

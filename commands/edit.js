@@ -1,5 +1,5 @@
 const quotesSchema = require('../schemas/quotes-schema');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 // TODO: clean this up this mess
 
@@ -31,7 +31,7 @@ module.exports = {
 
         // TODO: clean up this mess of a code
 
-        if (!member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+        if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 
             if (quoteToEdit['submitterId'] == member.id) {
 

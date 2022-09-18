@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     category: 'MosesUtilities',
@@ -8,7 +8,7 @@ module.exports = {
     testOnly: true,
 
     callback: async({ interaction }) => {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle('MosesBot command help:')
             .setURL('https://moses.gq/')
             .setThumbnail('https://cdn.discordapp.com/attachments/980813644948463656/982458232306032700/3.jpg?size=4096')

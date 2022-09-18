@@ -1,4 +1,4 @@
-const { Permissions, MessageEmbed } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     category: 'MosesUtilities',
@@ -17,8 +17,8 @@ module.exports = {
     callback: async({ interaction, channel, args }) => {
 
 
-        const clearEmbed = new MessageEmbed()
-            .setColor('RANDOM')
+        const clearEmbed = new EmbedBuilder()
+            .setColor('Random')
             .setTimestamp()
             .setFooter({ text: 'MosesUtilities', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' });
 

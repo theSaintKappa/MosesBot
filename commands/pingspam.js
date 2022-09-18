@@ -40,7 +40,7 @@ module.exports = {
         const userId = `${interaction.options._hoistedOptions[0]?.value}`;
         const optionalArg = `${interaction.options._hoistedOptions[1]?.value}`;
 
-        const pingEmote = '<:pingReee:986375066998698034>'
+        const pingEmote = '<:ping2:1021118765582254082>'
 
         let response;
         switch (subcommand) {
