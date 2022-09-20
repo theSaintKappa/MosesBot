@@ -8,10 +8,11 @@ const { GatewayIntentBits, EmbedBuilder } = DiscordJS;
 const client = new DiscordJS.Client({
     intents: [
         GatewayIntentBits.Guilds,
-        // GatewayIntentBits.GUILD_MESSAGES,
-        // GatewayIntentBits.GUILD_MESSAGE_REACTIONS,
-        // GatewayIntentBits.GUILD_PRESENCES,
-        // GatewayIntentBits.GUILD_MEMBERS,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildMembers,
     ],
 })
 
