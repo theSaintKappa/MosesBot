@@ -15,7 +15,7 @@ module.exports = {
         name: 'quote',
         description: 'Provide a quote to add to the MosesDB',
         required: true,
-        type: 'STRING',
+        type: 3,
     }],
 
 

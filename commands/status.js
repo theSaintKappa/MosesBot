@@ -7,7 +7,7 @@ module.exports = {
             name: 'type',
             description: 'Choose activity type',
             required: true,
-            type: 'STRING',
+        type: 3,
             choices: [{
                     name: "Playing",
                     value: "PLAYING"
@@ -31,7 +31,7 @@ module.exports = {
             name: 'status',
             description: 'Status',
             required: true,
-            type: 'STRING',
+            type: 3,
         }
     ],
     slash: true,

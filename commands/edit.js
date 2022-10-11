@@ -12,13 +12,13 @@ module.exports = {
             name: 'quote-id',
             description: 'Provide an id for the quote you would like to edit. To check a quote\'s id run: /quotes',
             required: true,
-            type: 'NUMBER',
+        type: 4,
         },
         {
             name: 'new-quote',
             description: 'What would you like to edit the quote to?',
             required: true,
-            type: 'STRING',
+            type: 3,
         }
     ],
 

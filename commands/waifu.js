@@ -12,7 +12,7 @@ module.exports = {
     }, {
         type: 1,
         name: "nsfw",
-        description: "When NOT moms home",
+        description: "When moms NOT home",
     }],
 
     slash: true,
@@ -21,14 +21,16 @@ module.exports = {
     callback: async({ interaction, channel, user }) => {
 
         let subcommand = `${interaction.options._subcommand.toString()}`;
-        let content
+        let content, ephemeral
         switch (subcommand) {
             case 'sfw':
                 subcommand = 'false';
+                ephemeral = false
                 break;
             case 'nsfw':
                 subcommand = 'true';
                 content = '|| https://moses.gq ||'
+                ephemeral = true
                 break;
         }
 
@@ -53,7 +55,8 @@ module.exports = {
                 if (interaction) {
                     interaction.reply({
                         content,
-                        embeds: [waifuEmbed]
+                        embeds: [waifuEmbed],
+                        ephemeral
                     });
                 }
             })

@@ -4,11 +4,11 @@ require('dotenv').config();
 
 module.exports = {
     category: 'MentalBreakdown',
-    description: 'Scrape data from cat-milk/Anime-Girls-Holding-Programming-Books using the Github API.',
+    description: 'Anime Girls Holding Programming Books',
 
 
     options: [{
-        type: 'STRING',
+        type: 3,
         name: "language",
         description: "Choose programing language. If left blank a Random language will be selected.",
         required: false

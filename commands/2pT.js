@@ -69,8 +69,9 @@ module.exports = {
     callback: async ({ interaction, user, member, client }) => {
         const quotesArray = await quotesSchema.find({});
         const lastQuoteCount = await quotesSchema.find().sort({ quoteId: -1 }).limit(1);
+        let ephemeral = false
         const embed = new EmbedBuilder()
-            .setColor('Random')
+            .setColor('#00ff3c')
             .setTimestamp()
             .setFooter({ text: '2pT quotes DB', iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` });
 
@@ -79,6 +80,7 @@ module.exports = {
 
             embed.setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
             embed.setColor('#ff0000');
+            ephemeral = true
         };
 
         const updateChannelName = async () => {
@@ -96,8 +98,14 @@ module.exports = {
                     return false;
                 } else return true;
             });
-            if (quotesString == '') return embed.setTitle('The 2pT quotes DB is empty! Add a quote by running **\`/2pt add\`**');
+            if (quotesString == '') {
+                embed.setTitle('The 2pT quotes DB is empty! Add a quote by running **\`/2pt add\`**');
+                embed.setColor('#ff0000');
+                ephemeral = true;
+                return;
+            }
             embed.setTitle('Here are all the currently stored 2pT Quotes:');
+            embed.setColor('#00c8ff');
             embed.setDescription(quotesString);
         };
 
@@ -125,8 +133,9 @@ module.exports = {
             const quoteToEdit = await quotesSchema.findOne({ quoteId });
 
             if (quoteToEdit === null) {
-                embed.setDescription(`Quote with the id **\`#${quoteId}\`** doesn't exist.`);
+                embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
                 embed.setColor('#ff0000');
+                ephemeral = true
                 return;
             }
 
@@ -157,6 +166,7 @@ module.exports = {
             // Deny editing
             embed.setDescription(`Unfortunately quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`** was submitted by <@${quoteToEdit.submitterId}>.\nIf you want it edited ask them or a server admin.`);
             embed.setColor('#ff0000');
+            ephemeral = true
         };
 
         // REMOVE
@@ -166,8 +176,9 @@ module.exports = {
 
             // Check if document exists
             if (quoteToDrop === null) {
-                embed.setDescription(`Quote with the id **#\`${quoteId}\`** doesn't exist.`);
+                embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
                 embed.setColor('#ff0000');
+                ephemeral = true
                 return;
             }
 
@@ -176,6 +187,7 @@ module.exports = {
                 if (quoteToDrop.submitterId != member.id) {
                     embed.setDescription(`Unfortunately quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** was submitted by <@${quoteToDrop.submitterId}>.\nIf you want it removed ask them or a server admin.`);
                     embed.setColor('#ff0000');
+                    ephemeral = true
                     return;
                 }
 
@@ -223,7 +235,8 @@ module.exports = {
 
         if (interaction) {
             interaction.reply({
-                embeds: [embed]
+                embeds: [embed],
+                ephemeral
             });
         }
 

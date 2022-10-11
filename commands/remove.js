@@ -17,7 +17,7 @@ module.exports = {
         name: 'quote-id',
         description: 'Provide an id for the quote you would like to remove. To check a quote\'s id run: /quotes',
         required: true,
-        type: 'NUMBER',
+        type: 4,
     }],
 
 

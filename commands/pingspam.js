@@ -11,13 +11,13 @@ module.exports = {
             name: "start",
             description: "Start torturing someone.",
             options: [{
-                    type: 'USER',
+                type: 6,
                     name: "user",
                     description: "Who do you want to torture?",
                     required: true
                 },
                 {
-                    type: 'STRING',
+                    type: 3,
                     name: "optional-message",
                     description: "Optional message to go along with the pings.",
                     required: false

@@ -8,7 +8,7 @@ module.exports = {
         name: 'number-of-messages',
         description: 'Provide an number of messages you would like to delete from the current channel.',
         required: true,
-        type: 'NUMBER',
+        type: 4,
     }],
 
     slash: true,

@@ -4,13 +4,11 @@ module.exports = {
     category: 'MosesUtilities',
     description: 'Wish everyone a good night sleep!',
 
-    aliases: ['gn'],
-
     options: [{
         name: 'optional-message',
         description: 'Provide an optional message to add to the good night wishes.',
         required: false,
-        type: 'STRING',
+        type: 3,
     }],
 
     slash: true,
