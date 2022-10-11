@@ -73,5 +73,9 @@ module.exports = {
 
     getReceiver: function() {
         return pingReceiver;
+    },
+
+    resetCombo: function () {
+        comboCounter = 1
     }
 };

@@ -69,6 +69,8 @@ module.exports = {
                 response = `> ${pingEmote} Stopped torturing <@${spamCtrl.getReceiver()}>.`;
 
                 spamCtrl.setStatus(false);
+
+                spamCtrl.resetCombo()
                 break;
             default:
                 response = `Something went wrong!`;
