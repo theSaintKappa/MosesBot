@@ -3,7 +3,7 @@ const WOKCommands = require('wokcommands');
 const path = require('path');
 require('dotenv').config();
 
-const { GatewayIntentBits, EmbedBuilder } = DiscordJS;
+const { GatewayIntentBits, ActivityType } = DiscordJS;
 
 const client = new DiscordJS.Client({
     intents: [
@@ -11,7 +11,7 @@ const client = new DiscordJS.Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildPresences,
+        // GatewayIntentBits.GuildPresences,
         GatewayIntentBits.GuildMembers,
     ],
 })
@@ -35,7 +35,7 @@ client.on('ready', async() => {
     });
 
 
-    client.user.setActivity('/help', { type: 'WATCHING' });
+    client.user.setActivity('/help', { type: ActivityType.Watching });
     // const activities = [
     //     '/help',
     //     `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} moses fans!`
