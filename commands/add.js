@@ -20,8 +20,8 @@ module.exports = {
 
 
     callback: async({ interaction, args, user, client }) => {
-        // substringsArray.some(substring=>yourBigString.includes(substring))
-        if (args[0].toUpperCase().includes("MY ASS")) {
+        const filter = ['MYASS', 'MYAS', 'MY4SS', 'MY4S'];
+        if (filter.some(substring => args[0].replace(/\s/g, '').toUpperCase().includes(substring))) {
             if (interaction) {
                 interaction.reply({
                     content: `no u`,
