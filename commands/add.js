@@ -20,6 +20,17 @@ module.exports = {
 
 
     callback: async({ interaction, args, user, client }) => {
+        // substringsArray.some(substring=>yourBigString.includes(substring))
+        if (args[0].toUpperCase().includes("MY ASS")) {
+            if (interaction) {
+                interaction.reply({
+                    content: `no u`,
+                    files: ['https://www.meme-arsenal.com/memes/6ac93634b03c85079a5e61849db6130e.jpg'],
+                    ephemeral: true
+                });
+            }
+            return;
+        }
         const lastQuoteCount = await quotesSchema.find().sort({ quoteId: -1 }).limit(1);
         // console.log(lastQuoteCount[0]['quoteId'] + 1);
 
