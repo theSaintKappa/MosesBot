@@ -10,15 +10,16 @@ module.exports = {
 
     callback: async({ interaction }) => {
 
-        const quotesArray = await quotesSchema.find({});
+        const quotesArray = await quotesSchema.find().sort({ quoteId: -1 });
         var quotesString = '';
 
         quotesArray.every(quote => {
-            quotesString += `**#${quote['quoteId']}** \`${quote['quote']}\`(submitted by <@${quote['submitterId']}>)\n`;
-            if (quotesString.length > 4000) {
-                quotesString += '***+more***';
-                return false;
-            } else return true;
+            if (!(quotesString.length > 4000)) {
+                quotesString += `**#${quote['quoteId']}** \`${quote['quote']}\`(submitted by <@${quote['submitterId']}>)\n`;
+                return true;
+            }
+            quotesString += '***+more***';
+            return false;
         });
 
         const viewquotesEmbed = new EmbedBuilder()
@@ -30,7 +31,7 @@ module.exports = {
         if (quotesString == '') {
             viewquotesEmbed.setTitle('The MosesDB is empty! Add a quote by running \`/add\`');
         } else {
-            viewquotesEmbed.setTitle('Here are all the currently stored Moses Quotes:');
+            viewquotesEmbed.setTitle('Here are all the currently stored Moses Quotes (in descending order):');
         }
 
         if (interaction) {
