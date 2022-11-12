@@ -79,16 +79,17 @@ client.on("ready", async () => {
 const reactChannels = ["980813191556780064", "986333955286511656"];
 // quotes, memes
 client.on("messageCreate", async (message) => {
-    if (!reactChannels.includes(message.channel.id)) return;
+    if (reactChannels.includes(message.channel.id)) {
+        try {
+            // if message in memes channel && if message has no attachments
+            if (message.channel.id === reactChannels[1] && !message.attachments.size) return;
 
-    try {
-        // if message in memes channel && if message has no attachments
-        if (message.channel.id === reactChannels[1] && !message.attachments.size) return;
-
-        await message.react("<:upvote:982630993997496321>");
-        await message.react("<:downvote:982630978566639616>");
-    } catch (err) {
-        console.error(err);
+            await message.react("<:upvote:982630993997496321>");
+            await message.react("<:downvote:982630978566639616>");
+        } catch (err) {
+            console.error(err);
+        }
+        return;
     }
 
     if (message.content === "moses" && !message.author.bot) {
@@ -96,8 +97,8 @@ client.on("messageCreate", async (message) => {
         const randomReply = Math.floor(Math.random() * mosesReply.length);
 
         try {
-            message.channel.send("pong! and shit").then((m) => {
-                m.edit(`${mosesReply[randomReply]}\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${Math.round(client.ws.ping)}\`**ms**`);
+            message.channel.send("pong!").then((m) => {
+                m.edit(`moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`);
                 m.react("<:mosesThonk:981867313806602241>");
             });
         } catch (err) {
