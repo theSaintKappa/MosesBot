@@ -1,35 +1,32 @@
-const quotesSchema = require('../schemas/quotes-schema');
-const { Webhook, MessageBuilder } = require('discord-webhook-node');
-
-
+const quotesSchema = require("../schemas/moses-quotes-schema");
+const { Webhook, MessageBuilder } = require("discord-webhook-node");
 
 module.exports = function sendQuote() {
-
     let randomQuote, randomDocumentIndex, date, lastUsed;
 
+    const mongo = require("./mongo");
 
-    const mongo = require('./mongo');
-
-    const connectToMongoDB = async() => {
-        await mongo().then(async(mongoose) => {
+    const connectToMongoDB = async () => {
+        await mongo().then(async (mongoose) => {
             try {
-                console.log('Connected to mongodb!');
+                console.log("Connected to mongodb!");
 
                 let dbArray = await quotesSchema.find({});
 
                 randomDocumentIndex = Math.floor(Math.random() * dbArray.length);
 
-                randomQuote = dbArray[randomDocumentIndex]['quote'];
-                date = dbArray[randomDocumentIndex]['date'];
-                lastUsed = dbArray[randomDocumentIndex]['lastUsed'];
+                randomQuote = dbArray[randomDocumentIndex]["quote"];
+                date = dbArray[randomDocumentIndex]["date"];
+                lastUsed = dbArray[randomDocumentIndex]["lastUsed"];
 
-
-                await quotesSchema.updateOne({
-                    quoteId: randomDocumentIndex + 1
-                }, {
-                    lastUsed: Date.now()
-                });
-
+                await quotesSchema.updateOne(
+                    {
+                        quoteId: randomDocumentIndex + 1,
+                    },
+                    {
+                        lastUsed: Date.now(),
+                    }
+                );
 
                 console.log(`\nChose: ${randomQuote}\nSaid: ${date}\n`);
 
@@ -43,7 +40,7 @@ module.exports = function sendQuote() {
                     .setText(` <@&980815178813820988> Here is a random Moses quote for today!\`#${randomDocumentIndex + 1}\``)
                     // .setText("<@&980815178813820988> Here is a random Moses quote for today!`${quoteId}`")
                     .setColor(color[new Date().getDay()])
-                    .setFooter('Said by Moses on', 'https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096')
+                    .setFooter("Said by Moses on", "https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096")
                     .setTimestamp(date);
 
                 console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"\nIt was said: ${date}
@@ -53,10 +50,7 @@ ${(Date.now() - lastUsed.getTime()) / (1000 * 60)} min ago
 ${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60)} h ago
 ${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60 * 24)} days ago`);
 
-
                 hook.send(embed);
-
-
             } finally {
                 mongoose.connection.close();
             }

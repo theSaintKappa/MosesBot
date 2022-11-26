@@ -2,18 +2,17 @@ let spamming = false;
 let spamChannel = undefined;
 let pingReceiver = undefined;
 let optionalMessage = "";
-let comboCounter = 1
+let comboCounter = 1;
 
 // spam function repeats until variable spamming is false
 function spam() {
     return new Promise((resolve, reject) => {
-
-        if (!spamChannel)
-            reject('Channel is undefined!');
+        if (!spamChannel) reject("Channel is undefined!");
 
         // send message on spam channel
-        spamChannel.send({ content: `\`x${comboCounter}\` <@${pingReceiver}>${optionalMessage}` })
-            .then(msg => {
+        spamChannel
+            .send({ content: `\`x${comboCounter}\` <@${pingReceiver}>${optionalMessage}` })
+            .then((msg) => {
                 msg.delete();
 
                 comboCounter++;
@@ -34,19 +33,18 @@ function spam() {
                 }, 1000);
             })
             .catch(console.log);
-
     });
 }
 
 // public functions
 module.exports = {
     // pass in discord.js channel for spam function
-    setChannel: function(channel) {
+    setChannel: function (channel) {
         spamChannel = channel;
     },
 
     // set spam status (true = start spamming, false = stop spamming)
-    setStatus: function(statusFlag) {
+    setStatus: function (statusFlag) {
         // get current status
         let currentStatus = spamming;
 
@@ -59,23 +57,23 @@ module.exports = {
         }
     },
 
-    getStatus: function() {
+    getStatus: function () {
         return spamming;
     },
 
-    setReceiver: function(receiverId) {
+    setReceiver: function (receiverId) {
         pingReceiver = receiverId;
     },
 
-    setMessage: function(messageArg) {
+    setMessage: function (messageArg) {
         optionalMessage = messageArg;
     },
 
-    getReceiver: function() {
+    getReceiver: function () {
         return pingReceiver;
     },
 
     resetCombo: function () {
-        comboCounter = 1
-    }
+        comboCounter = 1;
+    },
 };

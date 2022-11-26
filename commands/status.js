@@ -1,39 +1,41 @@
 module.exports = {
-    category: 'MosesUtilities',
-    description: 'Change the bot status',
-    options: [{
-        name: 'type',
-        description: 'Choose an activity type',
-        required: true,
-        type: 3,
-            choices: [{
+    category: "MosesUtilities",
+    description: "Change the bot status",
+    options: [
+        {
+            name: "type",
+            description: "Choose an activity type",
+            required: true,
+            type: 3,
+            choices: [
+                {
                     name: "Playing",
-                value: '0'
+                    value: "0",
                 },
                 {
                     name: "Watching",
-                    value: '3'
+                    value: "3",
                 },
                 {
                     name: "Streaming",
-                    value: '1'
+                    value: "1",
                 },
                 {
                     name: "Competing in",
-                    value: '5'
+                    value: "5",
                 },
                 {
                     name: "Listening to",
-                    value: '2'
-                }]
-
+                    value: "2",
+                },
+            ],
         },
         {
-            name: 'status',
-            description: 'Status',
+            name: "status",
+            description: "Status",
             required: true,
             type: 3,
-        }
+        },
     ],
     slash: true,
     ownerOnly: true,
@@ -48,16 +50,16 @@ module.exports = {
             1: "Streaming",
             2: "Listening to",
             3: "Watching",
-            5: "Competing in"
+            5: "Competing in",
         };
 
-        client.user.setActivity({ type, url: 'https://www.twitch.tv/itsgino_', name: activity });
+        client.user.setActivity({ type, url: "https://www.twitch.tv/itsgino_", name: activity });
 
         if (interaction) {
             interaction.reply({
                 content: `> Client presence set to "**${activities[type]} ${activity}**"`,
-                ephemeral: true
+                ephemeral: true,
             });
         }
-    }
+    },
 };

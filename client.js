@@ -1,13 +1,23 @@
+const cron = require("node-cron");
 const DiscordJS = require("discord.js");
 const WOKCommands = require("wokcommands");
 const path = require("path");
 require("dotenv").config();
-
 const { GatewayIntentBits, ActivityType, EmbedBuilder } = DiscordJS;
 
 const client = new DiscordJS.Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
 });
+
+cron.schedule(
+    "15 7 * * *", // Everyday at 7:15
+
+    () => {
+        console.log("amogus");
+    },
+
+    { timezone: "Europe/Warsaw" }
+);
 
 client.on("ready", async () => {
     const dbOptions = {
@@ -23,28 +33,12 @@ client.on("ready", async () => {
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
+
     wok.on("databaseConnected", async (connection, state) => {
         console.log(`The connection state is "${state}"`);
     });
 
     client.user.setActivity("/help", { type: ActivityType.Watching });
-    // const activities = [
-    //     '/help',
-    //     `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} moses fans!`
-    // ];
-    // let i = 0;
-    // setInterval(() => client.user.setActivity(`${activities[i++ % activities.length]}`, { type: 'WATCHING' }), 15000);
-
-    // const user = await client.users.fetch('650785575888093184');
-    // const pmEmbed = new MessageEmbed()
-    //     .setColor('RANDOM')
-    //     .setDescription('> ***Hey! <a:mosesSquishy:985964224377389056>***\nJust a friendly reminder to finish writing your fucking code.\n*Have a good one*!')
-    //     .setFooter({ text: 'MosesReminders', iconURL: 'https://cdn.discordapp.com/avatars/315531146953752578/c74e42cfa5ab08a5daa5ede7365e2244.png?size=4096' })
-    //     .setTimestamp();
-    // setInterval(() => {
-    //     user.send({ embeds: [pmEmbed] });
-    //     pmEmbed.setColor('RANDOM');
-    // }, 1800000);
 
     client.on("guildMemberAdd", (member) => {
         const author = { name: member.guild.name, iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`, url: "https://moses.gq/" };
