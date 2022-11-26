@@ -17,16 +17,6 @@ module.exports = function sendQuote() {
 
                 randomQuote = dbArray[randomDocumentIndex]["quote"];
                 date = dbArray[randomDocumentIndex]["date"];
-                lastUsed = dbArray[randomDocumentIndex]["lastUsed"];
-
-                await quotesSchema.updateOne(
-                    {
-                        quoteId: randomDocumentIndex + 1,
-                    },
-                    {
-                        lastUsed: Date.now(),
-                    }
-                );
 
                 console.log(`\nChose: ${randomQuote}\nSaid: ${date}\n`);
 
@@ -43,12 +33,7 @@ module.exports = function sendQuote() {
                     .setFooter("Said by Moses on", "https://cdn.discordapp.com/attachments/980813644948463656/980822911600447558/moses.jpeg?size=4096")
                     .setTimestamp(date);
 
-                console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"\nIt was said: ${date}
-lastUsed:\n${Date.now() - lastUsed.getTime()} ms ago
-${(Date.now() - lastUsed.getTime()) / 1000} s ago
-${(Date.now() - lastUsed.getTime()) / (1000 * 60)} min ago
-${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60)} h ago
-${(Date.now() - lastUsed.getTime()) / (1000 * 60 * 60 * 24)} days ago`);
+                console.log(`\nSending quote #${randomDocumentIndex + 1}\n"${randomQuote}"`);
 
                 hook.send(embed);
             } finally {
