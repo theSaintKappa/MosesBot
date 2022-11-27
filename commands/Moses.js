@@ -138,22 +138,79 @@ module.exports = {
                 date: new Date(),
                 submitterName: user.username,
                 submitterId: user.id,
-            })
-                .save()
-                .then(() => {
-                    embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || "1"}\`:`, value: `**\`${quote}\`**` });
-                    updateChannelName();
-                });
+            }).save();
+
+            embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || "1"}\`:`, value: `**\`${quote}\`**` });
+            updateChannelName();
         };
 
         // EDIT
         const edit = async (quoteId, newQuote) => {
-            embed.setTitle("Sooooo... This command is not ready yet. Check back later tho.");
+            const quoteToEdit = await quotesSchema.findOne({ quoteId });
+
+            if (quoteToEdit === null) {
+                embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
+                embed.setColor("#ff0000");
+                ephemeral = true;
+                return;
+            }
+
+            // Edit in admin mode
+            if (member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                await quotesSchema.updateOne({ quoteId }, { quote: newQuote }).then(() => {
+                    embed.setDescription(`Quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`**\nwas updated to:\n"**${newQuote}**"\n\n(admin mode)`);
+                });
+                return;
+            }
+
+            // Edit in member mode (anly allow users to edit quotes they submitted)
+            if (quoteToEdit.submitterId == user.id) {
+                await quotesSchema.updateOne({ quoteId }, { quote: newQuote }).then(() => {
+                    embed.setDescription(`Quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`**\nwas updated to:\n"**${newQuote}**"`);
+                });
+                return;
+            }
+
+            // Deny editing
+            embed.setDescription(`Unfortunately quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`** was submitted by <@${quoteToEdit.submitterId}>.\nIf you want it edited ask them or a server admin.`);
+            embed.setColor("#ff0000");
+            ephemeral = true;
         };
 
         // REMOVE
         const drop = async (quoteId) => {
-            embed.setTitle("Sooooo... This command is not ready yet. Check back later tho.");
+            const quoteToDrop = await quotesSchema.findOne({ quoteId });
+
+            // Check if document exists
+            if (quoteToDrop === null) {
+                embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
+                embed.setColor("#ff0000");
+                ephemeral = true;
+                return;
+            }
+
+            // Edit in admin mode
+            if (member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                await quotesSchema.deleteOne({ quoteId }).then(async () => {
+                    embed.setDescription(`Quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** has been **permanently deleted**.\n(admin mode)`);
+                    updateChannelName();
+                });
+            }
+
+            // Edit in member mode (anly allow users to edit quotes they submitted)
+            if (quoteToDrop.submitterId == user.id) {
+                await quotesSchema.deleteOne({ quoteId }).then(async () => {
+                    embed.setDescription(`Quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** has been **permanently deleted**.`);
+                    updateChannelName();
+                });
+                return;
+            }
+
+            // Deny editing
+            embed.setDescription(`Unfortunately quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** was submitted by <@${quoteToDrop.submitterId}>.\nIf you want it removed ask them or a server admin.`);
+            embed.setColor("#ff0000");
+            ephemeral = true;
+            return;
         };
 
         // LEADERBOARD
