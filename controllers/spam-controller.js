@@ -17,7 +17,7 @@ function spam() {
 
                 comboCounter++;
 
-                // wait 1.5 s until sending next spam message
+                // wait 1s until sending next spam message
                 setTimeout(() => {
                     // continue spamming if spamming variable is true
                     if (spamming) {
@@ -39,12 +39,12 @@ function spam() {
 // public functions
 module.exports = {
     // pass in discord.js channel for spam function
-    setChannel: function (channel) {
+    setChannel: (channel) => {
         spamChannel = channel;
     },
 
     // set spam status (true = start spamming, false = stop spamming)
-    setStatus: function (statusFlag) {
+    setStatus: (statusFlag) => {
         // get current status
         let currentStatus = spamming;
 
@@ -57,23 +57,27 @@ module.exports = {
         }
     },
 
-    getStatus: function () {
+    getStatus: () => {
         return spamming;
     },
 
-    setReceiver: function (receiverId) {
+    setReceiver: (receiverId) => {
         pingReceiver = receiverId;
     },
 
-    setMessage: function (messageArg) {
+    setMessage: (messageArg) => {
         optionalMessage = messageArg;
     },
 
-    getReceiver: function () {
+    getReceiver: () => {
         return pingReceiver;
     },
 
-    resetCombo: function () {
+    resetCombo: () => {
         comboCounter = 1;
+    },
+
+    getCombo: () => {
+        return comboCounter;
     },
 };

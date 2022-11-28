@@ -106,6 +106,13 @@ module.exports = {
             const documentCount = await quotesSchema.countDocuments();
             const validPages = Math.ceil(documentCount / DOCS_PER_PAGE);
 
+            if (documentCount === 0) {
+                embed.setTitle("There are no Moses quotes currently saved!");
+                embed.setColor("#ff0000");
+                ephemeral = true;
+                return;
+            }
+
             if (!(page <= validPages && page >= 1)) {
                 embed.addFields({ name: `Invalid page \`#${page}\`!`, value: `Please provide a number between **1** and **${validPages}**.` });
                 embed.setColor("#ff0000");
@@ -123,8 +130,6 @@ module.exports = {
             for (const quote of quotesArray) {
                 quotesList += `**#${quote.quoteId}** \`${quote.quote}\`\n`;
             }
-
-            if (quotesList == "") return embed.setTitle("There are no moses quotes!");
 
             embed.setTitle(`Displaying page **\`#${page}\`** out of **\`${validPages}\`** of Moses quotes:`);
             embed.setDescription(quotesList);

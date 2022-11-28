@@ -1,5 +1,4 @@
 const quotesSchema = require("../schemas/pt-quotes-schema");
-const counterSchema = require("../schemas/pt-counter-schema");
 const { EmbedBuilder } = require("discord.js");
 const { PermissionsBitField } = require("discord.js");
 

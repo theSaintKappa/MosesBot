@@ -1,4 +1,5 @@
 const cron = require("node-cron");
+const { sendDailyQuote } = require("./daily-quote");
 const DiscordJS = require("discord.js");
 const WOKCommands = require("wokcommands");
 const path = require("path");
@@ -6,18 +7,25 @@ require("dotenv").config();
 const { GatewayIntentBits, ActivityType, EmbedBuilder } = DiscordJS;
 
 const client = new DiscordJS.Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildMembers,
+    ],
 });
 
-cron.schedule(
-    "15 7 * * *", // Everyday at 7:15
-
-    () => {
-        console.log("amogus");
-    },
-
-    { timezone: "Europe/Warsaw" }
-);
+const weekdays = {
+    0: "Sunday",
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday",
+};
 
 client.on("ready", async () => {
     const dbOptions = {
@@ -35,13 +43,27 @@ client.on("ready", async () => {
     });
 
     wok.on("databaseConnected", async (connection, state) => {
-        console.log(`The connection state is "${state}"`);
+        console.log(`The MongoDB connection state is "${state}"`);
+
+        cron.schedule(
+            "15 7 * * *", // Everyday at 7:15
+            () => {
+                const date = new Date();
+                console.log(`[Moses Daily Quotes] ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending ${weekdays[date.getDay()]} quote...`);
+                sendDailyQuote();
+            },
+            { timezone: "Europe/Warsaw" }
+        );
     });
 
     client.user.setActivity("/help", { type: ActivityType.Watching });
 
     client.on("guildMemberAdd", (member) => {
-        const author = { name: member.guild.name, iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`, url: "https://moses.gq/" };
+        const author = {
+            name: member.guild.name,
+            iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`,
+            url: "https://moses.gq/",
+        };
         const pmWelcomeEmbed = new EmbedBuilder()
             .setColor("#ff3fec")
             .setAuthor(author)
@@ -56,7 +78,11 @@ client.on("ready", async () => {
             .setAuthor(author)
             .setDescription(`> :wave: <@${member.user.id}> **has just joined \`${member.guild.name}\`**!`)
             .setThumbnail(`https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png?size=4096`)
-            .addFields({ name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true });
+            .addFields(
+                { name: "\u200B", value: "**ONE OF US!**", inline: true },
+                { name: "\u200B", value: "**ONE OF US!**", inline: true },
+                { name: "\u200B", value: "**ONE OF US!**", inline: true }
+            );
 
         member.send({ embeds: [pmWelcomeEmbed] });
         client.channels.cache.get("986301246048722955").send({ embeds: [welcomeEmbed] });
@@ -87,12 +113,11 @@ client.on("messageCreate", async (message) => {
     }
 
     if (message.content === "moses" && !message.author.bot) {
-        const mosesReply = ["moses indeed", "ey yo moses", "moses where?", "m0535"];
-        const randomReply = Math.floor(Math.random() * mosesReply.length);
-
         try {
             message.channel.send("pong!").then((m) => {
-                m.edit(`moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`);
+                m.edit(
+                    `moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`
+                );
                 m.react("<:mosesThonk:981867313806602241>");
             });
         } catch (err) {
