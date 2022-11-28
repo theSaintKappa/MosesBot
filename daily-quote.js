@@ -27,14 +27,12 @@ const sendDailyQuote = async () => {
     };
 
     const embed = new MessageBuilder()
-        .setText(`Hey <@&982392173951606795>, here is today's random Moses Quote!`)
+        .setText(`Hey <@&980815178813820988>, here is today's random Moses Quote!`)
         .setTitle(`**\`#${chosenQuote.quoteId}\`** ${chosenQuote.quote}`)
         // TODO: Random moses picture in thumbnail
         // .setThumbnail("https://i.imgur.com/AfFp7pu.png")
         .setColor(day[new Date().getDay()].color)
-        .setFooter(
-            `It was said on ${day[quoteDate.getDay()].weekday} ${getOrdinal(quoteDate.getDate())} ${months[quoteDate.getMonth()]} ${quoteDate.getFullYear()}.`
-        );
+        .setFooter(`It was said on ${day[quoteDate.getDay()].weekday} ${getOrdinal(quoteDate.getDate())} ${months[quoteDate.getMonth()]} ${quoteDate.getFullYear()}.`);
 
     const webhook = new Webhook(process.env.DAILY_WEBHOOK_URL);
     webhook

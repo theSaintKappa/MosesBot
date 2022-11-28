@@ -1,5 +1,3 @@
-const { EmbedBuilder } = require("discord.js");
-
 module.exports = {
     category: "MosesUtilities",
     description: "Sudo the bot to say something.",
@@ -17,7 +15,7 @@ module.exports = {
     testOnly: true,
 
     callback: async ({ interaction, channel, user, text }) => {
-        channel.send(text).then(() => {
+        channel.send(text.replaceAll("\u005Cn", "\u000A")).then(() => {
             if (interaction) {
                 interaction.reply({
                     content: `You made the bot say "\`${text}\`", congratulations.`,
