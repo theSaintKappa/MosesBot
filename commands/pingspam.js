@@ -1,4 +1,4 @@
-let spamCtrl = require("../controllers/spamCtrl");
+let spam = require("../controllers/spam-controller");
 
 module.exports = {
     category: "MosesUtilities",
@@ -46,34 +46,34 @@ module.exports = {
         let response;
         switch (subcommand) {
             case "start":
-                if (!spamCtrl.getStatus()) {
+                if (!spam.getStatus()) {
                     response = `> ${pingEmote} Started torturing <@${userId}>!`;
                 } else {
                     response = `> ${pingEmote} Updated pingspam! Now torturing <@${userId}>!`;
                 }
 
-                spamCtrl.setReceiver(userId);
-                spamCtrl.setChannel(channel);
+                spam.setReceiver(userId);
+                spam.setChannel(channel);
 
                 // Only set the optional msg if optional arg is defined
                 if (optionalArg !== "undefined") {
-                    spamCtrl.setMessage(` ${optionalArg}`);
-                    spamCtrl.setStatus(true);
+                    spam.setMessage(` ${optionalArg}`);
+                    spam.setStatus(true);
                     break;
                 }
-                spamCtrl.setMessage("");
-                spamCtrl.setStatus(true);
+                spam.setMessage("");
+                spam.setStatus(true);
                 break;
             case "stop":
-                if (!spamCtrl.getStatus()) {
+                if (!spam.getStatus()) {
                     response = `There is no active pingspam to stop!`;
                     break;
                 }
-                response = `> ${pingEmote} Stopped torturing <@${spamCtrl.getReceiver()}>.`;
+                response = `> ${pingEmote} Stopped torturing <@${spam.getReceiver()}> with a streak of \`${spam.getCombo()}\`.`;
 
-                spamCtrl.setStatus(false);
+                spam.setStatus(false);
 
-                spamCtrl.resetCombo();
+                spam.resetCombo();
                 break;
             default:
                 response = `Something went wrong!`;
