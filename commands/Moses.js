@@ -1,5 +1,6 @@
 const quotesSchema = require("../schemas/moses-quotes-schema");
 const leaderboardSchema = require("../schemas/moses-leaderboard-schema");
+const picsSchema = require("../schemas/moses-pics-schema");
 const { EmbedBuilder } = require("discord.js");
 const { PermissionsBitField } = require("discord.js");
 
@@ -78,6 +79,25 @@ module.exports = {
             name: "leaderboard",
             description: "Check the Moses quotes leaderboard!",
         },
+        {
+            type: 1, // subcommand
+            name: "pic",
+            description: "Have a schmoking hot Moses pic and would like to share it with the commuinty?",
+            options: [
+                {
+                    name: "attachment",
+                    description: "Upload a file in any of these formats: PNG, JPG, JPEG, GIF or WEBP.",
+                    type: 11, // attachment
+                    required: true,
+                },
+                {
+                    name: "description",
+                    description: "Describe your Moses (optional).",
+                    type: 3, // attachment
+                    required: false,
+                },
+            ],
+        },
     ],
 
     callback: async ({ interaction, user, member, client }) => {
@@ -151,6 +171,8 @@ module.exports = {
 
         // EDIT
         const edit = async (quoteId, newQuote) => {
+            console.log(member.permissions.has(PermissionsBitField.Flags.Administrator));
+            // return;
             const quoteToEdit = await quotesSchema.findOne({ quoteId });
 
             if (quoteToEdit === null) {
@@ -200,6 +222,7 @@ module.exports = {
                     embed.setDescription(`Quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** has been **permanently deleted**.\n(admin mode)`);
                     updateChannelName();
                 });
+                return;
             }
 
             // Edit in member mode (anly allow users to edit quotes they submitted)
@@ -221,6 +244,7 @@ module.exports = {
         // LEADERBOARD
         const leaderboard = async () => {
             const leaderboardArray = await leaderboardSchema.find().sort({ count: -1 });
+            if (leaderboardArray == "") return embed.setTitle("The Moses leaderboard is empty!");
             let place = 1;
             let leaderboardString = "";
 
@@ -229,41 +253,74 @@ module.exports = {
                 place++;
             }
 
-            if (leaderboardString == "") return embed.setTitle("The leaderboard is empty!");
-
             embed.setTitle(`Moses quotes leaderboard:`);
             embed.setDescription(leaderboardString);
             embed.setColor("#00c8ff");
         };
 
+        // PIC
+        const pic = async (file, description) => {
+            const allowedFileFormats = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+            if (!allowedFileFormats.includes(file.contentType)) {
+                embed.setTitle(`Only avaliable file formats are: PNG, JPG, JPEG, GIF or WEBP`);
+                embed.setColor("#ff0000");
+                ephemeral = true;
+                return;
+            }
+
+            await new picsSchema({
+                fileUrl: file.url,
+                description: description || null,
+                uploadDate: new Date().getTime(),
+                uploader: {
+                    userName: user.username,
+                    userId: user.id,
+                },
+                fileSize: file.size, // in bytes
+                fileDimensions: {
+                    width: file.width,
+                    height: file.height,
+                },
+                contentType: file.contentType,
+                fileName: file.name,
+            }).save();
+
+            // embed.setAuthor({ name: "SaintKappa Waifu Viewer", iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` })
+            if (typeof description !== "undefined") embed.addFields({ name: "Description:", value: description.toString(), inline: true });
+            embed.addFields({ name: "Dimensions:", value: `${file.width}x${file.height}`, inline: true }, { name: "File size:", value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true });
+            embed.setTitle(`Succesfully uploaded your image to the MosesDB!`);
+            embed.setURL(file.url);
+            embed.setImage(file.url);
+            ephemeral = true;
+        };
+
         const subcommand = `${interaction.options._subcommand.toString()}`;
-        const optionalArg = interaction.options._hoistedOptions;
+        const args = interaction.options._hoistedOptions;
         switch (subcommand) {
             case "list":
                 try {
-                    await list(optionalArg[0]?.value || 1);
+                    await list(args[0]?.value || 1);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
             case "add":
                 try {
-                    await add(optionalArg[0]?.value, optionalArg[1]?.value);
+                    await add(args[0]?.value, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
             case "edit":
                 try {
-                    await edit(optionalArg[0]?.value, optionalArg[1]?.value);
+                    await edit(args[0]?.value, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-
             case "remove":
                 try {
-                    await drop(optionalArg[0]?.value);
+                    await drop(args[0]?.value);
                 } catch (err) {
                     handleError(err);
                 }
@@ -271,6 +328,13 @@ module.exports = {
             case "leaderboard":
                 try {
                     await leaderboard();
+                } catch (err) {
+                    handleError(err);
+                }
+                break;
+            case "pic":
+                try {
+                    await pic(args[0]?.attachment, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }

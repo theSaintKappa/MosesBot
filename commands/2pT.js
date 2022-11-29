@@ -1,4 +1,5 @@
 const quotesSchema = require("../schemas/pt-quotes-schema");
+const leaderboardSchema = require("../schemas/pt-leaderboard-schema");
 const { EmbedBuilder } = require("discord.js");
 const { PermissionsBitField } = require("discord.js");
 
@@ -13,24 +14,24 @@ module.exports = {
         {
             type: 1, // subcommand
             name: "list",
-            description: "List all the 2pT quotes.",
+            description: "List all the stored 2pT quotes.",
         },
         // ADD
         {
             type: 1, // subcommand
             name: "add",
-            description: "Add a quote to the 2pT quotes DB.",
+            description: "Add a new 2pT quote",
             options: [
                 {
                     type: 6, // user
                     name: "user",
-                    description: "Wich server member said the quote?",
+                    description: "Wich server member would you like to quote?",
                     required: true,
                 },
                 {
                     type: 3, // string
                     name: "quote",
-                    description: "What did they/them say?", // satire ok?
+                    description: "What did they say?", // satire ok?
                     required: true,
                 },
             ],
@@ -39,7 +40,7 @@ module.exports = {
         {
             type: 1, // subcommand
             name: "edit",
-            description: "Edit a quote stored in the 2pT quotes DB.",
+            description: "Edit an existing 2pT quote.",
             options: [
                 {
                     type: 4, // integer
@@ -59,7 +60,7 @@ module.exports = {
         {
             type: 1, // subcommand
             name: "remove",
-            description: "Delete a quote from the 2pT quotes DB.",
+            description: "Delete a 2pT quote :sob:.",
             options: [
                 {
                     type: 4, // integer
@@ -68,6 +69,12 @@ module.exports = {
                     required: true,
                 },
             ],
+        },
+        // LEADERBOARD
+        {
+            type: 1, // subcommand
+            name: "leaderboard",
+            description: "Check the 2pT quotees leaderboard!",
         },
     ],
 
@@ -220,21 +227,61 @@ module.exports = {
                 });
         };
 
-        const subcommand = `${interaction.options._subcommand.toString()}`;
-        const optionalArg = interaction.options._hoistedOptions;
+        // LEADERBOARD
+        const leaderboard = async () => {
+            // const leaderboardArray = await leaderboardSchema.find().sort({ count: -1 });
+            // if (leaderboardArray == "") return embed.setTitle("The 2pT leaderboard is empty!");
+            // let place = 1;
+            // let leaderboardString = "";
 
+            // for (const user of leaderboardArray) {
+            //     leaderboardString += `**#${place}** <@${user.userId}> **→** **\`${user.count}\`**\n`;
+            //     place++;
+            // }
+
+            // embed.setTitle(`Moses quotes leaderboard:`);
+            // embed.setDescription(leaderboardString);
+            // embed.setColor("#00c8ff");
+            embed.setTitle(`This command ain't ready yet chief. Check back later`);
+        };
+
+        const subcommand = `${interaction.options._subcommand.toString()}`;
+        const args = interaction.options._hoistedOptions;
         switch (subcommand) {
             case "list":
-                await list();
+                try {
+                    await list();
+                } catch (err) {
+                    handleError(err);
+                }
                 break;
             case "add":
-                await add(optionalArg[0]?.value, optionalArg[1]?.value);
+                try {
+                    await add(args[0]?.value, args[1]?.value);
+                } catch (err) {
+                    handleError(err);
+                }
                 break;
             case "edit":
-                await edit(optionalArg[0]?.value, optionalArg[1]?.value);
+                try {
+                    await edit(args[0]?.value, args[1]?.value);
+                } catch (err) {
+                    handleError(err);
+                }
                 break;
             case "remove":
-                await drop(optionalArg[0]?.value);
+                try {
+                    await drop(args[0]?.value);
+                } catch (err) {
+                    handleError(err);
+                }
+                break;
+            case "leaderboard":
+                try {
+                    await leaderboard();
+                } catch (err) {
+                    handleError(err);
+                }
                 break;
         }
 

@@ -37,7 +37,7 @@ module.exports = {
         }
 
         await axios
-            .get(`https://api.waifu.im/random?is_nsfw=${subcommand}`)
+            .get(`https://api.waifu.im/search?is_nsfw=${subcommand}`)
             .then(async (response) => {
                 const res = response.data.images[0];
 
