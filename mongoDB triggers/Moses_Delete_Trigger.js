@@ -15,7 +15,7 @@ exports = async function (changeEvent) {
     context.services
         .get("MosesQuotes")
         .db(changeEvent.ns.db)
-        .collection("quotes")
+        .collection("moses-quotes")
         .updateMany({ quoteId: { $gt: doc.quoteId } }, { $inc: { quoteId: -1 } }, { multi: true });
 
     console.log(`Updated documents with id greater than ${doc.quoteId}`);

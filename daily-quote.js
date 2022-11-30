@@ -34,7 +34,7 @@ const sendDailyQuote = async () => {
         .setColor(day[new Date().getDay()].color)
         .setFooter(`It was said on ${day[quoteDate.getDay()].weekday} ${getOrdinal(quoteDate.getDate())} ${months[quoteDate.getMonth()]} ${quoteDate.getFullYear()}.`);
 
-    const webhook = new Webhook(process.env.DAILY_WEBHOOK_URL);
+    const webhook = new Webhook(process.env.MOSES_QUOTES_WEBHOOK_URL);
     webhook
         .send(embed)
         .then(async () => {

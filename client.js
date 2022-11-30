@@ -1,5 +1,6 @@
 const cron = require("node-cron");
 const { sendDailyQuote } = require("./daily-quote");
+const { sendDailyPic } = require("./daily-pic");
 const DiscordJS = require("discord.js");
 const WOKCommands = require("wokcommands");
 const path = require("path");
@@ -7,14 +8,7 @@ require("dotenv").config();
 const { GatewayIntentBits, ActivityType, EmbedBuilder } = DiscordJS;
 
 const client = new DiscordJS.Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildMembers,
-    ],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
 });
 
 const weekdays = {
@@ -54,6 +48,16 @@ client.on("ready", async () => {
             },
             { timezone: "Europe/Warsaw" }
         );
+
+        sendDailyPic();
+        cron.schedule(
+            "0 10 * * 5,6,0", // At 10:00 on Friday, Saturday, and Sunday
+            () => {
+                const date = new Date();
+                console.log(`[Moses Daily Pics] ${weekdays[date.getDay()]} ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending random Moses pic...`);
+            },
+            { timezone: "Europe/Warsaw" }
+        );
     });
 
     client.user.setActivity("/help", { type: ActivityType.Watching });
@@ -78,11 +82,7 @@ client.on("ready", async () => {
             .setAuthor(author)
             .setDescription(`> :wave: <@${member.user.id}> **has just joined \`${member.guild.name}\`**!`)
             .setThumbnail(`https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png?size=4096`)
-            .addFields(
-                { name: "\u200B", value: "**ONE OF US!**", inline: true },
-                { name: "\u200B", value: "**ONE OF US!**", inline: true },
-                { name: "\u200B", value: "**ONE OF US!**", inline: true }
-            );
+            .addFields({ name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true });
 
         member.send({ embeds: [pmWelcomeEmbed] });
         client.channels.cache.get("986301246048722955").send({ embeds: [welcomeEmbed] });
@@ -115,9 +115,7 @@ client.on("messageCreate", async (message) => {
     if (message.content === "moses" && !message.author.bot) {
         try {
             message.channel.send("pong!").then((m) => {
-                m.edit(
-                    `moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`
-                );
+                m.edit(`moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`);
                 m.react("<:mosesThonk:981867313806602241>");
             });
         } catch (err) {

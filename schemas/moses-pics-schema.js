@@ -47,4 +47,4 @@ const schema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("moses-pics-schema", schema, "moses-pics-schema");
+module.exports = mongoose.model("moses-pics", schema, "moses-pics");
