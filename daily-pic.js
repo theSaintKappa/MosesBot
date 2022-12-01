@@ -13,7 +13,7 @@ const sendDailyPic = async () => {
         .setTitle(`Here is a random Moses pic for today!`)
         .setURL(chosenPic.fileUrl)
         .setImage(chosenPic.fileUrl)
-        .addField("Uploader:", `<@${chosenPic.uploader.userId}>`, true)
+        .addField("Author:", `<@${chosenPic.uploader.userId}>`, true)
         .addField("Upload date:", `<t:${Math.floor(new Date(chosenPic.uploadDate).getTime() / 1000)}:R>`, true)
         .addField("Dimensions:", `${chosenPic.fileDimensions.width}x${chosenPic.fileDimensions.height}`, true)
         // .addField("File size:", `${parseFloat(chosenPic.fileSize / Math.pow(1024, 2)).toFixed(2)}MB`, true)

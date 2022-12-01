@@ -49,12 +49,12 @@ client.on("ready", async () => {
             { timezone: "Europe/Warsaw" }
         );
 
-        sendDailyPic();
         cron.schedule(
             "0 10 * * 5,6,0", // At 10:00 on Friday, Saturday, and Sunday
             () => {
                 const date = new Date();
                 console.log(`[Moses Daily Pics] ${weekdays[date.getDay()]} ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending random Moses pic...`);
+                sendDailyPic();
             },
             { timezone: "Europe/Warsaw" }
         );
@@ -66,7 +66,7 @@ client.on("ready", async () => {
         const author = {
             name: member.guild.name,
             iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`,
-            url: "https://moses.gq/",
+            url: "https://discord.gg/cHs56zgFBy",
         };
         const pmWelcomeEmbed = new EmbedBuilder()
             .setColor("#ff3fec")
@@ -74,9 +74,9 @@ client.on("ready", async () => {
             .setThumbnail("https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif?size=4096")
             .setTitle(`> :wave: Greetings ${member.user.username}!`)
             .setDescription(
-                "My name is **`MosesBot`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **8am** (CEST) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#980839919972921374>.\n\u200B"
-            )
-            .setFooter({ text: "Moses Before Hoes(es)!" });
+                "My name is **`MosesBot`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:15am** (CET) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#980839919972921374>.\n\u200B"
+            );
+        // .setFooter({ text: "Moses Before Hoes(es)!" });
         const welcomeEmbed = new EmbedBuilder()
             .setColor("Random")
             .setAuthor(author)
