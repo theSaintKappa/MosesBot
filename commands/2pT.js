@@ -97,7 +97,7 @@ module.exports = {
 
         const updateChannelName = async () => {
             const quotesCount = await quotesSchema.countDocuments({});
-            client.channels.cache.get("1029373422779781190").setName(`2pT Quotes ›› ${quotesCount.toLocaleString()}`);
+            client.channels.cache.get("1029373422779781190").setName(`🐒 2pT Quotes ›› ${quotesCount.toLocaleString()}`);
         };
 
         // LIST
