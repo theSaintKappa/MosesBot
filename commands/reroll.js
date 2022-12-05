@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { sendDailyQuote } = require("../daily-quote");
+const { sendDailyQuote } = require("../scheduled/daily-quote");
 
 module.exports = {
     category: "MosesUtilities",

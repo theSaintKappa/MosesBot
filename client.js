@@ -1,11 +1,9 @@
-const cron = require("node-cron");
-const { sendDailyQuote } = require("./daily-quote");
-const { sendDailyPic } = require("./daily-pic");
+const { scheduleCron } = require("./scheduled/cron-jobs");
 const DiscordJS = require("discord.js");
 const WOKCommands = require("wokcommands");
 const path = require("path");
 require("dotenv").config();
-const { GatewayIntentBits, ActivityType, EmbedBuilder } = DiscordJS;
+const { GatewayIntentBits, ActivityType, EmbedBuilder, Events } = DiscordJS;
 
 const client = new DiscordJS.Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
@@ -39,30 +37,12 @@ client.on("ready", async () => {
     wok.on("databaseConnected", async (connection, state) => {
         console.log(`The MongoDB connection state is "${state}"`);
 
-        cron.schedule(
-            "15 7 * * *", // Everyday at 7:15
-            () => {
-                const date = new Date();
-                console.log(`[Moses Daily Quotes] ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending ${weekdays[date.getDay()]} quote...`);
-                sendDailyQuote();
-            },
-            { timezone: "Europe/Warsaw" }
-        );
-
-        cron.schedule(
-            "0 10 * * 5,6,0", // At 10:00 on Friday, Saturday, and Sunday
-            () => {
-                const date = new Date();
-                console.log(`[Moses Daily Pics] ${weekdays[date.getDay()]} ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending random Moses pic...`);
-                sendDailyPic();
-            },
-            { timezone: "Europe/Warsaw" }
-        );
+        scheduleCron();
     });
 
     client.user.setActivity("/help", { type: ActivityType.Watching });
 
-    client.on("guildMemberAdd", (member) => {
+    client.on(Events.GuildMemberAdd, (member) => {
         const author = {
             name: member.guild.name,
             iconURL: `https://cdn.discordapp.com/icons/${member.guild.id}/${member.guild.icon}.gif?size=4096`,
@@ -88,7 +68,7 @@ client.on("ready", async () => {
         client.channels.cache.get("986301246048722955").send({ embeds: [welcomeEmbed] });
     });
 
-    client.on("guildMemberUpdate", (oldMember, newMember) => {
+    client.on(Events.GuildMemberUpdate, (oldMember, newMember) => {
         if (oldMember.pending === newMember.pending) return;
 
         console.log(`${newMember.user.username} just accepted the server rules!`);
@@ -98,7 +78,7 @@ client.on("ready", async () => {
 
 const reactChannels = ["980813191556780064", "986333955286511656"];
 // quotes, memes
-client.on("messageCreate", async (message) => {
+client.on(Events.MessageCreate, async (message) => {
     if (reactChannels.includes(message.channel.id)) {
         try {
             // if message in memes channel && if message has no attachments

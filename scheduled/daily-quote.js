@@ -1,5 +1,5 @@
-const quotesSchema = require("./schemas/moses-quotes-schema");
-const lastUsedSchema = require("./schemas/moses-last-used-schema");
+const quotesSchema = require("../schemas/moses-quotes-schema");
+const lastUsedSchema = require("../schemas/moses-last-used-schema");
 const { Webhook, MessageBuilder } = require("discord-webhook-node");
 
 const sendDailyQuote = async () => {

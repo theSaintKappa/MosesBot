@@ -4,3 +4,4 @@ node_modules/
 mongotest.js
 webhook-template.js
 archived-commands
+*.test.*
