@@ -1,6 +1,15 @@
 const cron = require("node-cron");
 const { sendDailyQuote } = require("./daily-quote");
 const { sendDailyPic } = require("./daily-pic");
+const weekdays = {
+    0: "Sunday",
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday",
+};
 
 const scheduleCron = () => {
     cron.schedule(
@@ -25,7 +34,7 @@ const scheduleCron = () => {
                 () => {
                     const date = new Date();
                     console.log(`[Moses Daily Pics] ${weekdays[date.getDay()]} ${date.getHours()}:${("0" + date.getMinutes()).slice(-2)} sending random Moses pic...`);
-                    sendDailyPic();
+                    // sendDailyPic();
                     setInterval(() => {
                         task.stop();
                     }, 1000);
