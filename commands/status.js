@@ -58,7 +58,6 @@ module.exports = {
         if (interaction) {
             interaction.reply({
                 content: `> Client presence set to "**${activities[type]} ${activity}**"`,
-                ephemeral: true,
             });
         }
     },

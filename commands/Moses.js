@@ -1,8 +1,7 @@
 const quotesSchema = require("../schemas/moses-quotes-schema");
 const leaderboardSchema = require("../schemas/moses-leaderboard-schema");
 const picsSchema = require("../schemas/moses-pics-schema");
-const { EmbedBuilder } = require("discord.js");
-const { PermissionsBitField } = require("discord.js");
+const { EmbedBuilder, PermissionsBitField, AttachmentBuilder } = require("discord.js");
 
 module.exports = {
     category: "Moses quotes",
@@ -268,23 +267,6 @@ module.exports = {
                 return;
             }
 
-            await new picsSchema({
-                fileUrl: file.url,
-                description: description || null,
-                uploadDate: new Date().getTime(),
-                uploader: {
-                    userName: user.username,
-                    userId: user.id,
-                },
-                fileSize: file.size, // in bytes
-                fileDimensions: {
-                    width: file.width,
-                    height: file.height,
-                },
-                contentType: file.contentType,
-                fileName: file.name,
-            }).save();
-
             // embed.setAuthor({ name: "SaintKappa Waifu Viewer", iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` })
             if (typeof description !== "undefined") embed.addFields({ name: "Description:", value: description.toString(), inline: true });
             embed.addFields({ name: "Dimensions:", value: `${file.width}x${file.height}`, inline: true }, { name: "File size:", value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true });
@@ -292,6 +274,19 @@ module.exports = {
             embed.setURL(file.url);
             embed.setImage(file.url);
             ephemeral = true;
+
+            const storageEmbed = new EmbedBuilder()
+                .setDescription(`+<@${user.id}> uploaded a new moses pic!`)
+                .addFields(
+                    { name: "Description:", value: description || "*none*", inline: true },
+                    { name: "Dimensions:", value: `${file.width}x${file.height}`, inline: true },
+                    { name: "File size:", value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true }
+                );
+
+            client.channels.cache.get("1058118420186542120").send({
+                embeds: [storageEmbed],
+                files: [new AttachmentBuilder(`${file.url}`)],
+            });
         };
 
         const subcommand = `${interaction.options._subcommand.toString()}`;

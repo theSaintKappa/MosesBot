@@ -4,6 +4,7 @@ const WOKCommands = require("wokcommands");
 const path = require("path");
 require("dotenv").config();
 const { GatewayIntentBits, ActivityType, EmbedBuilder, Events } = DiscordJS;
+const picsSchema = require("./schemas/moses-pics-schema");
 
 const client = new DiscordJS.Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
@@ -69,10 +70,32 @@ client.on("ready", async () => {
 const reactChannels = ["980813191556780064", "986333955286511656"];
 // quotes, memes
 client.on(Events.MessageCreate, async (message) => {
+    if (message.channel.id === "1058118420186542120" && message.embeds[0]?.data.description?.charAt(0) === "+") {
+        const [attachment] = message.attachments.values();
+        const description = message.embeds[0].data.fields?.find((obj) => obj.name === "Description:").value;
+        await new picsSchema({
+            fileUrl: attachment.attachment,
+            description: description !== "*none*" ? description : null,
+            uploadDate: new Date().getTime(),
+            uploader: {
+                userName: message.author.username,
+                userId: message.author.id,
+            },
+            fileSize: attachment.size, // in bytes
+            fileDimensions: {
+                width: attachment.width,
+                height: attachment.height,
+            },
+            contentType: attachment.contentType,
+            fileName: attachment.name,
+        }).save();
+        return;
+    }
+
     if (reactChannels.includes(message.channel.id)) {
         try {
             // if message in memes channel && if message has no attachments
-            if (message.channel.id === reactChannels[1] && !message.attachments.size) return;
+            if (message.channel.id === reactChannels[1] && !message.attachments.size && !message.content.startsWith("https://cdn.discordapp.com/attachments/")) return;
 
             await message.react("<:upvote:982630993997496321>");
             await message.react("<:downvote:982630978566639616>");
