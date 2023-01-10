@@ -1,35 +1,47 @@
-const { scheduleCron } = require("./scheduled/cron-jobs");
 const DiscordJS = require("discord.js");
-const WOKCommands = require("wokcommands");
+const WOK = require("wokcommands");
 const path = require("path");
 require("dotenv").config();
-const { GatewayIntentBits, ActivityType, EmbedBuilder, Events } = DiscordJS;
+const { Client, IntentsBitField, Partials, ActivityType, EmbedBuilder, Events } = DiscordJS;
+const { scheduleCron } = require("./scheduled/cron-jobs");
 const picsSchema = require("./schemas/moses-pics-schema");
+const mongoose = require("mongoose");
+// look into this later ok?
+mongoose.set("strictQuery", true);
 
-const client = new DiscordJS.Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers],
+const client = new Client({
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.MessageContent,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildMessageReactions,
+        IntentsBitField.Flags.GuildPresences,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.DirectMessages,
+    ],
+    partials: [Partials.Channel],
 });
 
-client.on("ready", async () => {
+client.on(Events.ClientReady, () => {
+    console.log("MosesBot is now up and running!");
+
     const dbOptions = {
         keepAlive: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
     };
 
-    const wok = new WOKCommands(client, {
+    new WOK({
+        client,
         commandsDir: path.join(__dirname, "commands"),
         testServers: ["980813190780841984"],
         botOwners: ["315531146953752578", "304961013202288651"],
+        commandsDir: path.join(__dirname, "commands"),
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
 
-    wok.on("databaseConnected", async (connection, state) => {
-        console.log(`The MongoDB connection state is "${state}"`);
-
-        scheduleCron();
-    });
+    scheduleCron();
 
     client.user.setActivity("/help", { type: ActivityType.Watching });
 
@@ -47,7 +59,6 @@ client.on("ready", async () => {
             .setDescription(
                 "My name is **`MosesBot`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:15am** (CET) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#980839919972921374>.\n\u200B"
             );
-        // .setFooter({ text: "Moses Before Hoes(es)!" });
         const welcomeEmbed = new EmbedBuilder()
             .setColor("Random")
             .setAuthor(author)
@@ -67,8 +78,11 @@ client.on("ready", async () => {
     });
 });
 
-const reactChannels = ["980813191556780064", "986333955286511656"];
-// quotes, memes
+const serverChannels = {
+    quotes: "980813191556780064",
+    memes: "986333955286511656",
+};
+
 client.on(Events.MessageCreate, async (message) => {
     if (message.channel.id === "1058118420186542120" && message.embeds[0]?.data.description?.charAt(0) === "+") {
         const [attachment] = message.attachments.values();
@@ -92,10 +106,10 @@ client.on(Events.MessageCreate, async (message) => {
         return;
     }
 
-    if (reactChannels.includes(message.channel.id)) {
+    if (Object.values(serverChannels).includes(message.channel.id)) {
         try {
             // if message in memes channel && if message has no attachments
-            if (message.channel.id === reactChannels[1] && !message.attachments.size && !message.content.startsWith("https://cdn.discordapp.com/attachments/")) return;
+            if (message.channel.id === serverChannels.memes && !message.attachments.size && !message.content.startsWith("https://cdn.discordapp.com/attachments/")) return;
 
             await message.react("<:upvote:982630993997496321>");
             await message.react("<:downvote:982630978566639616>");
