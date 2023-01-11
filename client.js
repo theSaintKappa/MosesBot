@@ -23,7 +23,8 @@ const client = new Client({
 });
 
 client.on(Events.ClientReady, () => {
-    console.log("MosesBot is now up and running!");
+    // setTimeout(() => client.application.commands.set([]), 2500);
+    console.log(`${client.user.username} is now up and running!`);
 
     const dbOptions = {
         keepAlive: true,

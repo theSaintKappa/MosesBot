@@ -1,74 +1,52 @@
-const { AttachmentBuilder, EmbedBuilder } = require("discord.js");
+const { AttachmentBuilder, ApplicationCommandOptionType } = require("discord.js");
+const { CommandType } = require("wokcommands");
 const axios = require("axios");
 require("dotenv").config();
 
-module.exports = {
-    category: "MentalBreakdown",
-    description: "Anime Girls Holding Programming Books",
+let languages = new Array();
+const headers = {
+    headers: {
+        Authorization: `Bearer ${process.env.GITHUB_GET_TOKEN}`,
+    },
+};
 
+module.exports = {
+    description: "Shows an anime girls holding a programming book from the language of your choice.",
+    type: CommandType.SLASH,
+    testOnly: true,
     options: [
         {
-            type: 3,
             name: "language",
-            description: "Choose programing language. If left blank a Random language will be selected.",
+            description: "Choose a programing language. If left blank a random one will be selected.",
+            type: ApplicationCommandOptionType.String,
             required: false,
         },
     ],
 
-    slash: true,
-    testOnly: true,
-
-    callback: async ({ interaction, args, channel }) => {
-        function reply(content, ephemeral = false) {
-            if (interaction) {
-                interaction.reply({
-                    content,
-                    ephemeral,
-                });
-            }
+    init: async () => {
+        try {
+            const getLanguages = await axios.get("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", headers);
+            for (const language of getLanguages.data) if (language.type !== "file") languages.push(language);
+            console.log("Successfuly cached anime girls.");
+        } catch (err) {
+            console.log("An error occured while caching anime girls.");
+            console.error(err);
         }
+    },
 
-        await axios
-            .get("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/")
-            .then(async (response) => {
-                const res = response.data;
+    callback: async ({ text }) => {
+        // If the user didn't provide an argument choose random language else find the one they chose
+        const chosenLanguage = !text ? languages[Math.floor(Math.random() * languages.length)] : languages.find((lang) => lang.name.toUpperCase() === text.toUpperCase());
 
-                let languagesArray = [];
-                for (const language of res) {
-                    if (language.name != "README.md" && language.name != "CONTRIBUTING.md") {
-                        languagesArray.push(language);
-                        language.name = language.name.toUpperCase();
-                    }
-                }
+        if (!chosenLanguage) return { content: `**Language *\`${text}\`* does not exist in the repo.**`, ephermal: true };
 
-                RandomLanguageIndex = Math.floor(Math.random() * languagesArray.length);
-                RandomLanguage = languagesArray[RandomLanguageIndex];
+        const languageResponse = await axios.get(chosenLanguage.url, headers);
 
-                const chosen = args[0] === undefined ? RandomLanguage : languagesArray.find((lang) => lang.name === args[0].toUpperCase());
+        const attachment = new AttachmentBuilder(languageResponse.data[Math.floor(Math.random() * languageResponse.data.length)].download_url);
 
-                if (chosen === undefined) {
-                    reply(`**Language** \`${args[0]}\` **does not exist in the repo.**`, true);
-                    return;
-                }
-
-                await axios
-                    .get(chosen.url)
-                    .then(async (response) => {
-                        RandomPicIndex = Math.floor(Math.random() * response.data.length);
-
-                        const attachment = new AttachmentBuilder(response.data[RandomPicIndex].download_url);
-
-                        interaction.reply({
-                            content: `**Here is your waifu holding a \`${chosen.path}\` book.**`,
-                            files: [attachment],
-                        });
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        return {
+            content: `**Here is your waifu holding a *\`${chosenLanguage.name}\`* book:**`,
+            files: [attachment],
+        };
     },
 };
