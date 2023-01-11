@@ -23,7 +23,6 @@ const client = new Client({
 });
 
 client.on(Events.ClientReady, () => {
-    // setTimeout(() => client.application.commands.set([]), 2500);
     console.log(`${client.user.username} is now up and running!`);
 
     const dbOptions = {
