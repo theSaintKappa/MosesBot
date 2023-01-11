@@ -1,3 +1,4 @@
+//
 const DiscordJS = require("discord.js");
 const WOK = require("wokcommands");
 const path = require("path");
