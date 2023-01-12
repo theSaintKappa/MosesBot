@@ -1,18 +1,17 @@
+const { EmbedBuilder, PermissionsBitField, AttachmentBuilder, ApplicationCommandOptionType } = require("discord.js");
 const quotesSchema = require("../schemas/moses-quotes-schema");
 const leaderboardSchema = require("../schemas/moses-leaderboard-schema");
 const picsSchema = require("../schemas/moses-pics-schema");
-const { EmbedBuilder, PermissionsBitField, AttachmentBuilder } = require("discord.js");
+const { CommandType } = require("wokcommands");
 
 module.exports = {
-    category: "Moses quotes",
-    description: "Moses quotes",
-    slash: true,
+    description: "All the Moses quotes related commands.",
+    type: CommandType.SLASH,
     testOnly: true,
-
     options: [
         // LIST
         {
-            type: 1, // subcommand
+            type: ApplicationCommandOptionType.Subcommand,
             name: "list",
             description: "List all the stored Moses quotes.",
             options: [
@@ -20,18 +19,18 @@ module.exports = {
                     name: "page",
                     description: "Which page do you want to see? (every page has 15 quotes in it).",
                     required: false,
-                    type: 4,
+                    type: ApplicationCommandOptionType.Number,
                 },
             ],
         },
         // ADD
         {
-            type: 1, // subcommand
+            type: ApplicationCommandOptionType.Subcommand,
             name: "add",
             description: "Add a new Moses quote.",
             options: [
                 {
-                    type: 3, // string
+                    type: ApplicationCommandOptionType.String,
                     name: "quote",
                     description: "What dumb bs did he say once again?",
                     required: true,
@@ -40,18 +39,18 @@ module.exports = {
         },
         // EDIT
         {
-            type: 1, // subcommand
+            type: ApplicationCommandOptionType.Subcommand,
             name: "edit",
             description: "Edit an existing Moses quote.",
             options: [
                 {
-                    type: 4, // integer
+                    type: ApplicationCommandOptionType.Number,
                     name: "quote-id",
                     description: "An id of the Moses quote you would like to edit. To check a quote's id run: /moses list <page>.",
                     required: true,
                 },
                 {
-                    type: 3, // string
+                    type: ApplicationCommandOptionType.String,
                     name: "new-quote",
                     description: "What would you like to edit the quote to?",
                     required: true,
@@ -60,12 +59,12 @@ module.exports = {
         },
         // REMOVE
         {
-            type: 1, // subcommand
+            type: ApplicationCommandOptionType.Subcommand,
             name: "remove",
             description: "Delete a Moses quote :sob:.",
             options: [
                 {
-                    type: 4, // integer
+                    type: ApplicationCommandOptionType.Number,
                     name: "quote-id",
                     description: "An id of the Moses quote you would like to delete. To check a quote's id run: /moses list <page>.",
                     required: true,
@@ -74,29 +73,30 @@ module.exports = {
         },
         // LEADERBOARD
         {
-            type: 1, // subcommand
+            type: ApplicationCommandOptionType.Subcommand,
             name: "leaderboard",
             description: "Check the Moses quotes leaderboard!",
         },
-        {
-            type: 1, // subcommand
-            name: "pic",
-            description: "Have a schmoking hot Moses pic and would like to share it with the commuinty?",
-            options: [
-                {
-                    name: "attachment",
-                    description: "Upload a file in any of these formats: PNG, JPG, JPEG, GIF or WEBP.",
-                    type: 11, // attachment
-                    required: true,
-                },
-                {
-                    name: "description",
-                    description: "Describe your Moses (optional).",
-                    type: 3, // attachment
-                    required: false,
-                },
-            ],
-        },
+        // PIC
+        // {
+        //     type: ApplicationCommandOptionType.Subcommand,
+        //     name: "pic",
+        //     description: "Have a schmoking hot Moses pic and would like to share it with the commuinty?",
+        //     options: [
+        //         {
+        //             name: "attachment",
+        //             description: "Upload a file in any of these formats: PNG, JPG, JPEG, GIF or WEBP.",
+        //             type: 11, // attachment
+        //             required: true,
+        //         },
+        //         {
+        //             name: "description",
+        //             description: "Describe your Moses (optional).",
+        //             type: 3, // attachment
+        //             required: false,
+        //         },
+        //     ],
+        // },
     ],
 
     callback: async ({ interaction, user, member, client }) => {
@@ -157,6 +157,15 @@ module.exports = {
 
         // ADD
         const add = async (quote) => {
+            const leaderboardUser = await leaderboardSchema.find({ userId: user.id });
+            if (!leaderboardUser) {
+                await new leaderboardSchema({
+                    userId: user.id,
+                    userName: user.username,
+                    count: 1,
+                }).save();
+            }
+
             await new quotesSchema({
                 quote,
                 date: new Date(),
@@ -170,8 +179,6 @@ module.exports = {
 
         // EDIT
         const edit = async (quoteId, newQuote) => {
-            console.log(member.permissions.has(PermissionsBitField.Flags.Administrator));
-            // return;
             const quoteToEdit = await quotesSchema.findOne({ quoteId });
 
             if (quoteToEdit === null) {
@@ -301,7 +308,7 @@ module.exports = {
                 break;
             case "add":
                 try {
-                    await add(args[0]?.value, args[1]?.value);
+                    await add(args[0]?.value);
                 } catch (err) {
                     handleError(err);
                 }
@@ -337,11 +344,9 @@ module.exports = {
         }
 
         embed.setFooter({ text: `Moses quotes \u2022 requeset took ${new Date().getTime() - beginTimestamp}ms`, iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` });
-        if (interaction) {
-            interaction.reply({
-                embeds: [embed],
-                ephemeral,
-            });
-        }
+        return {
+            embeds: [embed],
+            ephemeral,
+        };
     },
 };

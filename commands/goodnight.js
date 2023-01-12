@@ -1,20 +1,18 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, ApplicationCommandOptionType } = require("discord.js");
+const { CommandType } = require("wokcommands");
 
 module.exports = {
-    category: "MosesUtilities",
     description: "Wish everyone a good night sleep!",
-
+    type: CommandType.SLASH,
+    testOnly: true,
     options: [
         {
             name: "optional-message",
             description: "Provide an optional message to add to the good night wishes.",
             required: false,
-            type: 3,
+            type: ApplicationCommandOptionType.String,
         },
     ],
-
-    slash: true,
-    testOnly: true,
 
     callback: async ({ interaction, channel, user, text }) => {
         const gnMessage = `<@${user.id}> Wanted to wish you a good night sleep!`;

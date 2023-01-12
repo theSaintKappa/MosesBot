@@ -15,4 +15,4 @@ const schema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("pt-leaderboard-schema", schema, "pt-leaderboard-schema");
+module.exports = mongoose.model("pt-leaderboard", schema, "pt-leaderboard");

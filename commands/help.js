@@ -1,10 +1,9 @@
 const { EmbedBuilder } = require("discord.js");
+const { CommandType } = require("wokcommands");
 
 module.exports = {
-    category: "MosesUtilities",
     description: "List all the available Moses bot commands",
-
-    slash: true,
+    type: CommandType.SLASH,
     testOnly: true,
 
     callback: async ({ interaction, client }) => {

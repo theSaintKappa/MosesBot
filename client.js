@@ -109,6 +109,8 @@ client.on(Events.MessageCreate, async (message) => {
     if (Object.values(serverChannels).includes(message.channel.id)) {
         try {
             // if message in memes channel && if message has no attachments
+            if (message.interaction) return;
+
             if (message.channel.id === serverChannels.memes && !message.attachments.size && !message.content.startsWith("https://cdn.discordapp.com/attachments/") && !message.content.startsWith("https://media.discordapp.net/attachments/"))
                 return;
 

@@ -1,25 +1,27 @@
+const { ApplicationCommandOptionType, PermissionFlagsBits } = require("discord.js");
+const { CommandType } = require("wokcommands");
 let spam = require("../controllers/spam-controller");
 
 module.exports = {
-    category: "MosesUtilities",
     description: "Wish everyone a good night sleep!",
-
-    ownerOnly: true,
-
+    type: CommandType.SLASH,
+    testOnly: true,
+    guildOnly: true,
+    permissions: [PermissionFlagsBits.Administrator],
     options: [
         {
-            type: 1,
+            type: ApplicationCommandOptionType.Subcommand,
             name: "start",
             description: "Start torturing someone.",
             options: [
                 {
-                    type: 6,
+                    type: ApplicationCommandOptionType.User,
                     name: "user",
                     description: "Who do you want to torture?",
                     required: true,
                 },
                 {
-                    type: 3,
+                    type: ApplicationCommandOptionType.String,
                     name: "optional-message",
                     description: "Optional message to go along with the pings.",
                     required: false,
@@ -27,14 +29,11 @@ module.exports = {
             ],
         },
         {
-            type: 1,
+            type: ApplicationCommandOptionType.Subcommand,
             name: "stop",
             description: "Stop torturing.",
         },
     ],
-
-    slash: true,
-    testOnly: true,
 
     callback: async ({ interaction, channel }) => {
         const subcommand = `${interaction.options._subcommand.toString()}`;
@@ -79,10 +78,8 @@ module.exports = {
                 response = `Something went wrong!`;
         }
 
-        if (interaction) {
-            interaction.reply({
-                content: response,
-            });
-        }
+        return {
+            content: response,
+        };
     },
 };
