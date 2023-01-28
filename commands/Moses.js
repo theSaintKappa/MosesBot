@@ -144,7 +144,7 @@ module.exports = {
                 return { $gt: (page - 1) * DOCS_PER_PAGE, $lt: page * DOCS_PER_PAGE + 1 };
             };
 
-            const quotesArray = await quotesSchema.find({ quoteId: pagesRange(page) });
+            const quotesArray = await quotesSchema.find({ quoteId: pagesRange(page) }).sort({ quoteId: 1 });
             let quotesList = "";
             for (const quote of quotesArray) {
                 quotesList += `**#${quote.quoteId}** \`${quote.quote}\`\n`;
@@ -296,7 +296,7 @@ module.exports = {
             });
         };
 
-        const subcommand = `${interaction.options._subcommand.toString()}`;
+        const subcommand = interaction.options._subcommand;
         const args = interaction.options._hoistedOptions;
         switch (subcommand) {
             case "list":

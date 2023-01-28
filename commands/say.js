@@ -15,11 +15,10 @@ module.exports = {
     ],
 
     callback: async ({ interaction, channel, user, text }) => {
-        channel.send(text.replaceAll("\u005Cn", "\u000A")).then(() => {
-            return {
-                content: `You made the bot say "\`${text}\`", congratulations.`,
-                ephemeral: true,
-            };
-        });
+        await channel.send(text.replaceAll("\u005Cn", "\u000A"));
+        return {
+            content: `You made the bot say "\`${text}\`", congratulations.`,
+            ephemeral: true,
+        };
     },
 };

@@ -1,22 +1,22 @@
-const { EmbedBuilder, PermissionsBitField, ApplicationCommandOptionType } = require("discord.js");
-const quotesSchema = require("../schemas/pt-quotes-schema");
-const leaderboardSchema = require("../schemas/pt-leaderboard-schema");
-const { CommandType } = require("wokcommands");
+const { EmbedBuilder, PermissionsBitField, ApplicationCommandOptionType } = require('discord.js');
+const quotesSchema = require('../schemas/pt-quotes-schema');
+const leaderboardSchema = require('../schemas/pt-leaderboard-schema');
+const { CommandType } = require('wokcommands');
 
 module.exports = {
-    description: "All the 2pT quotes related commands.",
+    description: 'All the 2pT quotes related commands.',
     type: CommandType.SLASH,
     testOnly: true,
     options: [
         // LIST
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "list",
-            description: "List all the stored 2pT quotes.",
+            name: 'list',
+            description: 'List all the stored 2pT quotes.',
             options: [
                 {
-                    name: "page",
-                    description: "Which page do you want to see? (every page has 15 quotes in it).",
+                    name: 'page',
+                    description: 'Which page do you want to see? (every page has 15 quotes in it).',
                     required: false,
                     type: ApplicationCommandOptionType.Number,
                 },
@@ -25,19 +25,19 @@ module.exports = {
         // ADD
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "add",
-            description: "Add a new 2pT quote.",
+            name: 'add',
+            description: 'Add a new 2pT quote.',
             options: [
                 {
                     type: ApplicationCommandOptionType.User,
-                    name: "user",
-                    description: "Wich server member would you like to quote?",
+                    name: 'user',
+                    description: 'Wich server member would you like to quote?',
                     required: true,
                 },
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: "quote",
-                    description: "What did they say?",
+                    name: 'quote',
+                    description: 'What did they say?',
                     required: true,
                 },
             ],
@@ -45,19 +45,19 @@ module.exports = {
         // EDIT
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "edit",
-            description: "Edit an existing 2pT quote.",
+            name: 'edit',
+            description: 'Edit an existing 2pT quote.',
             options: [
                 {
                     type: ApplicationCommandOptionType.Number,
-                    name: "quote-id",
+                    name: 'quote-id',
                     description: "An id of the 2pT quote you would like to edit. To check a quote's id run: /2pT list <page>.",
                     required: true,
                 },
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: "new-quote",
-                    description: "What would you like to edit the quote to?",
+                    name: 'new-quote',
+                    description: 'What would you like to edit the quote to?',
                     required: true,
                 },
             ],
@@ -65,12 +65,12 @@ module.exports = {
         // REMOVE
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "remove",
-            description: "Delete a 2pT quote :sob:.",
+            name: 'remove',
+            description: 'Delete a 2pT quote :sob:.',
             options: [
                 {
                     type: ApplicationCommandOptionType.Number,
-                    name: "quote-id",
+                    name: 'quote-id',
                     description: "An id of the 2pT quote you would like to delete. To check a quote's id run: /2pT list <page>.",
                     required: true,
                 },
@@ -79,15 +79,15 @@ module.exports = {
         // LEADERBOARD
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "leaderboard",
-            description: "Check the 2pT quotes leaderboard!",
+            name: 'leaderboard',
+            description: 'Check the 2pT quotes leaderboard!',
         },
     ],
 
     callback: async ({ interaction, user, member, client }) => {
         const beginTimestamp = new Date().getTime();
         let ephemeral = false;
-        const embed = new EmbedBuilder().setColor("#00ff3c");
+        const embed = new EmbedBuilder().setColor('#00ff3c');
 
         const lastQuoteCount = await quotesSchema.find().sort({ quoteId: -1 }).limit(1);
 
@@ -95,13 +95,13 @@ module.exports = {
             console.error(err);
 
             embed.setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
         };
 
         const updateChannelName = async () => {
             const quotesCount = await quotesSchema.countDocuments({});
-            client.channels.cache.get("1029373422779781190").setName(`🚼 2pT Quotes ›› ${quotesCount.toLocaleString()}`);
+            client.channels.cache.get('1029373422779781190').setName(`🚼 2pT Quotes ›› ${quotesCount.toLocaleString()}`);
         };
 
         // LIST
@@ -111,15 +111,15 @@ module.exports = {
             const validPages = Math.ceil(documentCount / DOCS_PER_PAGE);
 
             if (documentCount === 0) {
-                embed.setTitle("There are no 2pT quotes currently saved!");
-                embed.setColor("#ff0000");
+                embed.setTitle('There are no 2pT quotes currently saved!');
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
 
             if (!(page <= validPages && page >= 1)) {
                 embed.addFields({ name: `Invalid page \`#${page}\`!`, value: `Please provide a number between **1** and **${validPages}**.` });
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -129,21 +129,21 @@ module.exports = {
                 return { $gt: (page - 1) * DOCS_PER_PAGE, $lt: page * DOCS_PER_PAGE + 1 };
             };
 
-            const quotesArray = await quotesSchema.find({ quoteId: pagesRange(page) });
-            let quotesList = "";
+            const quotesArray = await quotesSchema.find({ quoteId: pagesRange(page) }).sort({ quoteId: 1 });
+            let quotesList = '';
             for (const quote of quotesArray) {
                 quotesList += `**#${quote.quoteId}** \`${quote.quote}\`\n`;
             }
 
             embed.setTitle(`Displaying page **\`#${page}\`** out of **\`${validPages}\`** of 2pT quotes:`);
             embed.setDescription(quotesList);
-            embed.setColor("#00c8ff");
+            embed.setColor('#00c8ff');
         };
 
         // ADD
         const add = async (quoteeUserId, quote) => {
             const leaderboardUser = await leaderboardSchema.find({ userId: user.id });
-            if (leaderboardUser == "") {
+            if (leaderboardUser == '') {
                 await new leaderboardSchema({
                     userId: quoteeUserId,
                     userName: client.users.cache.get(quoteeUserId).username,
@@ -159,7 +159,7 @@ module.exports = {
                 submitterName: user.username,
             }).save();
 
-            embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || "1"}\`:`, value: `**\`${quote}\`**` });
+            embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || '1'}\` (said by <@${quoteeUserId}>:`, value: `**\`${quote}\`**` });
             updateChannelName();
         };
 
@@ -169,7 +169,7 @@ module.exports = {
 
             if (quoteToEdit === null) {
                 embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -192,7 +192,7 @@ module.exports = {
 
             // Deny editing
             embed.setDescription(`Unfortunately quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`** was submitted by <@${quoteToEdit.submitterId}>.\nIf you want it edited ask them or a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
         };
 
@@ -203,7 +203,7 @@ module.exports = {
             // Check if document exists
             if (quoteToDrop === null) {
                 embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -228,7 +228,7 @@ module.exports = {
 
             // Deny editing
             embed.setDescription(`Unfortunately quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** was submitted by <@${quoteToDrop.submitterId}>.\nIf you want it removed ask them or a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
             return;
         };
@@ -236,9 +236,9 @@ module.exports = {
         // LEADERBOARD
         const leaderboard = async () => {
             const leaderboardArray = await leaderboardSchema.find().sort({ count: -1 });
-            if (leaderboardArray == "") return embed.setTitle("The 2pT quotees leaderboard is empty!");
+            if (leaderboardArray == '') return embed.setTitle('The 2pT quotees leaderboard is empty!');
             let place = 1;
-            let leaderboardString = "";
+            let leaderboardString = '';
 
             for (const user of leaderboardArray) {
                 leaderboardString += `**#${place}** <@${user.userId}> **→** **\`${user.count}\`**\n`;
@@ -247,7 +247,7 @@ module.exports = {
 
             embed.setTitle(`2pT __quotees__ leaderboard:`);
             embed.setDescription(leaderboardString);
-            embed.setColor("#00c8ff");
+            embed.setColor('#00c8ff');
         };
 
         // PIC
@@ -285,42 +285,42 @@ module.exports = {
         const subcommand = `${interaction.options._subcommand.toString()}`;
         const args = interaction.options._hoistedOptions;
         switch (subcommand) {
-            case "list":
+            case 'list':
                 try {
                     await list(args[0]?.value || 1);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "add":
+            case 'add':
                 try {
                     await add(args[0]?.value, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "edit":
+            case 'edit':
                 try {
                     await edit(args[0]?.value, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "remove":
+            case 'remove':
                 try {
                     await drop(args[0]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "leaderboard":
+            case 'leaderboard':
                 try {
                     await leaderboard();
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "pic":
+            case 'pic':
                 try {
                     await pic(args[0]?.attachment, args[1]?.value);
                 } catch (err) {
