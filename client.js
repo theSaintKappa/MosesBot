@@ -51,7 +51,11 @@ client.on(Events.ClientReady, () => {
             sendQuote(client);
 
             try {
-                const request = await axios.get(`https://api.saintkappa.xyz/vulcan/luckyNumber`);
+                const request = await axios.get(`https://api.saintkappa.xyz/vulcan/luckyNumber`, {
+                    headers: {
+                        Authorization: `${process.env.VULCAN_KEY}`,
+                    },
+                });
 
                 client.channels.cache.get('1067438722703953992').setName(`🍀🔢 ›› ${request.data.number ?? 'brak'}`);
             } catch (err) {
