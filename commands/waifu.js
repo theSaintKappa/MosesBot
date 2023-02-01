@@ -1,21 +1,21 @@
-const { EmbedBuilder, ApplicationCommandOptionType } = require("discord.js");
-const { CommandType } = require("wokcommands");
-const axios = require("axios");
+const { EmbedBuilder, ApplicationCommandOptionType } = require('discord.js');
+const { CommandType } = require('wokcommands');
+const axios = require('axios');
 let tags = new Object();
 
 module.exports = {
-    description: ":3",
+    description: ':3',
     type: CommandType.SLASH,
     testOnly: true,
     options: [
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "sfw",
-            description: "When moms home",
+            name: 'sfw',
+            description: 'When moms home',
             options: [
                 {
-                    name: "sfw-tags",
-                    description: "tags",
+                    name: 'tags',
+                    description: 'tags',
                     required: false,
                     type: ApplicationCommandOptionType.String,
                     autocomplete: true,
@@ -24,12 +24,12 @@ module.exports = {
         },
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "nsfw",
-            description: "When moms NOT home",
+            name: 'nsfw',
+            description: 'When moms NOT home',
             options: [
                 {
-                    name: "nsfw-tags",
-                    description: "tags",
+                    name: 'tags',
+                    description: 'tags',
                     required: false,
                     type: ApplicationCommandOptionType.String,
                     autocomplete: true,
@@ -40,28 +40,28 @@ module.exports = {
 
     init: async () => {
         try {
-            const getTags = await axios.get("https://api.waifu.im/tags/?full=false");
+            const getTags = await axios.get('https://api.waifu.im/tags/?full=false');
             tags.sfw = getTags.data.versatile;
             tags.nsfw = getTags.data.nsfw;
-            console.log("Successfuly cached waifu api tags.");
+            console.log('Successfuly cached waifu api tags.');
         } catch (err) {
-            console.log("An error occured while caching waifu api tags.");
+            console.log('An error occured while caching waifu api tags.');
             console.error(err);
         }
     },
 
     autocomplete: (command, argument, interaction) => {
-        if (interaction.options._subcommand === "sfw") return tags.sfw;
+        if (interaction.options._subcommand === 'sfw') return tags.sfw;
         return tags.nsfw;
     },
 
-    callback: async ({ interaction, channel, user }) => {
+    callback: async ({ interaction }) => {
         const embed = new EmbedBuilder();
         const tagArg = interaction.options._hoistedOptions[0]?.value;
-        const isNsfw = interaction.options._subcommand === "sfw" ? false : true;
+        const isNsfw = interaction.options._subcommand === 'sfw' ? false : true;
 
-        if (![...tags.sfw, ...tags.nsfw].includes(tagArg)) {
-            embed.setColor("#ff0000").addFields({ name: `Tag **\`${tagArg}\`** doesn't exist!`, value: "If you leave the tag blank a random one will be selected." });
+        if (![...tags.sfw, ...tags.nsfw].includes(tagArg) && typeof tagArg !== 'undefined') {
+            embed.setColor('#ff0000').addFields({ name: `Tag **\`${tagArg}\`** doesn't exist!`, value: 'If you leave the tag blank a random one will be selected.' });
             return {
                 embeds: [embed],
                 ephemeral: true,
@@ -69,7 +69,7 @@ module.exports = {
         }
 
         try {
-            const request = await axios.get(`https://api.waifu.im/search?is_nsfw=${isNsfw}${tagArg !== undefined ? `&included_tags=${tagArg}` : ""}`);
+            const request = await axios.get(`https://api.waifu.im/search?is_nsfw=${isNsfw}${tagArg !== undefined ? `&included_tags=${tagArg}` : ''}`);
 
             const waifu = request.data.images[0];
 
@@ -78,10 +78,10 @@ module.exports = {
                 .setImage(waifu.url)
                 .setColor(waifu.dominant_color)
                 .addFields(
-                    { name: "Original source:", value: waifu.source, inline: false },
-                    { name: "Dimensions:", value: `${waifu.width}x${waifu.height}`, inline: true },
-                    { name: "Uploaded at:", value: `<t:${Math.floor(new Date(waifu.uploaded_at).getTime() / 1000)}:f>`, inline: true },
-                    { name: "Tags:", value: tags.join(", "), inline: true }
+                    { name: 'Original source:', value: waifu.source ?? 'none', inline: false },
+                    { name: 'Dimensions:', value: `${waifu.width}x${waifu.height}`, inline: true },
+                    { name: 'Uploaded at:', value: `<t:${Math.floor(new Date(waifu.uploaded_at).getTime() / 1000)}:f>`, inline: true },
+                    { name: 'Tags:', value: tags.join(', '), inline: true }
                 );
 
             return {
@@ -91,7 +91,7 @@ module.exports = {
         } catch (err) {
             console.error(err);
 
-            embed.setColor("#ff0000").addFields({ name: "An error occured while procesing your request.", value: "Try again later or contact a server admin." });
+            embed.setColor('#ff0000').addFields({ name: 'An error occured while procesing your request.', value: 'Try again later or contact a server admin.' });
             return {
                 embeds: [embed],
                 ephemeral: true,

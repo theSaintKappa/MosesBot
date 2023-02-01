@@ -7,7 +7,10 @@ module.exports = {
     type: CommandType.SLASH,
     testOnly: true,
 
-    callback: async ({ user }) => {
+    callback: async ({ interaction, user }) => {
+        if (!interaction) return;
+        interaction.deferReply();
+
         const embed = new EmbedBuilder();
         let request;
 
@@ -25,24 +28,24 @@ module.exports = {
             return { embeds: [embed], ephemeral: true };
         }
 
-        const grouppedGrades = request.data.reduce((result, obj) => {
+        const grouppedGrades = await request.data.reduce((result, obj) => {
             (result[obj.column.subject.name] || (result[obj.column.subject.name] = [])).push(obj);
             return result;
         }, {});
 
         const fields = Object.values(grouppedGrades).map((obj) => {
-            return { name: obj[0].column.subject.name, value: obj.map((grade) => grade.content).join(', '), inline: true };
+            return { name: obj[0].column.subject.name, value: `\`\`\`r\n${obj.map((grade) => grade.content).join(', ')}\`\`\``, inline: true };
         });
 
         embed
             .addFields(...fields)
             .setColor('#fe3776')
             .setTitle("Here are Moses' current grades:")
-            .setDescription('\u200B')
+            // .setDescription('\u200B')
             .setFooter({ text: `SaintKappa Vulcan API`, iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` });
 
-        return {
+        interaction.editReply({
             embeds: [embed],
-        };
+        });
     },
 };
