@@ -1,23 +1,23 @@
-const { EmbedBuilder, PermissionsBitField, AttachmentBuilder, ApplicationCommandOptionType } = require("discord.js");
-const quotesSchema = require("../schemas/moses-quotes-schema");
-const leaderboardSchema = require("../schemas/moses-leaderboard-schema");
-const picsSchema = require("../schemas/moses-pics-schema");
-const { CommandType } = require("wokcommands");
+const { EmbedBuilder, PermissionsBitField, AttachmentBuilder, ApplicationCommandOptionType } = require('discord.js');
+const quotesSchema = require('../schemas/moses-quotes-schema');
+const leaderboardSchema = require('../schemas/moses-leaderboard-schema');
+const picsSchema = require('../schemas/moses-pics-schema');
+const { CommandType } = require('wokcommands');
 
 module.exports = {
-    description: "All the Moses quotes related commands.",
+    description: 'All the Moses quotes related commands.',
     type: CommandType.SLASH,
     testOnly: true,
     options: [
         // LIST
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "list",
-            description: "List all the stored Moses quotes.",
+            name: 'list',
+            description: 'List all the stored Moses quotes.',
             options: [
                 {
-                    name: "page",
-                    description: "Which page do you want to see? (every page has 15 quotes in it).",
+                    name: 'page',
+                    description: 'Which page do you want to see? (every page has 15 quotes in it).',
                     required: false,
                     type: ApplicationCommandOptionType.Number,
                 },
@@ -26,13 +26,13 @@ module.exports = {
         // ADD
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "add",
-            description: "Add a new Moses quote.",
+            name: 'add',
+            description: 'Add a new Moses quote.',
             options: [
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: "quote",
-                    description: "What dumb bs did he say once again?",
+                    name: 'quote',
+                    description: 'What dumb bs did he say once again?',
                     required: true,
                 },
             ],
@@ -40,19 +40,19 @@ module.exports = {
         // EDIT
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "edit",
-            description: "Edit an existing Moses quote.",
+            name: 'edit',
+            description: 'Edit an existing Moses quote.',
             options: [
                 {
                     type: ApplicationCommandOptionType.Number,
-                    name: "quote-id",
+                    name: 'quote-id',
                     description: "An id of the Moses quote you would like to edit. To check a quote's id run: /moses list <page>.",
                     required: true,
                 },
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: "new-quote",
-                    description: "What would you like to edit the quote to?",
+                    name: 'new-quote',
+                    description: 'What would you like to edit the quote to?',
                     required: true,
                 },
             ],
@@ -60,12 +60,12 @@ module.exports = {
         // REMOVE
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "remove",
-            description: "Delete a Moses quote :sob:.",
+            name: 'remove',
+            description: 'Delete a Moses quote :sob:.',
             options: [
                 {
                     type: ApplicationCommandOptionType.Number,
-                    name: "quote-id",
+                    name: 'quote-id',
                     description: "An id of the Moses quote you would like to delete. To check a quote's id run: /moses list <page>.",
                     required: true,
                 },
@@ -74,8 +74,8 @@ module.exports = {
         // LEADERBOARD
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "leaderboard",
-            description: "Check the Moses quotes leaderboard!",
+            name: 'leaderboard',
+            description: 'Check the Moses quotes leaderboard!',
         },
         // PIC
         // {
@@ -102,7 +102,7 @@ module.exports = {
     callback: async ({ interaction, user, member, client }) => {
         const beginTimestamp = new Date().getTime();
         let ephemeral = false;
-        const embed = new EmbedBuilder().setColor("#00ff3c");
+        const embed = new EmbedBuilder().setColor('#00ff3c');
 
         const lastQuoteCount = await quotesSchema.find().sort({ quoteId: -1 }).limit(1);
 
@@ -110,13 +110,13 @@ module.exports = {
             console.error(err);
 
             embed.setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
         };
 
         const updateChannelName = async () => {
             const quotesCount = await quotesSchema.countDocuments({});
-            client.channels.cache.get("990343138268819497").setName(`🛐 Moses Quotes ›› ${quotesCount.toLocaleString()}`);
+            client.channels.cache.get('990343138268819497').setName(`🛐 Moses Quotes ›› ${quotesCount.toLocaleString()}`);
         };
 
         // LIST
@@ -126,15 +126,15 @@ module.exports = {
             const validPages = Math.ceil(documentCount / DOCS_PER_PAGE);
 
             if (documentCount === 0) {
-                embed.setTitle("There are no Moses quotes currently saved!");
-                embed.setColor("#ff0000");
+                embed.setTitle('There are no Moses quotes currently saved!');
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
 
             if (!(page <= validPages && page >= 1)) {
                 embed.addFields({ name: `Invalid page \`#${page}\`!`, value: `Please provide a number between **1** and **${validPages}**.` });
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -145,14 +145,14 @@ module.exports = {
             };
 
             const quotesArray = await quotesSchema.find({ quoteId: pagesRange(page) }).sort({ quoteId: 1 });
-            let quotesList = "";
+            let quotesList = '';
             for (const quote of quotesArray) {
                 quotesList += `**#${quote.quoteId}** \`${quote.quote}\`\n`;
             }
 
             embed.setTitle(`Displaying page **\`#${page}\`** out of **\`${validPages}\`** of Moses quotes:`);
             embed.setDescription(quotesList);
-            embed.setColor("#00c8ff");
+            embed.setColor('#00c8ff');
         };
 
         // ADD
@@ -173,7 +173,7 @@ module.exports = {
                 submitterId: user.id,
             }).save();
 
-            embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || "1"}\`:`, value: `**\`${quote}\`**` });
+            embed.setDescription(`**Added quote!**\n\`#${lastQuoteCount[0]?.quoteId + 1 || '1'} ${quote}\``);
             updateChannelName();
         };
 
@@ -183,7 +183,7 @@ module.exports = {
 
             if (quoteToEdit === null) {
                 embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -206,7 +206,7 @@ module.exports = {
 
             // Deny editing
             embed.setDescription(`Unfortunately quote **\`#${quoteToEdit.quoteId} ${quoteToEdit.quote}\`** was submitted by <@${quoteToEdit.submitterId}>.\nIf you want it edited ask them or a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
         };
 
@@ -217,7 +217,7 @@ module.exports = {
             // Check if document exists
             if (quoteToDrop === null) {
                 embed.setDescription(`Quote **\`#${quoteId}\`** doesn't exist.`);
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
@@ -242,7 +242,7 @@ module.exports = {
 
             // Deny editing
             embed.setDescription(`Unfortunately quote **\`#${quoteToDrop.quoteId} ${quoteToDrop.quote}\`** was submitted by <@${quoteToDrop.submitterId}>.\nIf you want it removed ask them or a server admin.`);
-            embed.setColor("#ff0000");
+            embed.setColor('#ff0000');
             ephemeral = true;
             return;
         };
@@ -250,9 +250,9 @@ module.exports = {
         // LEADERBOARD
         const leaderboard = async () => {
             const leaderboardArray = await leaderboardSchema.find().sort({ count: -1 });
-            if (leaderboardArray == "") return embed.setTitle("The Moses leaderboard is empty!");
+            if (leaderboardArray == '') return embed.setTitle('The Moses leaderboard is empty!');
             let place = 1;
-            let leaderboardString = "";
+            let leaderboardString = '';
 
             for (const user of leaderboardArray) {
                 leaderboardString += `**#${place}** <@${user.userId}> **→** **\`${user.count}\`**\n`;
@@ -261,22 +261,22 @@ module.exports = {
 
             embed.setTitle(`Moses quotes leaderboard:`);
             embed.setDescription(leaderboardString);
-            embed.setColor("#00c8ff");
+            embed.setColor('#00c8ff');
         };
 
         // PIC
         const pic = async (file, description) => {
-            const allowedFileFormats = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+            const allowedFileFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!allowedFileFormats.includes(file.contentType)) {
                 embed.setTitle(`Only avaliable file formats are: PNG, JPG, JPEG, GIF or WEBP`);
-                embed.setColor("#ff0000");
+                embed.setColor('#ff0000');
                 ephemeral = true;
                 return;
             }
 
             // embed.setAuthor({ name: "SaintKappa Waifu Viewer", iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` })
-            if (typeof description !== "undefined") embed.addFields({ name: "Description:", value: description.toString(), inline: true });
-            embed.addFields({ name: "Dimensions:", value: `${file.width}x${file.height}`, inline: true }, { name: "File size:", value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true });
+            if (typeof description !== 'undefined') embed.addFields({ name: 'Description:', value: description.toString(), inline: true });
+            embed.addFields({ name: 'Dimensions:', value: `${file.width}x${file.height}`, inline: true }, { name: 'File size:', value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true });
             embed.setTitle(`Succesfully uploaded your image to the MosesDB!`);
             embed.setURL(file.url);
             embed.setImage(file.url);
@@ -285,12 +285,12 @@ module.exports = {
             const storageEmbed = new EmbedBuilder()
                 .setDescription(`+<@${user.id}> uploaded a new moses pic!`)
                 .addFields(
-                    { name: "Description:", value: description || "*none*", inline: true },
-                    { name: "Dimensions:", value: `${file.width}x${file.height}`, inline: true },
-                    { name: "File size:", value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true }
+                    { name: 'Description:', value: description || '*none*', inline: true },
+                    { name: 'Dimensions:', value: `${file.width}x${file.height}`, inline: true },
+                    { name: 'File size:', value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true }
                 );
 
-            client.channels.cache.get("1058118420186542120").send({
+            client.channels.cache.get('1058118420186542120').send({
                 embeds: [storageEmbed],
                 files: [new AttachmentBuilder(`${file.url}`)],
             });
@@ -299,42 +299,42 @@ module.exports = {
         const subcommand = interaction.options._subcommand;
         const args = interaction.options._hoistedOptions;
         switch (subcommand) {
-            case "list":
+            case 'list':
                 try {
                     await list(args[0]?.value || 1);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "add":
+            case 'add':
                 try {
                     await add(args[0]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "edit":
+            case 'edit':
                 try {
                     await edit(args[0]?.value, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "remove":
+            case 'remove':
                 try {
                     await drop(args[0]?.value);
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "leaderboard":
+            case 'leaderboard':
                 try {
                     await leaderboard();
                 } catch (err) {
                     handleError(err);
                 }
                 break;
-            case "pic":
+            case 'pic':
                 try {
                     await pic(args[0]?.attachment, args[1]?.value);
                 } catch (err) {

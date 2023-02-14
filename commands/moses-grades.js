@@ -8,18 +8,12 @@ module.exports = {
     testOnly: true,
 
     callback: async ({ interaction, user }) => {
-        if (!interaction) return;
-        interaction.deferReply();
-
         const embed = new EmbedBuilder();
         let request;
 
+        const start = new Date().getTime();
         try {
-            request = await axios.get(`https://api.saintkappa.xyz/vulcan/grades`, {
-                headers: {
-                    Authorization: `${process.env.VULCAN_KEY}`,
-                },
-            });
+            request = await axios.get(`https://api.saintkappa.xyz/vulcan/grades`);
         } catch (err) {
             console.error(err);
 
@@ -41,11 +35,10 @@ module.exports = {
             .addFields(...fields)
             .setColor('#fe3776')
             .setTitle("Here are Moses' current grades:")
-            // .setDescription('\u200B')
-            .setFooter({ text: `SaintKappa Vulcan API`, iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` });
+            .setFooter({ text: `SaintKappa Vulcan API \u2022 ${new Date().getTime() - start}ms`, iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` });
 
-        interaction.editReply({
+        return {
             embeds: [embed],
-        });
+        };
     },
 };

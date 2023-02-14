@@ -159,7 +159,7 @@ module.exports = {
                 submitterName: user.username,
             }).save();
 
-            embed.addFields({ name: `Added quote \`#${lastQuoteCount[0]?.quoteId + 1 || '1'}\` (said by <@${quoteeUserId}>:`, value: `**\`${quote}\`**` });
+            embed.setDescription(`**Added quote by <@${quoteeUserId}>!**\n\`#${lastQuoteCount[0]?.quoteId + 1 || '1'} ${quote}\``);
             updateChannelName();
         };
 
