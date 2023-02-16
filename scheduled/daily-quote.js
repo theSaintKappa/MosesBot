@@ -3,46 +3,45 @@ const lastUsedSchema = require('../schemas/moses-last-used-schema');
 const { EmbedBuilder } = require('discord.js');
 
 const sendQuote = async (client) => {
-    const quotesArray = await quotesSchema.find({});
+    let quote = await quotesSchema.aggregate([{ $sample: { size: 1 } }]);
+    quote = quote[0];
 
-    const chosenQuote = quotesArray[Math.floor(Math.random() * quotesArray.length)];
-
-    const quoteDate = new Date(chosenQuote.date);
     const day = {
-        1: { weekday: 'monday', color: '#ff0000' },
-        2: { weekday: 'CHEWSDAY', color: '#ff6f00' },
-        3: { weekday: 'wednesday', color: '#fff200' },
-        4: { weekday: 'thursday', color: '#33ff00' },
-        5: { weekday: 'friday', color: '#00c8ff' },
-        6: { weekday: 'saturday', color: '#8c00ff' },
-        0: { weekday: 'sunday', color: '#ff00ff' },
+        1: { weekday: 'monday', color: '#ff6666' },
+        2: { weekday: 'CHEWSDAY', color: '#ffa866' },
+        3: { weekday: 'wednesday', color: '#fff766' },
+        4: { weekday: 'thursday', color: '#85ff66' },
+        5: { weekday: 'friday', color: '#66deff' },
+        6: { weekday: 'saturday', color: '#ba66ff' },
+        0: { weekday: 'sunday', color: '#ff66ff' },
     };
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
     const getOrdinal = (day) => {
         return day + (day > 0 ? ['th', 'st', 'nd', 'rd'][(day > 3 && day < 21) || day % 10 > 3 ? 0 : day % 10] : '');
     };
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     const embed = new EmbedBuilder()
         .setColor(day[new Date().getDay()].color)
-        .setTitle(`**\`#${chosenQuote.quoteId}\`** ${chosenQuote.quote}`)
-        .setFooter({ text: `It was said on ${day[quoteDate.getDay()].weekday} ${getOrdinal(quoteDate.getDate())} ${months[quoteDate.getMonth()]} ${quoteDate.getFullYear()}.` });
+        .setTitle(`**\`#${quote.quoteId}\`** ${quote.quote}`)
+        .setDescription(`\u200B\nUploaded by <@${quote.submitterId}> on ${day[quote.date.getDay()].weekday} ${getOrdinal(quote.date.getDate())} ${months[quote.date.getMonth()]} ${quote.date.getFullYear()}.`);
 
     try {
-        await client.channels.cache.get('980813191556780064').send({ embeds: [embed], content: `Hey <@&980815178813820988>, here is today's random Moses Quote!` });
+        await client.channels.cache.get('980813191556780064').send({ embeds: [embed], content: `Hiya <@&980815178813820988>, here is today's random Moses Quote!` });
 
-        console.log(`[Moses Quotes] Sent quote #${chosenQuote.quoteId} ${chosenQuote.quote.slice(0, 16)}...`);
+        console.log(`[Moses Quotes] Sent quote #${quote.quoteId} ${quote.quote.slice(0, 16)}...`);
 
-        await new lastUsedSchema({
-            usedQuoteId: chosenQuote.quoteId,
-            usedDate: new Date().getTime(),
-        })
-            .save()
-            .then(() => {
-                console.log(`[Moses Quotes] Saved quote #${chosenQuote.quoteId} to moses-last-used`);
-            })
-            .catch(() => {
-                console.error(`[Error] Failed to save quote #${chosenQuote.quoteId} to moses-last-used`);
-            });
+        // await new lastUsedSchema({
+        //     usedQuoteId: quote.quoteId,
+        //     usedDate: new Date().getTime(),
+        // })
+        //     .save()
+        //     .then(() => {
+        //         console.log(`[Moses Quotes] Saved quote #${quote.quoteId} to moses-last-used`);
+        //     })
+        //     .catch(() => {
+        //         console.error(`[Error] Failed to save quote #${quote.quoteId} to moses-last-used`);
+        //     });
     } catch (err) {
         console.error(err);
     }

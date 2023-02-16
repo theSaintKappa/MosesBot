@@ -1,7 +1,6 @@
 const { EmbedBuilder, ApplicationCommandOptionType } = require('discord.js');
-const { sendDailyQuote } = require('../scheduled/daily-quote');
+const { sendQuote } = require('../scheduled/daily-quote');
 const { CommandType } = require('wokcommands');
-const autocomplete = ['Delete last quote', "Don't delete last quote"];
 
 module.exports = {
     description: "Re-roll today's daily quote",
@@ -11,45 +10,34 @@ module.exports = {
         {
             name: 'delete-last-quote',
             description: 'Do you want to delete the last quote sent in the channel?',
-            required: true,
+            required: false,
             type: ApplicationCommandOptionType.String,
-            autocomplete: true,
+            choices: [
+                { name: 'Delete last quote', value: 'true' },
+                { name: "Don't delete last quote", value: 'false' },
+            ],
         },
     ],
-
-    autocomplete: () => autocomplete,
 
     callback: async ({ args, client }) => {
         let embed = new EmbedBuilder();
 
-        if (args[0] === autocomplete[0]) {
-            const quotesChannel = client.channels.cache.get('980813191556780064'); // quotes channel
-            try {
-                await quotesChannel.bulkDelete(1);
-                sendDailyQuote();
+        try {
+            if (args[0] === 'true') await client.channels.cache.get('980813191556780064').bulkDelete(1);
 
-                embed.setColor('#c756ff');
-                embed.setAuthor({
-                    name: "Re-rolled today's quote & removed the last one.",
-                    iconURL: 'https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif',
-                });
-            } catch (err) {
-                console.error(err);
+            sendQuote(client);
 
-                embed.setTitle(`An error occurred while processing your request.`);
-                embed.setColor('#ff0000');
-            }
-            return {
-                embeds: [embed],
-                ephemeral: true,
-            };
+            embed.setColor('#c756ff');
+            embed.setAuthor({
+                name: "Re-rolled today's quote.",
+                iconURL: 'https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif',
+            });
+        } catch (err) {
+            console.error(err);
+
+            embed.setTitle(`An error occurred while processing your request.`);
+            embed.setColor('#ff0000');
         }
-
-        sendDailyQuote();
-        embed.setAuthor({
-            name: "Re-rolled today's quote",
-            iconURL: 'https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif',
-        });
 
         return {
             embeds: [embed],

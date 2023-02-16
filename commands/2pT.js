@@ -151,6 +151,8 @@ module.exports = {
                 }).save();
             }
 
+            if (!quote.endsWith('.')) quote += '.';
+
             await new quotesSchema({
                 quoteeId: quoteeUserId,
                 quote,

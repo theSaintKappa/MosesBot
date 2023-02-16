@@ -40,7 +40,7 @@ client.on(Events.ClientReady, () => {
         testServers: ['980813190780841984'],
         botOwners: ['315531146953752578', '304961013202288651'],
         commandsDir: path.join(__dirname, 'commands'),
-        featuresDIr: path.join(__dirname, 'features'),
+        // featuresDIr: path.join(__dirname, 'features'),
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
@@ -49,6 +49,9 @@ client.on(Events.ClientReady, () => {
         '15 7 * * *', // Everyday at 7:15
         async () => {
             sendQuote(client);
+
+            const moses = [...'Moses'].sort(() => 0.5 - Math.random());
+            client.guilds.cache.get('980813190780841984').members.cache.get('389021335285661707').setNickname(moses.join(''));
 
             try {
                 const request = await axios.get(`https://api.saintkappa.xyz/vulcan/luckyNumber`);

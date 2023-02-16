@@ -166,6 +166,8 @@ module.exports = {
                 }).save();
             }
 
+            if (!quote.endsWith('.')) quote += '.';
+
             await new quotesSchema({
                 quote,
                 date: new Date(),
