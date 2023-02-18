@@ -1,5 +1,5 @@
-const quotesSchema = require('../schemas/moses-quotes-schema');
-const lastUsedSchema = require('../schemas/moses-last-used-schema');
+const quotesSchema = require('../models/moses-quotes-schema');
+const lastUsedSchema = require('../models/moses-last-used-schema');
 const { EmbedBuilder } = require('discord.js');
 
 const sendQuote = async (client) => {

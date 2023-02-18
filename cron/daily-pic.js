@@ -1,4 +1,4 @@
-const picsSchema = require('../schemas/moses-pics-schema');
+const picsSchema = require('../models/moses-pics-schema');
 const { Webhook, MessageBuilder } = require('discord-webhook-node');
 
 const sendDailyPic = async () => {

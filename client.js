@@ -3,11 +3,12 @@ const DiscordJS = require('discord.js');
 const WOK = require('wokcommands');
 const path = require('path');
 const cron = require('node-cron');
-const { sendQuote } = require('./scheduled/daily-quote');
+const { sendQuote } = require('./cron/daily-quote');
 require('dotenv').config();
 const axios = require('axios');
 const { Client, IntentsBitField, Partials, ActivityType, EmbedBuilder, Events } = DiscordJS;
-const picsSchema = require('./schemas/moses-pics-schema');
+const picsSchema = require('./models/moses-pics-schema');
+const statusSchema = require('./models/client-status-schema');
 const mongoose = require('mongoose');
 // look into this later ok?
 mongoose.set('strictQuery', true);
@@ -25,7 +26,7 @@ const client = new Client({
     partials: [Partials.Channel],
 });
 
-client.on(Events.ClientReady, () => {
+client.on(Events.ClientReady, async () => {
     console.log(`${client.user.username} is now up and running!`);
 
     const dbOptions = {
@@ -64,8 +65,6 @@ client.on(Events.ClientReady, () => {
         { timezone: 'Europe/Warsaw' }
     );
 
-    client.user.setActivity('/help', { type: ActivityType.Watching });
-
     client.on(Events.GuildMemberAdd, (member) => {
         const author = {
             name: member.guild.name,
@@ -97,6 +96,10 @@ client.on(Events.ClientReady, () => {
         console.log(`${newMember.user.username} just accepted the server rules!`);
         newMember.roles.add('980814138869698641');
     });
+
+    const clientStatus = await statusSchema.findOne({}).limit(1);
+    client.user?.setPresence({ activities: [{ name: clientStatus.name, type: clientStatus.activityType, url: 'https://www.twitch.tv/itsgino_' }], status: clientStatus.status });
+    console.log(`Client presence set to: ${clientStatus.activityName} ${clientStatus.name} (${clientStatus.status})`);
 });
 
 const serverChannels = {
@@ -105,6 +108,24 @@ const serverChannels = {
 };
 
 client.on(Events.MessageCreate, async (message) => {
+    // moses' code
+    if (message.content === 'cockandballs69') {
+        message.channel.send(`cock and balls 🗿🗿🗿 \n\n client latency: \`${new Date().getTime() - message.createdTimestamp}ms\`, \n Websocket Latency: \`${Math.round(client.ws.ping)}ms\``);
+        return;
+    }
+
+    if (message.content === 'moses' && !message.author.bot) {
+        try {
+            message.channel.send('pong!').then((m) => {
+                m.edit(`moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`);
+                m.react('<:mosesThonk:981867313806602241>');
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        return;
+    }
+
     if (message.channel.id === '1058118420186542120' && message.embeds[0]?.data.description?.charAt(0) === '+') {
         const [attachment] = message.attachments.values();
         const description = message.embeds[0].data.fields?.find((obj) => obj.name === 'Description:').value;
@@ -141,17 +162,6 @@ client.on(Events.MessageCreate, async (message) => {
             console.error(err);
         }
         return;
-    }
-
-    if (message.content === 'moses' && !message.author.bot) {
-        try {
-            message.channel.send('pong!').then((m) => {
-                m.edit(`moses indeed!\n\nClient latency: \`${m.createdTimestamp - message.createdTimestamp}\`**ms**.\nAPI latency: \`${client.ws.ping}\`**ms**`);
-                m.react('<:mosesThonk:981867313806602241>');
-            });
-        } catch (err) {
-            console.log(err);
-        }
     }
 });
 

@@ -1,7 +1,7 @@
 const { EmbedBuilder, PermissionsBitField, AttachmentBuilder, ApplicationCommandOptionType } = require('discord.js');
-const quotesSchema = require('../schemas/moses-quotes-schema');
-const leaderboardSchema = require('../schemas/moses-leaderboard-schema');
-const picsSchema = require('../schemas/moses-pics-schema');
+const quotesSchema = require('../models/moses-quotes-schema');
+const leaderboardSchema = require('../models/moses-leaderboard-schema');
+const picsSchema = require('../models/moses-pics-schema');
 const { CommandType } = require('wokcommands');
 
 module.exports = {
