@@ -1,16 +1,17 @@
 //TODO: Make a features directory
 const DiscordJS = require('discord.js');
+const { Client, IntentsBitField, Partials, MessageType, EmbedBuilder, Events } = DiscordJS;
+require('dotenv').config();
+const mongoose = require('mongoose');
 const WOK = require('wokcommands');
 const path = require('path');
 const cron = require('node-cron');
-const { sendQuote } = require('./cron/daily-quote');
-require('dotenv').config();
 const axios = require('axios');
-const { Client, IntentsBitField, Partials, ActivityType, EmbedBuilder, Events } = DiscordJS;
-const picsSchema = require('./models/moses-pics-schema');
+const { sendQuote } = require('./cron/daily-quote');
 const statusSchema = require('./models/client-status-schema');
-const mongoose = require('mongoose');
-// look into this later ok?
+const picsSchema = require('./models/moses-pics-schema');
+const picsWitelist = require('./pics-whitelist');
+
 mongoose.set('strictQuery', true);
 
 const client = new Client({
@@ -45,6 +46,8 @@ client.on(Events.ClientReady, async () => {
         mongoUri: process.env.MONGO_URI,
         dbOptions,
     });
+
+    picsWitelist.fetch();
 
     cron.schedule(
         '15 7 * * *', // Everyday at 7:15
@@ -108,12 +111,6 @@ const serverChannels = {
 };
 
 client.on(Events.MessageCreate, async (message) => {
-    // moses' code
-    if (message.content === 'cockandballs69') {
-        message.channel.send(`cock and balls 🗿🗿🗿 \n\n client latency: \`${new Date().getTime() - message.createdTimestamp}ms\`, \n Websocket Latency: \`${Math.round(client.ws.ping)}ms\``);
-        return;
-    }
-
     if (message.content === 'moses' && !message.author.bot) {
         try {
             message.channel.send('pong!').then((m) => {
@@ -126,28 +123,7 @@ client.on(Events.MessageCreate, async (message) => {
         return;
     }
 
-    if (message.channel.id === '1058118420186542120' && message.embeds[0]?.data.description?.charAt(0) === '+') {
-        const [attachment] = message.attachments.values();
-        const description = message.embeds[0].data.fields?.find((obj) => obj.name === 'Description:').value;
-        await new picsSchema({
-            fileUrl: attachment.attachment,
-            description: description !== '*none*' ? description : null,
-            uploadDate: new Date().getTime(),
-            uploader: {
-                userName: message.author.username,
-                userId: message.author.id,
-            },
-            fileSize: attachment.size, // in bytes
-            fileDimensions: {
-                width: attachment.width,
-                height: attachment.height,
-            },
-            contentType: attachment.contentType,
-            fileName: attachment.name,
-        }).save();
-        return;
-    }
-
+    // TODO: improve this
     if (Object.values(serverChannels).includes(message.channel.id)) {
         try {
             // if message in memes channel && if message has no attachments
@@ -163,6 +139,42 @@ client.on(Events.MessageCreate, async (message) => {
         }
         return;
     }
+});
+
+client.on(Events.MessageCreate, async (message) => {
+    const embed = new EmbedBuilder();
+    // check if message is a dm, if it has any attachments, if it's of type default and if it's not sent by a bot (to prevent infinite loops)
+    if (message.guildId || message.attachments.size === 0 || !message.type === MessageType.Default || message.author.bot) return;
+
+    if (!picsWitelist.get().includes(message.author.id)) return message.reply({ embeds: [embed.setTitle('You are not whitelisted to upload Moses pics!\n> Ask a server admin to whitelist you.').setColor('#ff0000')] });
+
+    const attachmentFileTypes = Array.from(message.attachments.values()).map((attachment) => attachment.contentType);
+    if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].some((fileType) => attachmentFileTypes.includes(fileType)))
+        return message.reply({ embeds: [embed.setTitle('Only allowed file formats are: PNG, JPG, GIF & WEBP').setColor('#ff0000')] });
+
+    const pics = Array.from(message.attachments.values()).map((attachment) => ({
+        url: attachment.url,
+        uploader: {
+            id: message.author.id,
+            username: message.author.username,
+        },
+        size: attachment.size,
+        dimensions: {
+            width: attachment.width,
+            height: attachment.height,
+        },
+        contentType: attachment.contentType,
+        name: attachment.name,
+        id: attachment.id,
+    }));
+
+    await picsSchema.insertMany(pics);
+
+    message.reply({ embeds: [embed.setTitle(`Succesfully uploaded ${message.attachments.size} file${message.attachments.size > 1 ? 's' : ''}!`).setColor('#00ff00')] });
+
+    client.channels.cache
+        .get('1058118420186542120')
+        .send({ content: `> <@${message.author.id}> just uploaded ${message.attachments.size} Moses pic${message.attachments.size > 1 ? 's' : ''}.`, files: pics.map((file) => file.url), allowedMentions: { users: [] } });
 });
 
 client.login(process.env.CLIENT_TOKEN);

@@ -1,33 +1,29 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    fileUrl: {
+    url: {
         type: String,
         required: true,
     },
-    description: {
-        type: String,
-        required: false,
-    },
-    uploadDate: {
+    uploadedAt: {
         type: Date,
-        required: true,
+        default: Date.now(),
     },
     uploader: {
-        userName: {
+        id: {
             type: String,
             required: true,
         },
-        userId: {
+        username: {
             type: String,
             required: true,
         },
     },
-    fileSize: {
+    size: {
         type: Number,
         required: true,
     },
-    fileDimensions: {
+    dimensions: {
         width: {
             type: Number,
             required: true,
@@ -41,10 +37,14 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    fileName: {
+    name: {
+        type: String,
+        required: true,
+    },
+    id: {
         type: String,
         required: true,
     },
 });
 
-module.exports = mongoose.model("moses-pics", schema, "moses-pics");
+module.exports = mongoose.model('moses-pics', schema, 'moses-pics');

@@ -1,7 +1,6 @@
 const { EmbedBuilder, PermissionsBitField, AttachmentBuilder, ApplicationCommandOptionType } = require('discord.js');
 const quotesSchema = require('../models/moses-quotes-schema');
 const leaderboardSchema = require('../models/moses-leaderboard-schema');
-const picsSchema = require('../models/moses-pics-schema');
 const { CommandType } = require('wokcommands');
 
 module.exports = {
@@ -77,26 +76,6 @@ module.exports = {
             name: 'leaderboard',
             description: 'Check the Moses quotes leaderboard!',
         },
-        // PIC
-        // {
-        //     type: ApplicationCommandOptionType.Subcommand,
-        //     name: "pic",
-        //     description: "Have a schmoking hot Moses pic and would like to share it with the commuinty?",
-        //     options: [
-        //         {
-        //             name: "attachment",
-        //             description: "Upload a file in any of these formats: PNG, JPG, JPEG, GIF or WEBP.",
-        //             type: 11, // attachment
-        //             required: true,
-        //         },
-        //         {
-        //             name: "description",
-        //             description: "Describe your Moses (optional).",
-        //             type: 3, // attachment
-        //             required: false,
-        //         },
-        //     ],
-        // },
     ],
 
     callback: async ({ interaction, user, member, client }) => {
@@ -266,38 +245,6 @@ module.exports = {
             embed.setColor('#00c8ff');
         };
 
-        // PIC
-        const pic = async (file, description) => {
-            const allowedFileFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!allowedFileFormats.includes(file.contentType)) {
-                embed.setTitle(`Only avaliable file formats are: PNG, JPG, JPEG, GIF or WEBP`);
-                embed.setColor('#ff0000');
-                ephemeral = true;
-                return;
-            }
-
-            // embed.setAuthor({ name: "SaintKappa Waifu Viewer", iconURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` })
-            if (typeof description !== 'undefined') embed.addFields({ name: 'Description:', value: description.toString(), inline: true });
-            embed.addFields({ name: 'Dimensions:', value: `${file.width}x${file.height}`, inline: true }, { name: 'File size:', value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true });
-            embed.setTitle(`Succesfully uploaded your image to the MosesDB!`);
-            embed.setURL(file.url);
-            embed.setImage(file.url);
-            ephemeral = true;
-
-            const storageEmbed = new EmbedBuilder()
-                .setDescription(`+<@${user.id}> uploaded a new moses pic!`)
-                .addFields(
-                    { name: 'Description:', value: description || '*none*', inline: true },
-                    { name: 'Dimensions:', value: `${file.width}x${file.height}`, inline: true },
-                    { name: 'File size:', value: `${parseFloat(file.size / Math.pow(1024, 2)).toFixed(2)}MB`, inline: true }
-                );
-
-            client.channels.cache.get('1058118420186542120').send({
-                embeds: [storageEmbed],
-                files: [new AttachmentBuilder(`${file.url}`)],
-            });
-        };
-
         const subcommand = interaction.options._subcommand;
         const args = interaction.options._hoistedOptions;
         switch (subcommand) {
@@ -332,13 +279,6 @@ module.exports = {
             case 'leaderboard':
                 try {
                     await leaderboard();
-                } catch (err) {
-                    handleError(err);
-                }
-                break;
-            case 'pic':
-                try {
-                    await pic(args[0]?.attachment, args[1]?.value);
                 } catch (err) {
                     handleError(err);
                 }

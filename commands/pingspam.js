@@ -1,9 +1,9 @@
-const { ApplicationCommandOptionType, PermissionFlagsBits } = require("discord.js");
-const { CommandType } = require("wokcommands");
-let spam = require("../controllers/spam-controller");
+const { ApplicationCommandOptionType, PermissionFlagsBits } = require('discord.js');
+const { CommandType } = require('wokcommands');
+let spam = require('../spam-controller');
 
 module.exports = {
-    description: "Wish everyone a good night sleep!",
+    description: 'Wish everyone a good night sleep!',
     type: CommandType.SLASH,
     testOnly: true,
     guildOnly: true,
@@ -11,27 +11,27 @@ module.exports = {
     options: [
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "start",
-            description: "Start torturing someone.",
+            name: 'start',
+            description: 'Start torturing someone.',
             options: [
                 {
                     type: ApplicationCommandOptionType.User,
-                    name: "user",
-                    description: "Who do you want to torture?",
+                    name: 'user',
+                    description: 'Who do you want to torture?',
                     required: true,
                 },
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: "optional-message",
-                    description: "Optional message to go along with the pings.",
+                    name: 'optional-message',
+                    description: 'Optional message to go along with the pings.',
                     required: false,
                 },
             ],
         },
         {
             type: ApplicationCommandOptionType.Subcommand,
-            name: "stop",
-            description: "Stop torturing.",
+            name: 'stop',
+            description: 'Stop torturing.',
         },
     ],
 
@@ -40,11 +40,11 @@ module.exports = {
         const userId = `${interaction.options._hoistedOptions[0]?.value}`;
         const optionalArg = `${interaction.options._hoistedOptions[1]?.value}`;
 
-        const pingEmote = "<:ping2:1021118765582254082>";
+        const pingEmote = '<:ping2:1021118765582254082>';
 
         let response;
         switch (subcommand) {
-            case "start":
+            case 'start':
                 if (!spam.getStatus()) {
                     response = `> ${pingEmote} Started torturing <@${userId}>!`;
                 } else {
@@ -55,15 +55,15 @@ module.exports = {
                 spam.setChannel(channel);
 
                 // Only set the optional msg if optional arg is defined
-                if (optionalArg !== "undefined") {
+                if (optionalArg !== 'undefined') {
                     spam.setMessage(` ${optionalArg}`);
                     spam.setStatus(true);
                     break;
                 }
-                spam.setMessage("");
+                spam.setMessage('');
                 spam.setStatus(true);
                 break;
-            case "stop":
+            case 'stop':
                 if (!spam.getStatus()) {
                     response = `There is no active pingspam to stop!`;
                     break;

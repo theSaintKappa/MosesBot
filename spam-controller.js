@@ -1,13 +1,13 @@
 let spamming = false;
-let spamChannel = undefined;
-let pingReceiver = undefined;
-let optionalMessage = "";
+let spamChannel;
+let pingReceiver;
+let optionalMessage = '';
 let comboCounter = 1;
 
 // spam function repeats until variable spamming is false
 function spam() {
     return new Promise((resolve, reject) => {
-        if (!spamChannel) reject("Channel is undefined!");
+        if (!spamChannel) reject('Channel is undefined!');
 
         // send message on spam channel
         spamChannel
