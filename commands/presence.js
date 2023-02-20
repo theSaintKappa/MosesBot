@@ -85,6 +85,6 @@ module.exports = {
             return { content: `An error occurred while setting the client presence.`, ephemeral: true };
         }
 
-        return { content: `> Client presence set to "**${activityName} ${name}** (${status})"`, ephemeral: true };
+        return { content: `> Client presence set to "**${activityName} ${name}**" (${status})`, ephemeral: false };
     },
 };

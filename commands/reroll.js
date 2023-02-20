@@ -1,5 +1,5 @@
 const { EmbedBuilder, ApplicationCommandOptionType } = require('discord.js');
-const { sendQuote } = require('../cron/daily-quote');
+const sendQuote = require('../send-quote');
 const { CommandType } = require('wokcommands');
 
 module.exports = {
