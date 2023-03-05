@@ -145,7 +145,7 @@ module.exports = {
                 }).save();
             }
 
-            if (!quote.endsWith('.')) quote += '.';
+            if (!quote.endsWith('.') && !quote.endsWith('?') && !quote.endsWith('!')) quote += '.';
 
             await new quotesSchema({
                 quote,
