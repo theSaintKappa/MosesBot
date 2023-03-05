@@ -6,7 +6,7 @@ const picsWitelist = require('./pics-whitelist');
 const path = require('path');
 require('dotenv').config();
 
-mongoose.set('strictQuery', true);
+mongoose.set('strictQuery', false);
 
 const client = new Client({
     intents: [
