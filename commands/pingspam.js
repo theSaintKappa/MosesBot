@@ -1,13 +1,14 @@
 const { ApplicationCommandOptionType, PermissionFlagsBits } = require('discord.js');
 const { CommandType } = require('wokcommands');
-let spam = require('../spam-controller');
+let pingSpam = require('../ping-spam');
 
 module.exports = {
-    description: 'Wish everyone a good night sleep!',
+    description: 'Torture someone via discord mentions.',
     type: CommandType.SLASH,
     testOnly: true,
-    guildOnly: true,
     permissions: [PermissionFlagsBits.Administrator],
+    guildOnly: true,
+
     options: [
         {
             type: ApplicationCommandOptionType.Subcommand,
@@ -22,8 +23,8 @@ module.exports = {
                 },
                 {
                     type: ApplicationCommandOptionType.String,
-                    name: 'optional-message',
-                    description: 'Optional message to go along with the pings.',
+                    name: 'message',
+                    description: 'Message to go along with the pings (optional).',
                     required: false,
                 },
             ],
@@ -36,50 +37,36 @@ module.exports = {
     ],
 
     callback: async ({ interaction, channel }) => {
-        const subcommand = `${interaction.options._subcommand.toString()}`;
-        const userId = `${interaction.options._hoistedOptions[0]?.value}`;
-        const optionalArg = `${interaction.options._hoistedOptions[1]?.value}`;
+        const subcommand = interaction.options._subcommand;
+        const userId = interaction.options._hoistedOptions[0]?.value;
+        const message = interaction.options._hoistedOptions[1]?.value ?? '';
 
         const pingEmote = '<:ping2:1021118765582254082>';
 
-        let response;
         switch (subcommand) {
             case 'start':
-                if (!spam.getStatus()) {
-                    response = `> ${pingEmote} Started torturing <@${userId}>!`;
-                } else {
-                    response = `> ${pingEmote} Updated pingspam! Now torturing <@${userId}>!`;
+                if (pingSpam.getStatus()) {
+                    pingSpam.setReceiver(userId);
+                    pingSpam.setChannel(channel);
+                    pingSpam.setMessage(message);
+                    pingSpam.resetCombo();
+                    return `> ${pingEmote} Updated pingspam! Now torturing <@${userId}>!`;
                 }
 
-                spam.setReceiver(userId);
-                spam.setChannel(channel);
+                pingSpam.setReceiver(userId);
+                pingSpam.setChannel(channel);
+                pingSpam.setMessage(message);
+                pingSpam.setStatus(true);
 
-                // Only set the optional msg if optional arg is defined
-                if (optionalArg !== 'undefined') {
-                    spam.setMessage(` ${optionalArg}`);
-                    spam.setStatus(true);
-                    break;
-                }
-                spam.setMessage('');
-                spam.setStatus(true);
-                break;
+                return `> ${pingEmote} Started torturing <@${userId}>!`;
+
             case 'stop':
-                if (!spam.getStatus()) {
-                    response = `There is no active pingspam to stop!`;
-                    break;
-                }
-                response = `> ${pingEmote} Stopped torturing <@${spam.getReceiver()}> with a streak of \`${spam.getCombo()}\`.`;
+                if (!pingSpam.getStatus()) return { content: `There is no active pingspam to stop!`, ephemeral: true };
 
-                spam.setStatus(false);
+                pingSpam.setStatus(false);
 
-                spam.resetCombo();
-                break;
-            default:
-                response = `Something went wrong!`;
+                return `> ${pingEmote} Stopped torturing <@${pingSpam.getReceiver()}> with a streak of \`${pingSpam.getCombo()}\`.`;
         }
-
-        return {
-            content: response,
-        };
+        pingSpam.resetCombo();
     },
 };
