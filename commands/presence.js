@@ -66,7 +66,7 @@ module.exports = {
         const activities = {
             0: 'Playing',
             1: 'Streaming',
-            2: 'Listening',
+            2: 'Listening to',
             3: 'Watching',
             5: 'Competing in',
         };

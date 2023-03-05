@@ -36,25 +36,6 @@ client.on(Events.ClientReady, async () => {
 
     picsWitelist.fetch();
 
-    // cron.schedule(
-    //     '15 7 * * *', // Everyday at 7:15
-    //     async () => {
-    //         sendQuote(client);
-
-    //         const moses = [...'Moses'].sort(() => 0.5 - Math.random());
-    //         client.guilds.cache.get('980813190780841984').members.cache.get('389021335285661707').setNickname(moses.join(''));
-
-    //         try {
-    //             const request = await axios.get(`https://api.saintkappa.xyz/vulcan/luckyNumber`);
-
-    //             client.channels.cache.get('1067438722703953992').setName(`🍀🔢 ›› ${request.data.number ?? 'brak'}`);
-    //         } catch (err) {
-    //             console.error(err);
-    //         }
-    //     },
-    //     { timezone: 'Europe/Warsaw' }
-    // );
-
     const clientStatus = await statusSchema.findOne({}).limit(1);
     client.user?.setPresence({ activities: [{ name: clientStatus.name, type: clientStatus.activityType, url: 'https://www.twitch.tv/itsgino_' }], status: clientStatus.status });
     console.log(`Client presence set to: ${clientStatus.activityName} ${clientStatus.name} (${clientStatus.status})`);

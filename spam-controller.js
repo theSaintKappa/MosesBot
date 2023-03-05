@@ -36,14 +36,11 @@ function spam() {
     });
 }
 
-// public functions
 module.exports = {
-    // pass in discord.js channel for spam function
     setChannel: (channel) => {
         spamChannel = channel;
     },
 
-    // set spam status (true = start spamming, false = stop spamming)
     setStatus: (statusFlag) => {
         // get current status
         let currentStatus = spamming;
