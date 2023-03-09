@@ -40,5 +40,5 @@ client.on(Events.ClientReady, async () => {
     client.user?.setPresence({ activities: [{ name: clientStatus.name, type: clientStatus.activityType, url: 'https://www.twitch.tv/itsgino_' }], status: clientStatus.status });
     console.log(`Client presence set to: ${clientStatus.activityName} ${clientStatus.name} (${clientStatus.status})`);
 });
-
+// oops
 client.login(process.env.CLIENT_TOKEN);
