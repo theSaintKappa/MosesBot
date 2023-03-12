@@ -34,7 +34,7 @@ module.exports = {
             { name: '\u200B', value: '╒═════ ***Admin commands***' },
             { name: '/reroll <clear previous?>', value: "Re-roll today's daily quote" },
             { name: '/presence [type] [name] <status>', value: 'Change the bot presence' },
-            { name: '/clear [ammount]', value: 'Purge messages from the current channel' },
+            { name: '/clear [amount]', value: 'Purge messages from the current channel' },
             { name: '/say [message]', value: 'Sudo the bot to say something' },
             { name: '/pingspam [start/stop] [user]', value: 'Torture someone via discord mentions' },
             { name: '/command', value: 'Display all the global & guild scoped slash commands' },
