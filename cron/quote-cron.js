@@ -1,9 +1,10 @@
-const cron = require('node-cron');
+// const cron = require('node-cron');
+const cron = require('node-schedule');
 const axios = require('axios');
 const sendQuote = require('../send-quote');
 
 module.exports = (instance, client) => {
-    cron.schedule(
+    cron.scheduleJob(
         '15 7 * * *', // Everyday at 7:15
         async () => {
             try {
@@ -17,7 +18,6 @@ module.exports = (instance, client) => {
             } catch (err) {
                 console.error(err);
             }
-        },
-        { timezone: 'Europe/Warsaw' }
+        }
     );
 };
