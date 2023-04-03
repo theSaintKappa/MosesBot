@@ -5,7 +5,6 @@ const statusSchema = require('./models/client-status-schema');
 const picsWitelist = require('./pics-whitelist');
 const path = require('path');
 require('dotenv').config();
-
 mongoose.set('strictQuery', false);
 
 const client = new Client({
@@ -40,5 +39,5 @@ client.on(Events.ClientReady, async () => {
     client.user?.setPresence({ activities: [{ name: clientStatus.name, type: clientStatus.activityType, url: 'https://www.twitch.tv/itsgino_' }], status: clientStatus.status });
     console.log(`Client presence set to: ${clientStatus.activityName} ${clientStatus.name} (${clientStatus.status})`);
 });
-// oops
+
 client.login(process.env.CLIENT_TOKEN);
