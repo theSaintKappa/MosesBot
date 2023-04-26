@@ -1,6 +1,6 @@
 {
     "name": "moses-bot",
-    "version": "2.5.6",
+    "version": "2.5.7",
     "description": "A small Discord bot named after my friend Moses.",
     "main": "client.js",
     "scripts": {
