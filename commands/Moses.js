@@ -169,6 +169,8 @@ module.exports = {
                 return;
             }
 
+            if (!newQuote.endsWith('.') && !newQuote.endsWith('?') && !newQuote.endsWith('!')) newQuote += '.';
+
             // Edit in admin mode
             if (member.permissions.has(PermissionsBitField.Flags.Administrator)) {
                 await quotesSchema.updateOne({ quoteId }, { quote: newQuote }).then(() => {

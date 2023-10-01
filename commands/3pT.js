@@ -31,7 +31,7 @@ module.exports = {
                 {
                     type: ApplicationCommandOptionType.User,
                     name: 'user',
-                    description: 'Wich server member would you like to quote?',
+                    description: 'Which server member would you like to quote?',
                     required: true,
                 },
                 {
@@ -184,6 +184,8 @@ module.exports = {
                 return;
             }
 
+            if (!newQuote.endsWith('.') && !newQuote.endsWith('?') && !newQuote.endsWith('!')) newQuote += '.';
+
             // Edit in admin mode
             if (member.permissions.has(PermissionsBitField.Flags.Administrator)) {
                 await quotesSchema.updateOne({ quoteId }, { quote: newQuote }).then(() => {
@@ -246,7 +248,7 @@ module.exports = {
         // LEADERBOARD
         const leaderboard = async () => {
             const leaderboardArray = await leaderboardSchema.find().sort({ count: -1 });
-            if (leaderboardArray == '') return embed.setTitle('The 3pT quotees leaderboard is empty!');
+            if (leaderboardArray == '') return embed.setTitle('The 3pT quotes leaderboard is empty!');
             let place = 1;
             let leaderboardString = '';
 
