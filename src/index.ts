@@ -1,15 +1,16 @@
 import { Client, EmbedBuilder, Events, GatewayIntentBits, Partials } from "discord.js";
 import { commands } from "./commands";
 import "./db/setup";
+import Presence, { IPresence } from "./models/bot/presence";
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.MessageContent,
         GatewayIntentBits.DirectMessages,
     ],
     partials: [Partials.Channel],
@@ -17,6 +18,9 @@ const client = new Client({
 
 client.once(Events.ClientReady, async (client) => {
     console.log(`🟢 ${client.user.username} is now online!`);
+
+    const presence = await Presence.findOne<IPresence>();
+    if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
