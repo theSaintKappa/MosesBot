@@ -1,7 +1,8 @@
 import { Client, EmbedBuilder, Events, GatewayIntentBits, Partials } from "discord.js";
 import { commands } from "./commands";
 import "./db/setup";
-import Presence, { IPresence } from "./models/bot/presence";
+import { IPresence } from "./db/types";
+import Presence from "./models/bot/presence";
 
 const client = new Client({
     intents: [

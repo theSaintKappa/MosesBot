@@ -1,12 +1,5 @@
-import { ClientPresenceStatus } from "discord.js";
-import { Document, Schema, model } from "mongoose";
-import { DocumentTimestamps } from "../../db/types";
-
-export interface IPresence extends Document, DocumentTimestamps {
-    type: number;
-    name: string;
-    status: ClientPresenceStatus;
-}
+import { Schema, model } from "mongoose";
+import { IPresence } from "../../db/types";
 
 const schema = new Schema<IPresence>(
     {

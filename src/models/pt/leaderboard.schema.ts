@@ -9,4 +9,4 @@ const schema = new Schema<ILeaderboard>(
     { timestamps: true, versionKey: false }
 );
 
-export default model<ILeaderboard>("moses.leaderboard", schema, "moses.leaderboard");
+export default model<ILeaderboard>("pt.leaderboard", schema, "pt.leaderboard");

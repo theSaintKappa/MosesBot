@@ -1,13 +1,14 @@
 import { Schema, model } from "mongoose";
-import { IMosesQuote } from "../../db/types";
+import { IPtQuote } from "../../db/types";
 
-const schema = new Schema<IMosesQuote>(
+const schema = new Schema<IPtQuote>(
     {
         id: { type: Number, required: false, unique: true },
         content: { type: String, required: true },
+        authorId: { type: String, required: true },
         submitterId: { type: String, required: true },
     },
     { timestamps: true, versionKey: false }
 );
 
-export default model<IMosesQuote>("moses.quotes", schema, "moses.quotes");
+export default model<IPtQuote>("pt.quotes", schema, "pt.quotes");
