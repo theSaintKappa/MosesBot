@@ -1,5 +1,6 @@
 import { AttachmentBuilder, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
 import { CommandObject } from "../commands";
+import secrets from "../secrets";
 
 interface UnknownObject {
     [key: string]: any;
@@ -12,7 +13,7 @@ interface Language {
 
 const languages: Language[] = [];
 
-const headers = { Authorization: `Bearer ${process.env.GITHUB_TOKEN!!}` };
+const headers = { Authorization: `Bearer ${secrets.githubToken}` };
 
 try {
     const data = (await fetch("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", { headers }).then((res) => res.json())) as UnknownObject[];

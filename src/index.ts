@@ -3,6 +3,7 @@ import { commands } from "./commands";
 import "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
+import secrets from "./secrets";
 
 const client = new Client({
     intents: [
@@ -45,6 +46,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-if (!process.env.DISCORD_TOKEN) throw new Error("No Discord bot token provided. Set DISCORD_TOKEN environment variable.");
+client.login(secrets.discordToken);
 
-client.login(process.env.DISCORD_TOKEN);
+export const clientId = client.application?.id;

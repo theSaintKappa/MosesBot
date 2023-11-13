@@ -1,5 +1,6 @@
-import { CommandInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from "discord.js";
+import { APIUser, CommandInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from "discord.js";
 import { readdir } from "node:fs/promises";
+import secrets from "./secrets";
 
 export const commands = new Map<string, CommandObject>();
 
@@ -10,10 +11,12 @@ for (const file of commandFiles) {
     commands.set(command.builder.name, command);
 }
 
-const rest = new REST().setToken(process.env.DISCORD_TOKEN!!);
+const rest = new REST().setToken(secrets.discordToken);
 
 try {
-    const data = (await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID!!, process.env.TEST_GUILD_ID!!), {
+    const clientUser = (await rest.get(Routes.user())) as APIUser;
+
+    const data = (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), {
         body: [...commands.values()].map((command) => command.builder.toJSON()),
     })) as RESTPostAPIChatInputApplicationCommandsJSONBody[];
 
