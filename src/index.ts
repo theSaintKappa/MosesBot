@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, Partials } from "discord.js";
+import { Client, EmbedBuilder, Events, GatewayIntentBits, Partials } from "discord.js";
 import { commands } from "./commands";
 import "./db/setup";
 
@@ -20,7 +20,8 @@ client.once(Events.ClientReady, async (client) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isChatInputCommand()) return;
+
     const command = commands.get(interaction.commandName);
     if (!command) return;
 
@@ -29,10 +30,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } catch (err) {
         console.error(err);
 
+        const errorEmbed = new EmbedBuilder().setColor("#ff0000").setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
+
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: "There was an error while executing this command!", ephemeral: true });
+            await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
         } else {
-            await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+            await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
     }
 });

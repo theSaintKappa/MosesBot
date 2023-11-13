@@ -9,11 +9,11 @@ export interface IQuote extends Document, DocumentTimestamps {
 
 const schema = new Schema<IQuote>(
     {
-        id: { type: Number, required: true, unique: true },
+        id: { type: Number, required: false, unique: true },
         content: { type: String, required: true },
         submitterId: { type: String, required: true },
     },
     { timestamps: true, versionKey: false }
 );
 
-export default model<IQuote>("moses.quotes", schema);
+export default model<IQuote>("moses.quotes", schema, "moses.quotes");
