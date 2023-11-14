@@ -1,9 +1,8 @@
-import { CommandInteractionOptionResolver, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
+import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
 import { CommandObject } from "../commands";
 import { ILeaderboard, IMosesQuote, SchemaWithMetadata } from "../db/types";
 import MosesLeaderboard from "../models/moses/leaderboard.schema";
 import MosesQuote from "../models/moses/quote.schema";
-import { errorEmbed, infoEmbed, successEmbed } from "../utils/embed";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -60,8 +59,9 @@ export default {
     },
 } as CommandObject;
 
-infoEmbed.setFooter({ text: "Moses quotes" });
-successEmbed.setFooter({ text: "Moses quotes" });
+const infoEmbed = new EmbedBuilder().setColor("#00c8ff").setFooter({ text: "Moses quotes" });
+const successEmbed = new EmbedBuilder().setColor("#00ff3c").setFooter({ text: "Moses quotes" });
+const errorEmbed = new EmbedBuilder().setColor("#ff0000");
 
 async function list(page: number): Promise<InteractionReplyOptions> {
     const pageSize = 15;

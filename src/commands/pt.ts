@@ -1,9 +1,8 @@
-import { CommandInteractionOptionResolver, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
+import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
 import { CommandObject } from "../commands";
 import { ILeaderboard, IPtQuote, SchemaWithMetadata } from "../db/types";
 import PtLeaderboard from "../models/pt/leaderboard.schema";
 import PtQuote from "../models/pt/quote.schema";
-import { errorEmbed, infoEmbed, successEmbed } from "../utils/embed";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -40,7 +39,6 @@ export default {
     run: async (interaction) => {
         const subcommand = interaction.options.data[0].name;
         const args = <CommandInteractionOptionResolver>interaction.options;
-        const startTimestamp = performance.now();
 
         switch (subcommand) {
             case "list":
@@ -62,8 +60,9 @@ export default {
     },
 } as CommandObject;
 
-infoEmbed.setFooter({ text: "3pT quotes" });
-successEmbed.setFooter({ text: "3pT quotes" });
+const infoEmbed = new EmbedBuilder().setColor("#00c8ff").setFooter({ text: "3pT quotes" });
+const successEmbed = new EmbedBuilder().setColor("#00ff3c").setFooter({ text: "3pT quotes" });
+const errorEmbed = new EmbedBuilder().setColor("#ff0000");
 
 async function list(page: number): Promise<InteractionReplyOptions> {
     const pageSize = 15;
