@@ -3,6 +3,7 @@ import { commands } from "./commands";
 import "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
+import scheduleJobs from "./scheduler";
 import secrets from "./secrets";
 
 const client = new Client({
@@ -20,6 +21,8 @@ const client = new Client({
 
 client.once(Events.ClientReady, async (client) => {
     console.log(`🟢 ${client.user.username} is now online!`);
+
+    scheduleJobs(client);
 
     const presence = await Presence.findOne<IPresence>();
     if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });

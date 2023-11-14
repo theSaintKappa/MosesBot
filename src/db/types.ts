@@ -1,5 +1,5 @@
 import { ClientPresenceStatus } from "discord.js";
-import { Date, Document } from "mongoose";
+import { Document } from "mongoose";
 
 export interface DocumentTimestamps {
     createdAt: Date;
