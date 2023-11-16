@@ -97,12 +97,8 @@ async function list(page: number): Promise<InteractionReplyOptions> {
 }
 
 async function add(quote: string, user: User): Promise<InteractionReplyOptions> {
-    const leaderboardEntry = await MosesLeaderboard.findOne<ILeaderboard[]>({ userId: user.id });
-
-    if (!leaderboardEntry) await MosesLeaderboard.create({ userId: user.id, count: 0 });
-
     if (!quote.endsWith(".") && !quote.endsWith("?") && !quote.endsWith("!")) quote += ".";
-    await MosesQuote.create({ content: quote, submitterId: user.id });
+    await MosesQuote.create({ id: 0, content: quote, submitterId: user.id });
 
     return { embeds: [successEmbed.setTitle(`> ✅ Quote added!`).setDescription(`**\`${quote}\`**`)] };
 }

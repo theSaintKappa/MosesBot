@@ -3,7 +3,7 @@ import { IPtQuote } from "../../db/types";
 
 const schema = new Schema<IPtQuote>(
     {
-        id: { type: Number, required: false, unique: true },
+        id: { type: Number, required: true, unique: true },
         content: { type: String, required: true },
         authorId: { type: String, required: true },
         submitterId: { type: String, required: true },
