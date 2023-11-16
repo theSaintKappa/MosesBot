@@ -1,8 +1,8 @@
 import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
-import { CommandObject } from "../commands";
 import { ILeaderboard, IMosesQuote, SchemaWithMetadata } from "../db/types";
 import MosesLeaderboard from "../models/moses/leaderboard.schema";
 import MosesQuote from "../models/moses/quote.schema";
+import { CommandObject } from "./";
 
 export default {
     builder: new SlashCommandBuilder()

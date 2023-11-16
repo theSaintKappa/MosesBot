@@ -1,15 +1,18 @@
 import { APIUser, CommandInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from "discord.js";
-import { readdir } from "node:fs/promises";
-import secrets from "./secrets";
+import secrets from "../secrets";
 
-export const commands = new Map<string, CommandObject>();
+import aghpb from "./aghpb";
+import moses from "./moses";
+import presence from "./presence";
+import pt from "./pt";
+const commandObjects = [aghpb, moses, presence, pt];
 
-const commandsPath = import.meta.dir + "/commands";
-const commandFiles = await readdir(commandsPath);
-for (const file of commandFiles) {
-    const command: CommandObject = await import(commandsPath + "/" + file).then((module) => module.default);
-    commands.set(command.builder.name, command);
+export interface CommandObject {
+    builder: SlashCommandBuilder;
+    run: (interaction: CommandInteraction) => Promise<void>;
 }
+
+export const commands = new Map<string, CommandObject>(commandObjects.map((command) => [command.builder.name, command]));
 
 const rest = new REST().setToken(secrets.discordToken);
 
@@ -23,9 +26,4 @@ try {
     console.log(`🔷 Successfully loaded ${data.length} slash command(s)`);
 } catch (err) {
     console.error(err);
-}
-
-export interface CommandObject {
-    builder: SlashCommandBuilder;
-    run: (interaction: CommandInteraction) => Promise<void>;
 }

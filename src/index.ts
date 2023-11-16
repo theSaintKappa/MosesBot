@@ -50,5 +50,3 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 client.login(secrets.discordToken);
-
-export const clientId = client.application?.id;

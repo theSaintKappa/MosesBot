@@ -1,8 +1,8 @@
 import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
-import { CommandObject } from "../commands";
 import { ILeaderboard, IPtQuote, SchemaWithMetadata } from "../db/types";
 import PtLeaderboard from "../models/pt/leaderboard.schema";
 import PtQuote from "../models/pt/quote.schema";
+import { CommandObject } from "./";
 
 export default {
     builder: new SlashCommandBuilder()

@@ -1,6 +1,6 @@
 import { ActivityType, ClientPresenceStatus, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
-import { CommandObject } from "../commands";
 import Presence from "../models/bot/presence";
+import { CommandObject } from "./";
 
 export default {
     builder: new SlashCommandBuilder()
