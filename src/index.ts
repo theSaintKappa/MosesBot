@@ -1,4 +1,4 @@
-import { Client, EmbedBuilder, Events, GatewayIntentBits, Partials } from "discord.js";
+import { ActivityType, Client, EmbedBuilder, Events, GatewayIntentBits, Partials } from "discord.js";
 import { commands } from "./commands";
 import "./db/setup";
 import { IPresence } from "./db/types";
@@ -20,12 +20,17 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, async (client) => {
+    console.log(`⚙️  Running in ${secrets.environment} mode.`);
     console.log(`🟢 ${client.user.username} is now online!`);
 
     scheduleJobs(client);
 
-    const presence = await Presence.findOne<IPresence>();
-    if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });
+    if (secrets.environment === "production") {
+        const presence = await Presence.findOne<IPresence>();
+        if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });
+        return;
+    }
+    client.user.setPresence({ activities: [{ type: ActivityType.Custom, name: "⚙️ TESTING MODE" }], status: "dnd" });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {

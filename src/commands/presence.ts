@@ -16,6 +16,7 @@ export default {
                     { name: "Streaming", value: "1" },
                     { name: "Listening to", value: "2" },
                     { name: "Watching", value: "3" },
+                    { name: "Custom", value: "4" },
                     { name: "Competing in", value: "5" }
                 )
         )
@@ -25,7 +26,7 @@ export default {
                 .setName("status")
                 .setDescription("The bot's status.")
                 .setRequired(true)
-                .setChoices({ name: "Online", value: "online" }, { name: "Idle", value: "idle" }, { name: "Do Not Disturb", value: "dnd" })
+                .setChoices({ name: "Online", value: "online" }, { name: "Idle", value: "idle" }, { name: "Do Not Disturb", value: "dnd" }, { name: "Invisible", value: "invisible" })
         ),
 
     run: async (interaction) => {
@@ -38,6 +39,6 @@ export default {
 
         await Presence.updateOne({}, { type, name, status }, { upsert: true });
 
-        await interaction.reply({ content: `> Client presence set to "**${ActivityType[type]} ${name}**" (${status})` });
+        await interaction.reply({ content: `> Client presence set to "**${type !== ActivityType.Custom ? ActivityType[type] + " " : ""}${name}**" (${status})` });
     },
 } as CommandObject;
