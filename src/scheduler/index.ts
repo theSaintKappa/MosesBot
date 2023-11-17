@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { Client, ColorResolvable, EmbedBuilder, NewsChannel, TextChannel } from "discord.js";
+import { Client, ColorResolvable, EmbedBuilder } from "discord.js";
 import { IMosesQuote } from "../db/types";
 import MosesQuote from "../models/moses/quote.schema";
 import secrets from "../secrets";
@@ -24,7 +24,7 @@ export default function scheduleJobs(client: Client) {
                 .setTitle(`**\`#${quote.id}\`** ${quote.content}`)
                 .setDescription(`\u200B\nUploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`);
 
-            const channel = client.channels.cache.get("980813191556780064") as TextChannel | NewsChannel;
+            const channel = client.channels.cache.get("980813191556780064") as SendableChannel;
             const message = await channel.send({ embeds: [embed], content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&980815178813820988>, ${getRandomValue(messages)}` });
             message.react("<:upvote:982630993997496321>");
             message.react("<:downvote:982630978566639616>");

@@ -1,4 +1,4 @@
-import { ClientPresenceStatus } from "discord.js";
+import { ActivityType, ClientPresenceStatus } from "discord.js";
 import { Document } from "mongoose";
 
 export interface DocumentTimestamps {
@@ -37,7 +37,7 @@ export interface IMosesPicUploader extends Document, DocumentTimestamps {
 }
 
 export interface IPresence extends Document, DocumentTimestamps {
-    type: number;
+    type: ActivityType;
     name: string;
     status: ClientPresenceStatus;
 }

@@ -1,10 +1,10 @@
-import { Message, MessageType, NewsChannel, PartialMessage, TextChannel } from "discord.js";
+import { Message, MessageType, PartialMessage } from "discord.js";
 import MosesPic from "../models/moses/pics.schema";
 import MosesPicUploader from "../models/moses/pics.uploaders.schema";
 
 const dmCheck = (message: Message | PartialMessage) => message.guildId || message.attachments.size === 0 || message.type !== MessageType.Default || message.author.bot;
 
-export async function uploadPics(message: Message, logsChannel: TextChannel | NewsChannel) {
+export async function uploadPics(message: Message, logsChannel: SendableChannel) {
     if (dmCheck(message)) return;
 
     const picUploader = await MosesPicUploader.find({ userId: message.author.id });
@@ -28,7 +28,7 @@ export async function uploadPics(message: Message, logsChannel: TextChannel | Ne
     });
 }
 
-export async function deletePics(message: Message | PartialMessage, logsChannel: TextChannel | NewsChannel) {
+export async function deletePics(message: Message | PartialMessage, logsChannel: SendableChannel) {
     if (dmCheck(message)) return;
 
     const picIds = [...message.attachments.keys()];
