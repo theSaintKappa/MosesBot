@@ -50,7 +50,7 @@ client.once(Events.ClientReady, async (client) => {
             });
         }
 
-        if (message.channel.id !== "986333955286511656" || (message.embeds.length === 0 && message.attachments.size === 0)) {
+        if (message.channel.id === "986333955286511656" && message.embeds.length !== 0 && message.attachments.size !== 0) {
             message.react("<:upvote:982630993997496321>");
             message.react("<:downvote:982630978566639616>");
         }
