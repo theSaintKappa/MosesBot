@@ -21,6 +21,21 @@ export interface ILeaderboard extends Document, DocumentTimestamps {
     count: number;
 }
 
+export interface IMosesPic extends Document, DocumentTimestamps {
+    id: string;
+    url: string;
+    submitterId: string;
+    name: string;
+    size: number;
+    dimensions: { width: number; height: number };
+    contentType: string;
+}
+
+export interface IMosesPicUploader extends Document, DocumentTimestamps {
+    userId: string;
+    adminId: string;
+}
+
 export interface IPresence extends Document, DocumentTimestamps {
     type: number;
     name: string;
