@@ -1,5 +1,5 @@
 import { ActivityType, Client, EmbedBuilder, Events, GatewayIntentBits, MessageType, NewsChannel, Partials, TextChannel } from "discord.js";
-import { commands } from "./commands";
+import { executeCommand } from "./commands";
 import "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
@@ -43,24 +43,7 @@ client.once(Events.ClientReady, async (client) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-
-    const command = commands.get(interaction.commandName);
-    if (!command) return;
-
-    try {
-        await command.run(interaction);
-    } catch (err) {
-        console.error(err);
-
-        const errorEmbed = new EmbedBuilder().setColor("#ff0000").setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
-
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
-        } else {
-            await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
-        }
-    }
+    if (interaction.isChatInputCommand()) executeCommand(interaction);
 });
 
 client.login(secrets.discordToken);
