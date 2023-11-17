@@ -1,16 +1,17 @@
 {
     "name": "mosesbot",
-    "version": "3.0.8",
+    "version": "3.0.9",
     "description": "A Discord bot named after my friend Moses",
     "author": {
         "name": "SaintKappa",
         "url": "https://github.com/theSaintKappa"
     },
     "license": "BSD-2-Clause",
-    "module": "src/index.ts",
+    "module": "./src/index.ts",
     "type": "module",
     "scripts": {
-        "dev": "bun run --watch ./src/index.ts"
+        "dev": "NODE_ENV=development bun run --watch .",
+        "start": "NODE_ENV=production bun run ."
     },
     "devDependencies": {
         "bun-types": "latest"
