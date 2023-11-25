@@ -2,10 +2,11 @@ import { APIUser, CommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputAp
 import secrets from "../secrets";
 
 import aghpb from "./aghpb";
+import clear from "./clear";
 import moses from "./moses";
 import presence from "./presence";
 import pt from "./pt";
-const commandObjects = [aghpb, moses, presence, pt];
+const commandObjects = [aghpb, clear, moses, presence, pt];
 
 export interface CommandObject {
     builder: SlashCommandBuilder;
