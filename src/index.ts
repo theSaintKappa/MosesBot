@@ -44,17 +44,24 @@ client.once(Events.ClientReady, async (client) => {
 
     client.on(Events.MessageCreate, async (message) => {
         if (message.content === "moses" && !message.author.bot) {
-            message.channel.send("pong!").then((msg: Message) => {
+            return message.channel.send("pong!").then((msg: Message) => {
                 msg.edit(`\`\`\`yaml\nClient latency: ${msg.createdTimestamp - message.createdTimestamp}ms\nWebSocket latency: ${client.ws.ping}ms\`\`\``);
                 message.delete();
             });
         }
 
-        if (message.channel.id === "986333955286511656" && message.embeds.length !== 0 && message.attachments.size !== 0) {
-            message.react("<:upvote:982630993997496321>");
-            message.react("<:downvote:982630978566639616>");
+        if (message.channel.id === "986333955286511656" && hasImages(message)) {
+            message.react(client.emojis.cache.get("982630993997496321") ?? "👍");
+            message.react(client.emojis.cache.get("982630978566639616") ?? "👎");
+            return;
+        }
+
+        if (message.channel.id === "1175397530821992449" && hasImages(message)) {
+            message.react(client.emojis.cache.get("1178009254070861867") ?? "🥰");
+            return;
         }
     });
+    const hasImages = (message: Message) => message.embeds.some((embed) => embed.image || embed.thumbnail) || message.attachments.size !== 0;
 
     client.on(Events.GuildMemberAdd, async (member) => {
         const dmEmbed = new EmbedBuilder()
