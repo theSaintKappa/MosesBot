@@ -1,6 +1,6 @@
 import { ActivityType, ClientPresenceStatus, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
 import Presence from "../models/bot/presence";
-import { CommandObject } from "./";
+import { CommandObject, CommandType } from "./types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -28,6 +28,8 @@ export default {
                 .setRequired(true)
                 .setChoices({ name: "Online", value: "online" }, { name: "Idle", value: "idle" }, { name: "Do Not Disturb", value: "dnd" }, { name: "Invisible", value: "invisible" })
         ),
+
+    type: CommandType.Guild,
 
     run: async (interaction) => {
         const args = <CommandInteractionOptionResolver>interaction.options;

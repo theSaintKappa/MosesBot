@@ -2,7 +2,7 @@ import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions
 import { ILeaderboard, IMosesQuote, SchemaWithMetadata } from "../db/types";
 import MosesLeaderboard from "../models/moses/leaderboard.schema";
 import MosesQuote from "../models/moses/quote.schema";
-import { CommandObject } from "./";
+import { CommandObject, CommandType } from "./types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -34,6 +34,8 @@ export default {
                 .addNumberOption((option) => option.setName("id").setDescription("The id of the quote you would like to delete. To check quote id's, run: /moses list <page>.").setRequired(true))
         )
         .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the Moses quote adders leaderboard.")),
+
+    type: CommandType.Guild,
 
     run: async (interaction) => {
         const subcommand = interaction.options.data[0].name;

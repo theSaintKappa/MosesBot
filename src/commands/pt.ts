@@ -2,7 +2,7 @@ import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions
 import { ILeaderboard, IPtQuote, SchemaWithMetadata } from "../db/types";
 import PtLeaderboard from "../models/pt/leaderboard.schema";
 import PtQuote from "../models/pt/quote.schema";
-import { CommandObject } from "./";
+import { CommandObject, CommandType } from "./types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -35,6 +35,8 @@ export default {
                 .addNumberOption((option) => option.setName("id").setDescription("The id of the quote you would like to delete. To check quote id's, run: /3pT list <page>.").setRequired(true))
         )
         .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the 3pT quote authors leaderboard.")),
+
+    type: CommandType.Guild,
 
     run: async (interaction) => {
         const subcommand = interaction.options.data[0].name;

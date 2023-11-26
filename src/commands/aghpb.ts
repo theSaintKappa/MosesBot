@@ -1,6 +1,6 @@
 import { AttachmentBuilder, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
 import secrets from "../secrets";
-import { CommandObject } from "./";
+import { CommandObject, CommandType } from "./types";
 
 interface UnknownObject {
     [key: string]: any;
@@ -27,6 +27,8 @@ export default {
         .setName("aghpb")
         .setDescription("Shows an anime girl holding a programming book about the language of your choice.")
         .addStringOption((option) => option.setName("language").setDescription("A programming language the book is about. If left blank a random one will be selected.").setRequired(false)),
+
+    type: CommandType.Global,
 
     run: async (interaction) => {
         const languageArg = (<CommandInteractionOptionResolver>interaction.options).getString("language")?.toLowerCase();

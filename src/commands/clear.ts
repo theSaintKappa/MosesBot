@@ -1,5 +1,5 @@
-import { CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { CommandObject } from "./";
+import { ChannelType, CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { CommandObject, CommandType } from "./types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -8,18 +8,21 @@ export default {
         .addNumberOption((option) => option.setName("qty").setDescription("Number of messages you would like to delete.").setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
+    type: CommandType.Global,
+
     run: async (interaction) => {
-        const channel = interaction.channel as SendableChannel;
         const qty = (<CommandInteractionOptionResolver>interaction.options).getNumber("qty")!!;
 
-        if (qty < 1 || qty > 100) {
-            interaction.reply({ content: "> ⚠️ You can only delete between 1 and 100 messages.", ephemeral: true });
-            return;
-        }
+        if (qty < 1 || qty > 100) return interaction.reply({ content: "> ⚠️ You can only delete between 1 and 100 messages.", ephemeral: true });
+
+        const channel = interaction.channel as SendableChannel;
+        if (!channel) return;
+        if (![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type))
+            return interaction.reply({ content: "> ⚠️ This command can only be used in guild text channels.", ephemeral: true });
 
         await channel.bulkDelete(qty, true);
 
-        interaction.reply({ content: `> 🧹 Deleted ${qty} message${qty === 1 ? "" : "s"}.` });
+        interaction.reply({ content: `> 🧹 Deleted ${qty} message${qty === 1 ? "" : "s"}` });
         setTimeout(() => interaction.deleteReply(), 5000);
     },
 } as CommandObject;

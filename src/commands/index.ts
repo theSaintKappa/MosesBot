@@ -1,5 +1,6 @@
 import { APIUser, CommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from "discord.js";
 import secrets from "../secrets";
+import { CommandObject, CommandType } from "./types";
 
 import aghpb from "./aghpb";
 import clear from "./clear";
@@ -8,23 +9,24 @@ import presence from "./presence";
 import pt from "./pt";
 const commandObjects = [aghpb, clear, moses, presence, pt];
 
-export interface CommandObject {
-    builder: SlashCommandBuilder;
-    run: (interaction: CommandInteraction) => Promise<void>;
-}
-
 const commands = new Map<string, CommandObject>(commandObjects.map((command) => [command.builder.name, command]));
 
 const rest = new REST().setToken(secrets.discordToken);
 
 try {
     const clientUser = (await rest.get(Routes.user())) as APIUser;
+    const [globalCommands, guildCommands] = [...commands.values()].reduce(
+        (acc, command) => {
+            acc[command.type === CommandType.Guild ? 1 : 0].push(command.builder.toJSON());
+            return acc;
+        },
+        [[], []] as RESTPostAPIChatInputApplicationCommandsJSONBody[][]
+    );
 
-    const data = (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), {
-        body: [...commands.values()].map((command) => command.builder.toJSON()),
-    })) as RESTPostAPIChatInputApplicationCommandsJSONBody[];
+    globalCommands && (await rest.put(Routes.applicationCommands(clientUser.id), { body: globalCommands }));
+    guildCommands && (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), { body: guildCommands }));
 
-    console.log(`🔷 Successfully loaded ${data.length} slash command(s)`);
+    console.log(`🔷 Successfully loaded ${globalCommands.length + guildCommands.length} slash command(s)`);
 } catch (err) {
     console.error(err);
 }
