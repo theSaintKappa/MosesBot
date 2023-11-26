@@ -1,10 +1,11 @@
-import { ActivityType, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
+import { ActivityType, Client, EmbedBuilder, Events, GatewayIntentBits, Message, MessageType, Partials } from "discord.js";
 import { executeCommand } from "./commands";
+import config from "./config.json";
 import "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
 import { deletePics, uploadPics } from "./pics";
-import scheduleJobs from "./scheduler";
+import { getQuoteEmbed, getRandomQuote, scheduleJobs } from "./scheduler";
 import secrets from "./secrets";
 
 const client = new Client({
@@ -26,7 +27,22 @@ client.once(Events.ClientReady, async (client) => {
 
     scheduleJobs(client);
 
-    const picLogsChannel = client.channels.cache.get("1058118420186542120") as SendableChannel;
+    client.on(Events.MessageCreate, async (message) => {
+        if (
+            message.type === MessageType.Reply &&
+            message.reference &&
+            message.reference.messageId &&
+            message.reference.channelId === config.channels.quotes &&
+            message.channel.id === config.channels.quotes &&
+            message.content === "reroll"
+        ) {
+            const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
+            channel.messages.cache.get(message.reference.messageId)?.edit({ embeds: [getQuoteEmbed(await getRandomQuote())] });
+            message.delete();
+        }
+    });
+
+    const picLogsChannel = client.channels.cache.get(config.channels.picsLog) as SendableChannel;
     client.on(Events.MessageCreate, async (message) => {
         await uploadPics(message, picLogsChannel);
     });
@@ -39,7 +55,7 @@ client.once(Events.ClientReady, async (client) => {
     });
 
     client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-        if (oldMember.pending !== newMember.pending) newMember.roles.add("980814138869698641");
+        if (oldMember.pending !== newMember.pending) newMember.roles.add(config.roles.mosesFan);
     });
 
     client.on(Events.MessageCreate, async (message) => {
@@ -50,14 +66,14 @@ client.once(Events.ClientReady, async (client) => {
             });
         }
 
-        if (message.channel.id === "986333955286511656" && hasImages(message)) {
-            message.react(client.emojis.cache.get("982630993997496321") ?? "👍");
-            message.react(client.emojis.cache.get("982630978566639616") ?? "👎");
+        if (message.channel.id === config.channels.memes && hasImages(message)) {
+            message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
+            message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");
             return;
         }
 
-        if (message.channel.id === "1175397530821992449" && hasImages(message)) {
-            message.react(client.emojis.cache.get("1178009254070861867") ?? "🥰");
+        if (message.channel.id === config.channels.pets && hasImages(message)) {
+            message.react(client.emojis.cache.get(config.emojis.catLove) ?? "🥰");
             return;
         }
     });
@@ -70,7 +86,7 @@ client.once(Events.ClientReady, async (client) => {
             .setThumbnail("https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif")
             .setTitle(`> :wave: Greetings ${member.user.username}!`)
             .setDescription(
-                "My name is **`MosesBot`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:15am** (CET) a random Moses Quote will be sent to the <#980813191556780064> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#980839919972921374>.\n\u200B"
+                `My name is **\`${client.user.username}\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:00am** (GMT+1) a random Moses Quote will be sent to the <#${config.channels.quotes}> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#${config.channels.togglePings}>.\n\u200B`
             );
         member.send({ embeds: [dmEmbed] });
 
@@ -80,7 +96,7 @@ client.once(Events.ClientReady, async (client) => {
             .setThumbnail(`https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png`)
             .addFields({ name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true }, { name: "\u200B", value: "**ONE OF US!**", inline: true });
 
-        const welcomeChannel = client.channels.cache.get("986301246048722955") as SendableChannel;
+        const welcomeChannel = client.channels.cache.get(config.channels.welcone) as SendableChannel;
         welcomeChannel.send({ embeds: [welcomeEmbed] });
     });
 
