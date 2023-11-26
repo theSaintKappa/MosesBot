@@ -51,7 +51,7 @@ client.once(Events.ClientReady, async (client) => {
     });
 
     client.on(Events.InteractionCreate, async (interaction) => {
-        if (interaction.isChatInputCommand()) executeCommand(interaction);
+        if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) executeCommand(interaction);
     });
 
     client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {

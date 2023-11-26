@@ -1,5 +1,5 @@
 import { ChannelType, CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { CommandObject, CommandType } from "./types";
+import { CommandScope, SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -8,7 +8,7 @@ export default {
         .addNumberOption((option) => option.setName("qty").setDescription("Number of messages you would like to delete.").setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    type: CommandType.Global,
+    scope: CommandScope.Global,
 
     run: async (interaction) => {
         const qty = (<CommandInteractionOptionResolver>interaction.options).getNumber("qty")!!;
@@ -25,4 +25,4 @@ export default {
         interaction.reply({ content: `> 🧹 Deleted ${qty} message${qty === 1 ? "" : "s"}` });
         setTimeout(() => interaction.deleteReply(), 5000);
     },
-} as CommandObject;
+} as SlashCommandObject;

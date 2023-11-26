@@ -33,7 +33,10 @@ export async function sendQuote(client: Client, quote?: IMosesQuote) {
     quote ??= await getRandomQuote();
 
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
-    const message = await channel.send({ embeds: [getQuoteEmbed(quote)], content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&980815178813820988>, ${getRandomValue(messages)}` });
+    const message = await channel.send({
+        embeds: [getQuoteEmbed(quote)],
+        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)}`,
+    });
     message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
     message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");
 }

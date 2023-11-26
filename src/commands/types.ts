@@ -1,12 +1,16 @@
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction, SlashCommandBuilder } from "discord.js";
 
-export interface CommandObject {
-    builder: SlashCommandBuilder;
-    type: CommandType;
-    run: (interaction: CommandInteraction) => Promise<void>;
+interface CommandObject<TBuilder, TInteraction> {
+    builder: TBuilder;
+    scope: CommandScope;
+    run: (interaction: TInteraction) => Promise<void>;
 }
 
-export enum CommandType {
+export type SlashCommandObject = CommandObject<SlashCommandBuilder, ChatInputCommandInteraction>;
+
+export type ContextMenuCommandObject = CommandObject<ContextMenuCommandBuilder, ContextMenuCommandInteraction>;
+
+export enum CommandScope {
     Guild = "GUILD",
     Global = "GLOBAL",
 }

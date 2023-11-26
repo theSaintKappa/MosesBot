@@ -1,6 +1,6 @@
 import { ActivityType, ClientPresenceStatus, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
-import Presence from "../models/bot/presence";
-import { CommandObject, CommandType } from "./types";
+import Presence from "../../models/bot/presence";
+import { CommandScope, SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -29,7 +29,7 @@ export default {
                 .setChoices({ name: "Online", value: "online" }, { name: "Idle", value: "idle" }, { name: "Do Not Disturb", value: "dnd" }, { name: "Invisible", value: "invisible" })
         ),
 
-    type: CommandType.Guild,
+    scope: CommandScope.Guild,
 
     run: async (interaction) => {
         const args = <CommandInteractionOptionResolver>interaction.options;
@@ -43,4 +43,4 @@ export default {
 
         await interaction.reply({ content: `> Client presence set to "**${type !== ActivityType.Custom ? ActivityType[type] + " " : ""}${name}**" (${status})` });
     },
-} as CommandObject;
+} as SlashCommandObject;
