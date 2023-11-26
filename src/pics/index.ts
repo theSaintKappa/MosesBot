@@ -2,18 +2,23 @@ import { Message, MessageType, PartialMessage } from "discord.js";
 import MosesPic from "../models/moses/pics.schema";
 import MosesPicUploader from "../models/moses/pics.uploaders.schema";
 
-const dmCheck = (message: Message | PartialMessage) => message.guildId || message.attachments.size === 0 || message.type !== MessageType.Default || message.author.bot;
+const uploadCheck = (message: Message | PartialMessage) => !message.guildId && message.attachments.size !== 0 && message.type === MessageType.Default && !message.author.bot;
 
 export async function uploadPics(message: Message, logsChannel: SendableChannel) {
-    if (dmCheck(message)) return;
+    if (!uploadCheck(message)) return;
 
     const picUploader = await MosesPicUploader.find({ userId: message.author.id });
-    if (!picUploader) return message.reply({ content: "> ❌ You don't have permissions to upload Moses pics\n> Ask a server admin to add you to the list" });
+    if (!picUploader) {
+        message.reply({ content: "> ❌ You don't have permissions to upload Moses pics\n> Ask a server admin to add you to the list" });
+        return;
+    }
 
     const allowedFileTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
     const uploadedFileTypes = [...message.attachments.values()].map((attachment) => attachment.contentType);
-    if (!allowedFileTypes.some((fileType) => uploadedFileTypes.includes(fileType)))
-        return message.reply({ content: "> ❌ Not allowed format type detected\n> Allowed file formats are: PNG, JPG, GIF & WEBP" });
+    if (!allowedFileTypes.some((fileType) => uploadedFileTypes.includes(fileType))) {
+        message.reply({ content: "> ❌ Not allowed format type detected\n> Allowed file formats are: PNG, JPG, GIF & WEBP" });
+        return;
+    }
 
     const pics = await MosesPic.insertMany(
         message.attachments.toJSON().map(({ id, url, name, size, width, height, contentType }) => ({ id, url, submitterId: message.author.id, name, size, dimensions: { width, height }, contentType }))
@@ -29,7 +34,7 @@ export async function uploadPics(message: Message, logsChannel: SendableChannel)
 }
 
 export async function deletePics(message: Message | PartialMessage, logsChannel: SendableChannel) {
-    if (dmCheck(message)) return;
+    if (!uploadCheck(message)) return;
 
     const picIds = [...message.attachments.keys()];
 
