@@ -3,7 +3,6 @@ import {
     ChatInputCommandInteraction,
     ContextMenuCommandInteraction,
     EmbedBuilder,
-    Interaction,
     REST,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
@@ -14,14 +13,16 @@ import { CommandScope, ContextMenuCommandObject, SlashCommandObject } from "./ty
 
 import reroll from "./contextMenu/reroll";
 import aghpb from "./slash/aghpb";
+import channel from "./slash/channel";
 import clear from "./slash/clear";
 import moses from "./slash/moses";
 import presence from "./slash/presence";
 import pt from "./slash/pt";
-const commandObjects = new Set([reroll, aghpb, clear, moses, presence, pt]);
+const commandObjects = new Set([reroll, aghpb, channel, clear, moses, presence, pt]);
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 
+// Register commands with REST client
 try {
     const rest = new REST().setToken(secrets.discordToken);
 

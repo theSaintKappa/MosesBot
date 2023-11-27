@@ -1,4 +1,4 @@
-import { ActivityType, Attachment, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, MessageType, PartialMessage, Partials } from "discord.js";
+import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
 import { executeCommand } from "./commands";
 import config from "./config.json";
 import "./db/setup";
@@ -25,21 +25,26 @@ client.once(Events.ClientReady, async (client) => {
     console.log(`⚙️  Running in ${secrets.environment} mode`);
     console.log(`🟢 ${client.user.username} is now online!`);
 
+    // Schedule cron jobs
     scheduleJobs(client);
 
+    // Execute commands
     client.on(Events.InteractionCreate, async (interaction) => {
         if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) executeCommand(interaction);
     });
 
+    // Upload and delete pics
     const picLogsChannel = client.channels.cache.get(config.channels.picsLog) as SendableChannel;
     client.on(Events.MessageCreate, async (message) => await uploadPics(message, picLogsChannel));
     client.on(Events.MessageDelete, async (message) => await deletePics(message, picLogsChannel));
 
+    // Add role to new members that accepted the rules
     client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (oldMember.pending !== newMember.pending) newMember.roles.add(config.roles.mosesFan);
     });
 
     client.on(Events.MessageCreate, async (message) => {
+        // Ping check
         if (message.content === "moses" && !message.author.bot) {
             return message.channel.send("pong!").then((msg: Message) => {
                 msg.edit(`\`\`\`yaml\nClient latency: ${msg.createdTimestamp - message.createdTimestamp}ms\nWebSocket latency: ${client.ws.ping}ms\`\`\``);
@@ -49,18 +54,19 @@ client.once(Events.ClientReady, async (client) => {
 
         const hasMedia = (message: Message) => message.embeds.some((embed) => embed.image || embed.thumbnail || embed.video) || message.attachments.size !== 0;
 
+        // Add reactions to memes and pets
         if (message.channel.id === config.channels.memes && hasMedia(message)) {
             message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
             message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");
             return;
         }
-
         if (message.channel.id === config.channels.pets && hasMedia(message)) {
             message.react(client.emojis.cache.get(config.emojis.catLove) ?? "🥰");
             return;
         }
     });
 
+    // Send welcome messages
     client.on(Events.GuildMemberAdd, async (member) => {
         const dmWelcome = new EmbedBuilder()
             .setColor("#ff3fec")
@@ -83,6 +89,7 @@ client.once(Events.ClientReady, async (client) => {
         channel.send({ embeds: [serverWelcome], files: [attachment] });
     });
 
+    // Set bot presence based on environment
     if (secrets.environment === "production") {
         const presence = await Presence.findOne<IPresence>();
         if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });

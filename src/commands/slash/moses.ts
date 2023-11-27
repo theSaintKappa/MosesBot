@@ -38,21 +38,21 @@ export default {
     scope: CommandScope.Guild,
 
     run: async (interaction) => {
-        const subcommand = interaction.options.data[0].name;
-        const args = <CommandInteractionOptionResolver>interaction.options;
+        const { options } = interaction;
+        const subcommand = options.getSubcommand();
 
         switch (subcommand) {
             case "list":
-                await interaction.reply(await list(args.getNumber("page") ?? 1));
+                await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
-                await interaction.reply(await add(args.getString("quote")!!, interaction.user));
+                await interaction.reply(await add(options.getString("quote")!!, interaction.user));
                 break;
             case "edit":
-                await interaction.reply(await edit(args.getNumber("id")!!, args.getString("quote")!!, interaction.memberPermissions!!, interaction.user!!));
+                await interaction.reply(await edit(options.getNumber("id")!!, options.getString("quote")!!, interaction.memberPermissions!!, interaction.user!!));
                 break;
             case "delete":
-                await interaction.reply(await drop(args.getNumber("id")!!, interaction.memberPermissions!!, interaction.user!!));
+                await interaction.reply(await drop(options.getNumber("id")!!, interaction.memberPermissions!!, interaction.user!!));
                 break;
             case "leaderboard":
                 await interaction.reply(await leaderboard());
