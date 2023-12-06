@@ -1,6 +1,6 @@
 import { ApplicationCommandType, ContextMenuCommandBuilder, PermissionFlagsBits } from "discord.js";
 import config from "../../config.json";
-import { getQuoteEmbed, getRandomQuote } from "../../scheduler";
+import { getQuoteEmbed, getRandomPic, getRandomQuote } from "../../scheduler";
 import { CommandScope, ContextMenuCommandObject } from "../types";
 
 export default {
@@ -17,7 +17,7 @@ export default {
             interaction.reply({ content: `> ❌ This context menu command can only be used in the <#${config.channels.quotes}> channel.`, ephemeral: true });
         else {
             const channel = interaction.channel as SendableChannel;
-            channel.messages.cache.get(interaction.targetId)?.edit({ embeds: [getQuoteEmbed(await getRandomQuote())] });
+            channel.messages.cache.get(interaction.targetId)?.edit({ embeds: [getQuoteEmbed(await getRandomQuote(), await getRandomPic())] });
             interaction.reply({ content: "> ✅ Successfully rerolled the Moses quote.", ephemeral: true });
         }
 

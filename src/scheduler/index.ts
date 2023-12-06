@@ -1,7 +1,8 @@
 import { CronJob } from "cron";
 import { Client, ColorResolvable, EmbedBuilder } from "discord.js";
 import config from "../config.json";
-import { IMosesQuote } from "../db/types";
+import { IMosesPic, IMosesQuote } from "../db/types";
+import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
 
 const colors: ColorResolvable[] = ["#ff66ff", "#ff5e5e", "#ffa35d", "#fff75d", "#7dff5d", "#61ddff", "#bd6dff"];
@@ -18,23 +19,30 @@ export async function getRandomQuote() {
     return quote;
 }
 
+export async function getRandomPic() {
+    const pic = await MosesPic.aggregate<IMosesPic>([{ $sample: { size: 1 } }]).then((pic) => pic[0]);
+    return pic;
+}
+
 export function scheduleJobs(client: Client) {
     new CronJob("0 7 * * *", async () => await sendQuote(client), null, true, "Europe/Warsaw");
 }
 
-export function getQuoteEmbed(quote: IMosesQuote) {
+export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
     return new EmbedBuilder()
         .setColor(colors[new Date().getDay()])
         .setTitle(`**\`#${quote.id}\`** ${quote.content}`)
-        .setDescription(`\u200B\nUploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`);
+        .setDescription(`\u200B\nUploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`)
+        .setThumbnail(pic.url);
 }
 
-export async function sendQuote(client: Client, quote?: IMosesQuote) {
+export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMosesPic) {
     quote ??= await getRandomQuote();
+    pic ??= await getRandomPic();
 
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
     const message = await channel.send({
-        embeds: [getQuoteEmbed(quote)],
+        embeds: [getQuoteEmbed(quote, pic)],
         content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)}`,
     });
     message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
