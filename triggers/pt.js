@@ -15,7 +15,11 @@ exports = async function (changeEvent) {
             const { id, authorId } = await quotes.findOneAndUpdate({ _id: docId }, { $set: { id: sequence } }, { returnNewDocument: true });
             console.log(`Appended ${namespace.coll} document with id ${id}`);
 
-            const { userId } = await leaderboard.findOneAndUpdate({ userId: authorId }, { $inc: { count: parseInt(1, 10) } }, { returnNewDocument: true, upsert: true });
+            const { userId } = await leaderboard.findOneAndUpdate(
+                { userId: authorId },
+                { $inc: { count: parseInt(1, 10) }, $set: { updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
+                { returnNewDocument: true, upsert: true }
+            );
             console.log(`Incremented ${namespace.coll} leaderboard count for @${userId}`);
         } else if (changeEvent.operationType === "delete") {
             console.log(`Delete operation on ${namespace.coll}`);
@@ -24,7 +28,11 @@ exports = async function (changeEvent) {
             const { sequence } = await counter.findOneAndUpdate({ namespace }, { $inc: { sequence: parseInt(-1, 10) } }, { returnNewDocument: true });
             console.log(`Decremented ${namespace.coll} counter to ${sequence}`);
 
-            const { userId } = await leaderboard.findOneAndUpdate({ userId: docBeforeChange.authorId }, { $inc: { count: parseInt(-1, 10) } }, { returnNewDocument: true });
+            const { userId } = await leaderboard.findOneAndUpdate(
+                { userId: docBeforeChange.authorId },
+                { $inc: { count: parseInt(-1, 10) }, $set: { updatedAt: new Date() } },
+                { returnNewDocument: true }
+            );
             console.log(`Decremented ${namespace.coll} leaderboard count for @${userId}`);
 
             const counterDocument = await counter.find().toArray();
