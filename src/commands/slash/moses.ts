@@ -1,8 +1,11 @@
-import { CommandInteractionOptionResolver, EmbedBuilder, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
-import { ILeaderboard, IMosesQuote, SchemaWithMetadata } from "../../db/types";
+import { InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
+import { ILeaderboard, IMosesQuote } from "../../db/types";
 import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
+import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
 import { CommandScope, SlashCommandObject } from "../types";
+
+const pageSize = 15;
 
 export default {
     builder: new SlashCommandBuilder()
@@ -12,7 +15,9 @@ export default {
             subcommand
                 .setName("list")
                 .setDescription("List all stored Moses quotes.")
-                .addNumberOption((option) => option.setName("page").setDescription("The page of quotes you would like to see (every page has 15 quotes in it).").setRequired(false))
+                .addNumberOption((option) =>
+                    option.setName("page").setDescription(`The page number you would like to see (there are ${pageSize} quotes per page).`).setRequired(false).setAutocomplete(true)
+                )
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -34,6 +39,13 @@ export default {
                 .addNumberOption((option) => option.setName("id").setDescription("The id of the quote you would like to delete. To check quote id's, run: /moses list <page>.").setRequired(true))
         )
         .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the Moses quote adders leaderboard.")),
+
+    autocomplete: async () => {
+        const documentCount = await MosesQuote.countDocuments();
+        const totalPages = Math.ceil(documentCount / pageSize);
+
+        return Array.from({ length: totalPages }, (_, i) => ({ name: `${i + 1}`, value: i + 1 }));
+    },
 
     scope: CommandScope.Guild,
 
@@ -61,99 +73,72 @@ export default {
     },
 } as SlashCommandObject;
 
-const infoEmbed = new EmbedBuilder().setColor("#00c8ff").setFooter({ text: "Moses quotes" });
-const successEmbed = new EmbedBuilder().setColor("#00ff3c").setFooter({ text: "Moses quotes" });
-const errorEmbed = new EmbedBuilder().setColor("#ff0000");
-
 async function list(page: number): Promise<InteractionReplyOptions> {
-    const pageSize = 15;
+    if (page < 1) return getErrorReply(`Page number cannot be less than 1.`);
 
-    if (page < 1) return { embeds: [errorEmbed.setTitle("Page number must be greater than 0.")], ephemeral: true };
+    const documentCount = await MosesQuote.countDocuments();
+    if (documentCount === 0) return getErrorReply("There are no Moses quotes stored in the database.");
 
-    const quotesWithMetadata = await MosesQuote.aggregate<SchemaWithMetadata<IMosesQuote[]>>([
-        {
-            $facet: {
-                metadata: [{ $count: "totalDocuments" }],
-                data: [{ $skip: (page - 1) * pageSize }, { $limit: pageSize }],
-            },
-        },
-    ]);
+    const totalPages = Math.ceil(documentCount / pageSize);
+    if (page > totalPages) return getErrorReply(totalPages === 1 ? `There is only 1 page of quotes available.` : `There are only ${totalPages} pages of quotes available.`);
 
-    const quotes = quotesWithMetadata[0].data;
-    const totalQuotes = quotesWithMetadata[0].metadata[0].totalDocuments;
-    const validPages = Math.ceil(totalQuotes / pageSize);
+    const quotes = await MosesQuote.aggregate<IMosesQuote>([{ $sort: { id: 1 } }, { $skip: (page - 1) * pageSize }, { $limit: pageSize }]);
 
-    if (totalQuotes === 0) return { embeds: [errorEmbed.setDescription("❌ There are no Moses quotes stored in the database.")], ephemeral: true };
-    if (page > validPages)
-        return {
-            embeds: [errorEmbed.setDescription(validPages == 1 ? `❌ There is only 1 page of quotes available.` : `❌ There are only ${validPages} pages of quotes available.`)],
-            ephemeral: true,
-        };
-
-    let quotesString = "";
-    for (const quote of quotes) {
-        quotesString += `**#${quote.id}** \`${quote.content}\`\n`;
-    }
-
-    return { embeds: [infoEmbed.setTitle(`> 💛 Moses quotes *(page ${page} of ${validPages})*:`).setDescription(quotesString)] };
+    return getInfoReply(`Moses quotes *(page ${page} of ${totalPages})*:`, quotes.map((quote) => `**#${quote.id}** \`${quote.content.replace(/\n/, " ")}\``).join("\n"));
 }
 
 async function add(quote: string, user: User): Promise<InteractionReplyOptions> {
     if (!quote.endsWith(".") && !quote.endsWith("?") && !quote.endsWith("!")) quote += ".";
+
     await MosesQuote.create({ id: 0, content: quote, submitterId: user.id });
 
-    return { embeds: [successEmbed.setTitle(`> ✅ Quote added!`).setDescription(`**\`${quote}\`**`)] };
+    return getSuccessReply(`Quote added!`, `**\`${quote}\`**`);
 }
 
 async function edit(id: number, newQuote: string, memberPermissions: PermissionsBitField, user: User): Promise<InteractionReplyOptions> {
     const quote = await MosesQuote.findOne({ id });
 
-    if (!quote) return { embeds: [errorEmbed.setDescription(`❌ Quote **\`#${id}\`** does not exist.`)], ephemeral: true };
+    if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
     if (!newQuote.endsWith(".") && !newQuote.endsWith("?") && !newQuote.endsWith("!")) newQuote += ".";
 
-    if (quote.content === newQuote) return { embeds: [errorEmbed.setDescription(`❌ The new quote cannot be the same as the old one.`)], ephemeral: true };
+    if (quote.content === newQuote) return getErrorReply(`The new quote cannot be the same as the old one.`);
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         await MosesQuote.updateOne({ id }, { content: newQuote });
-        return { embeds: [successEmbed.setTitle(`> ✅ Quote edited!`).setDescription(`**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`)] };
+        return getSuccessReply(`Quote edited!`, `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === user.id) {
         await MosesQuote.updateOne({ id }, { content: newQuote });
-        return { embeds: [successEmbed.setTitle(`> ✅ Quote edited!`).setDescription(`**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`)] };
+        return getSuccessReply(`Quote edited!`, `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
     }
 
-    return { embeds: [errorEmbed.setDescription(`❌ Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`)], ephemeral: true };
+    return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
 }
 
 async function drop(id: number, memberPermissions: PermissionsBitField, user: User): Promise<InteractionReplyOptions> {
     const quote = await MosesQuote.findOne({ id });
 
-    if (!quote) return { embeds: [errorEmbed.setDescription(`❌ Quote **\`#${id}\`** does not exist.`)], ephemeral: true };
+    if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         await MosesQuote.deleteOne({ id });
-        return { embeds: [successEmbed.setTitle(`> ✅ Quote deleted!`).setDescription(`**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`)] };
+        return getSuccessReply(`Quote deleted!`, `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === user.id) {
         await MosesQuote.deleteOne({ id });
-        return { embeds: [successEmbed.setTitle(`> ✅ Quote deleted!`).setDescription(`**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`)] };
+        return getSuccessReply(`Quote deleted!`, `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
     }
 
-    return { embeds: [errorEmbed.setDescription(`❌ Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`)], ephemeral: true };
+    return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
 }
 
 async function leaderboard(): Promise<InteractionReplyOptions> {
     const leaderboard = await MosesLeaderboard.find<ILeaderboard>();
 
-    if (leaderboard.length === 0) return { embeds: [errorEmbed.setDescription("❌ The Moses leaderboard is empty.")], ephemeral: true };
+    if (leaderboard.length === 0) return getErrorReply("The Moses leaderboard is empty.");
 
-    let leaderboardString = "";
-    for (let [i, user] of leaderboard.entries()) {
-        leaderboardString += `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**\n`;
-    }
-
-    return { embeds: [infoEmbed.setTitle(`> 💛 Moses quote submiters leaderboard:`).setDescription(leaderboardString)] };
+    return getInfoReply(`Moses quote submiters leaderboard:`, leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
 }

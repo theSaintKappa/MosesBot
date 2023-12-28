@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction, SlashCommandBuilder } from "discord.js";
 
 interface CommandObject<TBuilder, TInteraction> {
     builder: TBuilder;
@@ -6,9 +6,13 @@ interface CommandObject<TBuilder, TInteraction> {
     run: (interaction: TInteraction) => Promise<void>;
 }
 
-export type SlashCommandObject = CommandObject<SlashCommandBuilder, ChatInputCommandInteraction>;
+interface Autocomplete {
+    autocomplete?: () => Promise<ApplicationCommandOptionChoiceData[]>;
+}
 
-export type ContextMenuCommandObject = CommandObject<ContextMenuCommandBuilder, ContextMenuCommandInteraction>;
+export interface SlashCommandObject extends CommandObject<SlashCommandBuilder, ChatInputCommandInteraction>, Autocomplete {}
+
+export interface ContextMenuCommandObject extends CommandObject<ContextMenuCommandBuilder, ContextMenuCommandInteraction> {}
 
 export enum CommandScope {
     Guild = "GUILD",

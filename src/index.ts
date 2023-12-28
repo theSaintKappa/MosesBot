@@ -1,5 +1,5 @@
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
-import { executeCommand } from "./commands";
+import { autocomplete, executeCommand } from "./commands";
 import config from "./config.json";
 import "./db/setup";
 import { IPresence } from "./db/types";
@@ -30,7 +30,8 @@ client.once(Events.ClientReady, async (client) => {
 
     // Execute commands
     client.on(Events.InteractionCreate, async (interaction) => {
-        if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) executeCommand(interaction);
+        if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) return executeCommand(interaction);
+        if (interaction.isAutocomplete()) return autocomplete(interaction);
     });
 
     // Upload and delete pics

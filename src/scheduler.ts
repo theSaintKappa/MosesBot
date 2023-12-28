@@ -1,9 +1,9 @@
 import { CronJob } from "cron";
 import { Client, ColorResolvable, EmbedBuilder } from "discord.js";
-import config from "../config.json";
-import { IMosesPic, IMosesQuote } from "../db/types";
-import MosesPic from "../models/moses/pics.schema";
-import MosesQuote from "../models/moses/quote.schema";
+import config from "./config.json";
+import { IMosesPic, IMosesQuote } from "./db/types";
+import MosesPic from "./models/moses/pics.schema";
+import MosesQuote from "./models/moses/quote.schema";
 
 const colors: ColorResolvable[] = ["#ff66ff", "#ff5e5e", "#ffa35d", "#fff75d", "#7dff5d", "#61ddff", "#bd6dff"];
 const greetings = ["Hi", "Hello", "Hey", "Hellow", "Hi there", "Hello there", "Hey there", "Hellow there"];

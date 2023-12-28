@@ -1,5 +1,6 @@
 import {
     APIUser,
+    AutocompleteInteraction,
     ChatInputCommandInteraction,
     ContextMenuCommandInteraction,
     EmbedBuilder,
@@ -57,5 +58,16 @@ export async function executeCommand(interaction: ChatInputCommandInteraction | 
 
         if (interaction.replied || interaction.deferred) await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
         else await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+    }
+}
+
+export async function autocomplete(interaction: AutocompleteInteraction) {
+    const command = commands.get(interaction.commandName) as SlashCommandObject;
+    if (!command || !command.autocomplete) return;
+
+    try {
+        await interaction.respond(await command.autocomplete());
+    } catch (err) {
+        console.error(err);
     }
 }
