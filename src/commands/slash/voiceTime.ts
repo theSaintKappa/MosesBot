@@ -33,6 +33,9 @@ const viewState = () =>
     getInfoReply(
         "Current VoiceTime state:",
         getVoiceTimeState().size
-            ? [...getVoiceTimeState()].map(([userId, joinTime]) => `<@${userId}> **→** <t:${Math.floor(joinTime / 1000)}:R>`).join("\n")
+            ? "\u200B\n" +
+                  [...getVoiceTimeState()]
+                      .flatMap(([userId, { incognito, channelId, timestamp }]) => (incognito ? [] : `<@${userId}>\t\t\t**in** <#${channelId}> **→** <t:${Math.floor(timestamp / 1000)}:R>`))
+                      .join("\n")
             : "**No server members are currently in a voice channel.**"
     );
