@@ -9,22 +9,39 @@ interface VoiceState {
     incognito: boolean;
 }
 
-const voiceStateMap = new Map<string, VoiceState>();
+const voiceStatesMap = new Map<string, VoiceState>();
 
-const getStateEmbed = () =>
-    new EmbedBuilder()
-        .setColor("Random")
-        .setTitle("> ⌚ Current VoiceTime state:")
-        .setDescription(
-            "\u200B\n" +
-                (voiceStateMap.size
-                    ? [...voiceStateMap]
-                          .flatMap(([userId, { incognito, channelId, timestamp }]) => (incognito ? [] : `<@${userId}> **in** <#${channelId}> **→** <t:${Math.floor(timestamp / 1000)}:R>`))
-                          .join("\n")
-                    : "***No server members are currently in a voice channel.***") +
-                "\n\u200B"
-        )
-        .setTimestamp();
+function groupByChannel() {
+    const channelGroups = new Map<string, Array<{ userId: string } & Omit<VoiceState, "channelId">>>();
+    voiceStatesMap.forEach(({ timestamp, channelId, incognito }, userId) => {
+        if (channelGroups.has(channelId)) channelGroups.get(channelId)!.push({ userId, timestamp, incognito });
+        else channelGroups.set(channelId, [{ userId, timestamp, incognito }]);
+    });
+    return channelGroups;
+}
+
+function getStateEmbed() {
+    const embed = new EmbedBuilder().setColor("Random").setTitle("⌚ Current VoiceTime state:").setTimestamp();
+
+    if (!voiceStatesMap.size) embed.setDescription("***No server members are currently in a voice channel.***");
+    else
+        embed.setDescription("\u200B").addFields(
+            [...groupByChannel()].flatMap(([channelId, voiceState]) => {
+                return voiceState.some((element) => element.incognito)
+                    ? []
+                    : {
+                          name: `> <#${channelId}>`,
+                          value: voiceState
+                              .flatMap(({ userId, incognito, timestamp }) => (incognito ? [] : `<@${userId}> **→** <t:${Math.floor(timestamp / 1000)}:R>`))
+                              .concat("\u200B")
+                              .join("\n"),
+                          inline: false,
+                      };
+            })
+        );
+
+    return embed;
+}
 
 // Update state message if the user was not in incognito channel
 async function updateStateMessage(client: Client, voiceChannel?: VoiceBasedChannel) {
@@ -49,7 +66,7 @@ function isIncognitio(channel: VoiceBasedChannel | undefined) {
 export function initializeVoiceTime(client: Client) {
     // Initialize channel time map with current guild voice states
     client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache.forEach(async (voiceState) =>
-        voiceStateMap.set(voiceState.id, {
+        voiceStatesMap.set(voiceState.id, {
             timestamp: Date.now(),
             channelId: voiceState.channelId!,
             incognito: isIncognitio(voiceState.guild.channels.cache.get(voiceState.channelId!) as VoiceChannel),
@@ -64,7 +81,7 @@ export function initializeVoiceTime(client: Client) {
 
         // On join
         if (!oldState.channel && newState.channel) {
-            voiceStateMap.set(newState.id, { timestamp: Date.now(), channelId: newState.channel.id, incognito: isIncognitio(newState.channel) });
+            voiceStatesMap.set(newState.id, { timestamp: Date.now(), channelId: newState.channel.id, incognito: isIncognitio(newState.channel) });
 
             updateStateMessage(client, newState.channel);
 
@@ -73,14 +90,14 @@ export function initializeVoiceTime(client: Client) {
 
         // On leave
         if (oldState.channel && !newState.channel) {
-            const joinTime = voiceStateMap.get(newState.id);
+            const joinTime = voiceStatesMap.get(newState.id);
             if (!joinTime) {
                 console.log(`joinTime is undefined for ${newState.member?.user.username}`);
                 return;
             }
 
             const timeSpent = Date.now() - joinTime.timestamp;
-            voiceStateMap.delete(newState.id);
+            voiceStatesMap.delete(newState.id);
 
             updateStateMessage(client, oldState.channel);
 
@@ -90,7 +107,7 @@ export function initializeVoiceTime(client: Client) {
 
         // On switch
         if (oldState.channel && newState.channel) {
-            let oldStateValue = voiceStateMap.get(newState.id);
+            let oldStateValue = voiceStatesMap.get(newState.id);
             if (oldStateValue) {
                 oldStateValue.incognito = isIncognitio(newState.channel);
                 oldStateValue.channelId = newState.channel.id;
@@ -110,7 +127,7 @@ export function initializeVoiceTime(client: Client) {
         cleanupInProgress = true;
 
         await VoiceTime.bulkWrite(
-            Array.from(voiceStateMap.entries()).map(([userId, joinTime]) => {
+            Array.from(voiceStatesMap.entries()).map(([userId, joinTime]) => {
                 return { updateOne: { filter: { userId }, update: { $inc: { time: Date.now() - joinTime.timestamp } }, upsert: true } };
             })
         );
@@ -120,4 +137,4 @@ export function initializeVoiceTime(client: Client) {
     ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"].forEach((signal) => process.on(signal, cleanup));
 }
 
-export const getVoiceTimeState = () => voiceStateMap as ReadonlyMap<string, VoiceState>;
+export const getVoiceTimeState = () => voiceStatesMap as ReadonlyMap<string, VoiceState>;
