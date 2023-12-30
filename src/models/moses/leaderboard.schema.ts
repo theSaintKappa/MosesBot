@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { ILeaderboard } from "../../db/types";
+import { ILeaderboard } from "../../db";
 
 const schema = new Schema<ILeaderboard>(
     {

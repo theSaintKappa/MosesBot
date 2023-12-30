@@ -1,6 +1,6 @@
 import { Message, MessageType, PartialMessage } from "discord.js";
-import MosesPic from "./models/moses/pics.schema";
-import MosesPicUploader from "./models/moses/pics.uploaders.schema";
+import MosesPic from "../models/moses/pics.schema";
+import MosesPicUploader from "../models/moses/pics.uploaders.schema";
 
 const uploadCheck = (message: Message | PartialMessage) => !message.guildId && message.attachments.size !== 0 && message.type === MessageType.Default && !message.author.bot;
 

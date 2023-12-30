@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IMosesQuote } from "../../db/types";
+import { IMosesQuote } from "../../db";
 
 const schema = new Schema<IMosesQuote>(
     {

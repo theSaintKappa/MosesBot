@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IPtQuote } from "../../db/types";
+import { IPtQuote } from "../../db";
 
 const schema = new Schema<IPtQuote>(
     {

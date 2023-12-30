@@ -1,9 +1,9 @@
 import { InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
-import { ILeaderboard, IMosesQuote } from "../../db/types";
+import { CommandScope, SlashCommandObject } from "../../commands";
+import { ILeaderboard, IMosesQuote } from "../../db";
 import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
 import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
 
 const pageSize = 15;
 

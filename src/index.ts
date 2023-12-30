@@ -1,13 +1,12 @@
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
 import { autocomplete, executeCommand, registerCommands } from "./commands";
 import config from "./config.json";
-import { connectMongo } from "./db/setup";
-import { IPresence } from "./db/types";
+import { IPresence, connectMongo } from "./db";
+import { deletePics, uploadPics } from "./features/pics";
+import { scheduleJobs } from "./features/scheduler";
+import { initializeVoiceTime } from "./features/voiceTracker";
 import Presence from "./models/bot/presence";
-import { deletePics, uploadPics } from "./pics";
-import { scheduleJobs } from "./scheduler";
-import secrets from "./secrets";
-import { initializeVoiceTime } from "./voiceTracker";
+import secrets from "./utils/secrets";
 
 console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
 

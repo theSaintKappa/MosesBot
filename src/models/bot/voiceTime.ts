@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IVoiceTime } from "../../db/types";
+import { IVoiceTime } from "../../db";
 
 const schema = new Schema<IVoiceTime>(
     {

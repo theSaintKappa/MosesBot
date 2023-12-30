@@ -1,5 +1,5 @@
 import { ChannelType, InteractionReplyOptions, PermissionFlagsBits, PermissionOverwrites, SlashCommandBuilder } from "discord.js";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, SlashCommandObject } from "../../commands";
 
 export default {
     builder: new SlashCommandBuilder()

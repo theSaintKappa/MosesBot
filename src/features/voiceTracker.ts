@@ -1,7 +1,7 @@
 import { Client, EmbedBuilder, Events, VoiceBasedChannel, VoiceChannel } from "discord.js";
-import config from "./config.json";
-import VoiceTime from "./models/bot/voiceTime";
-import secrets from "./secrets";
+import config from "../config.json";
+import VoiceTime from "../models/bot/voiceTime";
+import secrets from "../utils/secrets";
 
 interface VoiceState {
     timestamp: number;

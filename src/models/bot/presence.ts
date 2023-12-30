@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IPresence } from "../../db/types";
+import { IPresence } from "../../db";
 
 const schema = new Schema<IPresence>(
     {

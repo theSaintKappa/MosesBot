@@ -1,9 +1,9 @@
 import { InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
-import { ILeaderboard, IPtQuote } from "../../db/types";
+import { CommandScope, SlashCommandObject } from "../../commands";
+import { ILeaderboard, IPtQuote } from "../../db";
 import PtLeaderboard from "../../models/pt/leaderboard.schema";
 import PtQuote from "../../models/pt/quote.schema";
 import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
 
 const pageSize = 15;
 
