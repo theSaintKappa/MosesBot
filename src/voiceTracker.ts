@@ -64,6 +64,8 @@ function isIncognitio(channel: VoiceBasedChannel | undefined) {
 }
 
 export function initializeVoiceTime(client: Client) {
+    console.log("╔ 💛 \x1b[33mInitializing VoiceTime module...\x1b[0m");
+
     // Initialize channel time map with current guild voice states
     client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache.forEach(async (voiceState) =>
         voiceStatesMap.set(voiceState.id, {
@@ -106,7 +108,7 @@ export function initializeVoiceTime(client: Client) {
         }
 
         // On switch
-        if (oldState.channel && newState.channel) {
+        if (oldState.channel && newState.channel && oldState.channel.id !== newState.channel.id) {
             let oldStateValue = voiceStatesMap.get(newState.id);
             if (oldStateValue) {
                 oldStateValue.incognito = isIncognitio(newState.channel);
@@ -122,9 +124,11 @@ export function initializeVoiceTime(client: Client) {
     });
 
     let cleanupInProgress: boolean = false;
-    async function cleanup() {
+    async function cleanup(signal: string | NodeJS.Signals) {
         if (cleanupInProgress) return;
         cleanupInProgress = true;
+
+        console.log(`🔶 \x1b[43m${signal} signal received. Cleaning up...\x1b[0m`);
 
         await VoiceTime.bulkWrite(
             Array.from(voiceStatesMap.entries()).map(([userId, joinTime]) => {
@@ -134,7 +138,9 @@ export function initializeVoiceTime(client: Client) {
         process.exit(0);
     }
 
-    ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"].forEach((signal) => process.on(signal, cleanup));
+    ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"].forEach((signal) => process.on(signal, cleanup.bind(null, signal)));
+
+    console.log("╚ ☑️  \x1b[35mVoiceTime module has been initialized!\x1b[0m");
 }
 
 export const getVoiceTimeState = () => voiceStatesMap as ReadonlyMap<string, VoiceState>;

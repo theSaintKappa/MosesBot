@@ -1,7 +1,7 @@
 import {
-    APIUser,
     AutocompleteInteraction,
     ChatInputCommandInteraction,
+    ClientUser,
     ContextMenuCommandInteraction,
     EmbedBuilder,
     REST,
@@ -25,25 +25,26 @@ const commandObjects = new Set([reroll, aghpb, channel, clear, moses, presence, 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 
 // Register commands with REST client
-try {
-    const rest = new REST().setToken(secrets.discordToken);
+export async function registerCommands(clientUser: ClientUser) {
+    console.log(`╔ ⭐ \x1b[33mRegistering commands...\x1b[0m`);
+    try {
+        const rest = new REST().setToken(secrets.discordToken);
 
-    const clientUser = (await rest.get(Routes.user())) as APIUser;
+        const [globalCommands, guildCommands] = [...commands.values()].reduce(
+            (acc, command) => {
+                acc[command.scope === CommandScope.Guild ? 1 : 0].push(command.builder.toJSON());
+                return acc;
+            },
+            [[], []] as Array<RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody>[]
+        );
 
-    const [globalCommands, guildCommands] = [...commands.values()].reduce(
-        (acc, command) => {
-            acc[command.scope === CommandScope.Guild ? 1 : 0].push(command.builder.toJSON());
-            return acc;
-        },
-        [[], []] as Array<RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody>[]
-    );
+        globalCommands && (await rest.put(Routes.applicationCommands(clientUser.id), { body: globalCommands }));
+        guildCommands && (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), { body: guildCommands }));
 
-    globalCommands && (await rest.put(Routes.applicationCommands(clientUser.id), { body: globalCommands }));
-    guildCommands && (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), { body: guildCommands }));
-
-    console.log(`🔷 Successfully loaded ${globalCommands.length + guildCommands.length} command(s)`);
-} catch (err) {
-    console.error(err);
+        console.log(`╚ ☑️  \x1b[35mSuccessfully registered ${globalCommands.length + guildCommands.length} commands!\x1b[0m`);
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export async function executeCommand(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {

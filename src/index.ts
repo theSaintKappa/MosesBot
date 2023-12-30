@@ -1,13 +1,15 @@
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
-import { autocomplete, executeCommand } from "./commands";
+import { autocomplete, executeCommand, registerCommands } from "./commands";
 import config from "./config.json";
-import "./db/setup";
+import { connectMongo } from "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
 import { deletePics, uploadPics } from "./pics";
 import { scheduleJobs } from "./scheduler";
 import secrets from "./secrets";
 import { initializeVoiceTime } from "./voiceTracker";
+
+console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
 
 const client = new Client({
     intents: [
@@ -23,15 +25,19 @@ const client = new Client({
     partials: [Partials.Channel],
 });
 
+await connectMongo();
+
 client.once(Events.ClientReady, async (client) => {
-    console.log(`⚙️  Running in ${secrets.environment} mode`);
-    console.log(`🟢 ${client.user.username} is now online!`);
+    console.log(`═ 🟢 \x1b[42m${client.user.username} is now online!\x1b[0m`);
 
     // Schedule cron jobs
     scheduleJobs(client);
 
     // Initialize voice time tracking
     initializeVoiceTime(client);
+
+    // Register slash commands
+    registerCommands(client.user);
 
     // Execute commands
     client.on(Events.InteractionCreate, async (interaction) => {

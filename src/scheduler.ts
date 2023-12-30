@@ -26,6 +26,7 @@ export async function getRandomPic() {
 
 export function scheduleJobs(client: Client) {
     new CronJob("0 7 * * *", async () => await sendQuote(client), null, true, "Europe/Warsaw");
+    console.log("═ ☑️  \x1b[35mQuote Cron Job has been scheduled!\x1b[0m");
 }
 
 export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
