@@ -1,16 +1,8 @@
 //prettier-ignore
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, ChatInputCommandInteraction, ClientUser, ContextMenuCommandBuilder, ContextMenuCommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from "discord.js";
-import secrets from "./utils/secrets";
-
-import reroll from "./commands/contextMenu/reroll";
-import aghpb from "./commands/slash/aghpb";
-import channel from "./commands/slash/channel";
-import clear from "./commands/slash/clear";
-import moses from "./commands/slash/moses";
-import presence from "./commands/slash/presence";
-import pt from "./commands/slash/pt";
-import voiceTime from "./commands/slash/voiceTime";
-const commandObjects = new Set([reroll, aghpb, channel, clear, moses, presence, pt, voiceTime]);
+import { AutocompleteInteraction, ChatInputCommandInteraction, ClientUser, ContextMenuCommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
+import secrets from "../utils/secrets";
+import commandObjects from "./list";
+import { CommandScope, ContextMenuCommandObject, SlashCommandObject } from "./types";
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 
@@ -62,23 +54,4 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     } catch (err) {
         console.error(err);
     }
-}
-
-interface CommandObject<TBuilder, TInteraction> {
-    builder: TBuilder;
-    scope: CommandScope;
-    run: (interaction: TInteraction) => Promise<void>;
-}
-
-interface Autocomplete {
-    autocomplete?: () => Promise<ApplicationCommandOptionChoiceData[]>;
-}
-
-export interface SlashCommandObject extends CommandObject<SlashCommandBuilder, ChatInputCommandInteraction>, Autocomplete {}
-
-export interface ContextMenuCommandObject extends CommandObject<ContextMenuCommandBuilder, ContextMenuCommandInteraction> {}
-
-export enum CommandScope {
-    Guild = "GUILD",
-    Global = "GLOBAL",
 }

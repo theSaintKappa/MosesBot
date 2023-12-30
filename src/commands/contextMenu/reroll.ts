@@ -1,7 +1,7 @@
 import { ApplicationCommandType, ContextMenuCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { CommandScope, ContextMenuCommandObject } from "../../commands";
 import config from "../../config.json";
 import { getQuoteEmbed, getRandomPic, getRandomQuote } from "../../features/scheduler";
+import { CommandScope, ContextMenuCommandObject } from "../types";
 
 export default {
     builder: new ContextMenuCommandBuilder()

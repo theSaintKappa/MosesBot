@@ -1,5 +1,5 @@
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
-import { autocomplete, executeCommand, registerCommands } from "./commands";
+import { autocomplete, executeCommand, registerCommands } from "./commands/register";
 import config from "./config.json";
 import { IPresence, connectMongo } from "./db";
 import { deletePics, uploadPics } from "./features/pics";

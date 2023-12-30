@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
-import { CommandScope, SlashCommandObject } from "../../commands";
 import { getVoiceTimeState } from "../../features/voiceTracker";
 import { getInfoReply } from "../../utils/replyEmbeds";
+import { CommandScope, SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
