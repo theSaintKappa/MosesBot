@@ -19,7 +19,8 @@ import clear from "./slash/clear";
 import moses from "./slash/moses";
 import presence from "./slash/presence";
 import pt from "./slash/pt";
-const commandObjects = new Set([reroll, aghpb, channel, clear, moses, presence, pt]);
+import voiceTime from "./slash/voiceTime";
+const commandObjects = new Set([reroll, aghpb, channel, clear, moses, presence, pt, voiceTime]);
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 

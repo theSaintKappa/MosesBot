@@ -1,6 +1,6 @@
 # MosesBot
 
-#### A Discord bot named after my friend Moses
+### A Very Cool Discord Bot named after my friend Moses
 
 <br>
 
@@ -18,4 +18,6 @@ GITHUB_TOKEN=your_token # A GitHub personal access token with the `public_repo` 
 TEST_GUILD_ID=your_guild_id # A Discord guild id for testing slash commands
 ```
 
-5. Finally, start the bot with `$ bun run src/index.ts`
+5. Edit the `src/config.json` file to have your own discord ids
+
+6. Finally, start the bot with `$ bun run src/index.ts`

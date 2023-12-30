@@ -4,10 +4,10 @@ import config from "./config.json";
 import "./db/setup";
 import { IPresence } from "./db/types";
 import Presence from "./models/bot/presence";
-import VoiceTime from "./models/bot/voiceTime";
 import { deletePics, uploadPics } from "./pics";
 import { scheduleJobs } from "./scheduler";
 import secrets from "./secrets";
+import { initializeVoiceTime } from "./voiceTracker";
 
 const client = new Client({
     intents: [
@@ -29,6 +29,9 @@ client.once(Events.ClientReady, async (client) => {
 
     // Schedule cron jobs
     scheduleJobs(client);
+
+    // Initialize voice time tracking
+    initializeVoiceTime(client);
 
     // Execute commands
     client.on(Events.InteractionCreate, async (interaction) => {
@@ -91,49 +94,6 @@ client.once(Events.ClientReady, async (client) => {
         const channel = client.channels.cache.get(config.channels.welcone) as SendableChannel;
         channel.send({ embeds: [serverWelcome], files: [attachment] });
     });
-
-    // Initialize channel time map with current guild voice states
-    const channelTimeMap = new Map<string, number>();
-    client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache.forEach(async (voiceState) => channelTimeMap.set(voiceState.id, Date.now()));
-
-    // Track voice time
-    client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
-        if (oldState.member?.user.bot) return;
-
-        // On join
-        if (!oldState.channelId && newState.channelId) {
-            channelTimeMap.set(newState.id, Date.now());
-            return;
-        }
-
-        // On leave
-        if (oldState.channelId && !newState.channelId) {
-            const joinTime = channelTimeMap.get(newState.id);
-            if (!joinTime) {
-                console.log(`joinTime is undefined for ${newState.member?.user.username}`);
-                return;
-            }
-
-            const timeSpent = Date.now() - joinTime;
-            channelTimeMap.delete(newState.id);
-            await VoiceTime.updateOne({ userId: newState.id }, { $inc: { time: timeSpent } }, { upsert: true });
-        }
-    });
-
-    let cleanupInProgress: boolean = false;
-    async function cleanup() {
-        if (cleanupInProgress) return;
-        cleanupInProgress = true;
-
-        await VoiceTime.bulkWrite(
-            Array.from(channelTimeMap.entries()).map(([userId, joinTime]) => {
-                return { updateOne: { filter: { userId }, update: { $inc: { time: Date.now() - joinTime } }, upsert: true } };
-            })
-        );
-        process.exit();
-    }
-
-    ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2", "uncaughtException", "exit"].forEach((signal) => process.on(signal, cleanup));
 
     // Set bot presence based on environment
     if (secrets.environment === "production") {
