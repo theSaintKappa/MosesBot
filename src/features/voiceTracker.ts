@@ -26,7 +26,7 @@ function groupVoiceStatesByChannel() {
     return channelGroups;
 }
 
-function getStateEmbed() {
+export function getStateEmbed() {
     const embed = new EmbedBuilder().setColor("Random").setTitle("⌚ Current VoiceTime state:").setTimestamp();
 
     voiceStatesMap.size

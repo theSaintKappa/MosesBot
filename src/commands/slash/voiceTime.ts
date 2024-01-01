@@ -1,5 +1,6 @@
-import { SlashCommandBuilder } from "discord.js";
-import { getVoiceTimeState } from "../../features/voiceTracker";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { getStateEmbed } from "../../features/voiceTracker";
+import VoiceTime from "../../models/bot/voiceTime";
 import { getInfoReply } from "../../utils/replyEmbeds";
 import { CommandScope, SlashCommandObject } from "../types";
 
@@ -18,24 +19,17 @@ export default {
 
         switch (subcommand) {
             case "leaderboard":
-                await interaction.reply(viewLeaderboard());
+                await interaction.reply(await viewLeaderboard());
                 break;
             case "state":
-                await interaction.reply(viewState());
+                await interaction.reply({ embeds: [getStateEmbed()] });
                 break;
         }
     },
 } as SlashCommandObject;
 
-const viewLeaderboard = () => ({ content: "> This functionality is not yet implemented. Check back later!", ephemeral: true });
+async function viewLeaderboard() {
+    const voiceTime = await VoiceTime.find({}).sort({ time: -1 });
 
-const viewState = () =>
-    getInfoReply(
-        "Current VoiceTime state:",
-        getVoiceTimeState().size
-            ? "\u200B\n" +
-                  [...getVoiceTimeState()]
-                      .flatMap(([userId, { incognito, channelId, timestamp }]) => (incognito ? [] : `<@${userId}>\t\t\t**in** <#${channelId}> **→** <t:${Math.floor(timestamp / 1000)}:R>`))
-                      .join("\n")
-            : "**No server members are currently in a voice channel.**"
-    );
+    return getInfoReply("Voice Time Leaderboard", voiceTime.map((vt, i) => `**${i + 1}.** <@${vt.userId}> **→** ${(vt.time / 1000 / 60 / 60).toFixed(2)} hours`).join("\n"));
+}
