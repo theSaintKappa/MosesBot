@@ -60,7 +60,7 @@ export default {
         const getRecentQuotesAutocomplete = async (): Promise<ApplicationCommandOptionChoiceData[]> =>
             MosesQuote.aggregate<IMosesQuote>([{ $sort: { id: -1 } }, { $limit: 25 }]).then((quotes) =>
                 quotes.map(({ content, id }) => {
-                    content = `#${id} → ${content.replace(/\n/, " ")}`;
+                    content = `#${id} → ${content.replace(/\n/g, " ")}`;
                     const name = content.length > 100 ? `${content.substring(0, 97)}...` : content;
                     return { name, value: id };
                 })
@@ -218,7 +218,7 @@ const queue = {
 
         return getInfoReply(
             `Moses quote queue:`,
-            queue.map((q, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${q.quoteReference.id}** **\`${q.quoteReference.content}\`**`).join("\n")
+            queue.map(({ quoteReference }, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n")
         );
     },
 };
