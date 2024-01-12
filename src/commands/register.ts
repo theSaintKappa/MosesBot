@@ -1,5 +1,6 @@
 //prettier-ignore
 import { AutocompleteInteraction, ChatInputCommandInteraction, ClientUser, ContextMenuCommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
+import { getErrorReply } from "../utils/replyEmbeds";
 import secrets from "../utils/secrets";
 import commandObjects from "./list";
 import { CommandScope, ContextMenuCommandObject, SlashCommandObject } from "./types";
@@ -38,10 +39,8 @@ export async function executeCommand(interaction: ChatInputCommandInteraction | 
     } catch (err) {
         console.error(err);
 
-        const errorEmbed = new EmbedBuilder().setColor("#ff0000").setTitle(`An error occurred while processing your request.\nTry again later or contact a server admin.`);
-
-        if (interaction.replied || interaction.deferred) await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
-        else await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+        const errorReply = getErrorReply.bind(null, "An error occurred while processing your request.\nTry again later or contact a server admin.");
+        interaction.replied || interaction.deferred ? await interaction.followUp(errorReply()) : await interaction.reply(errorReply());
     }
 }
 

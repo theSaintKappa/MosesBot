@@ -1,4 +1,5 @@
 import { ChannelType, InteractionReplyOptions, PermissionFlagsBits, PermissionOverwrites, SlashCommandBuilder } from "discord.js";
+import { getNoticeReply } from "../../utils/replyEmbeds";
 import { CommandScope, SlashCommandObject } from "../types";
 
 export default {
@@ -17,10 +18,7 @@ export default {
         const subcommand = options.getSubcommand();
         const channel = interaction.channel;
 
-        if (channel?.type !== ChannelType.GuildText) {
-            interaction.reply({ content: "> This command can only be used in text channels." });
-            return;
-        }
+        if (channel?.type !== ChannelType.GuildText) return interaction.reply(getNoticeReply("This command can only be used in text channels.", true));
 
         const permission = channel.permissionOverwrites.cache.get(channel.guild.roles.everyone.id)!!;
 

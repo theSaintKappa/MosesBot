@@ -1,4 +1,5 @@
 import { ChannelType, CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { getNoticeReply } from "../../utils/replyEmbeds";
 import { CommandScope, SlashCommandObject } from "../types";
 
 export default {
@@ -13,12 +14,11 @@ export default {
     run: async (interaction) => {
         const qty = (<CommandInteractionOptionResolver>interaction.options).getNumber("qty")!!;
 
-        if (qty < 1 || qty > 100) return interaction.reply({ content: "> ⚠️ You can only delete between 1 and 100 messages.", ephemeral: true });
+        if (qty < 1 || qty > 100) return interaction.reply(getNoticeReply("You can only delete between 1 and 100 messages.", true));
 
         const channel = interaction.channel as SendableChannel;
         if (!channel) return;
-        if (![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type))
-            return interaction.reply({ content: "> ⚠️ This command can only be used in guild text channels.", ephemeral: true });
+        if (![ChannelType.GuildText, ChannelType.GuildAnnouncement].includes(channel.type)) return interaction.reply(getNoticeReply("This command can only be used in text channels.", true));
 
         await channel.bulkDelete(qty, true);
 
