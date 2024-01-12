@@ -50,7 +50,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     if (!command || !command.autocomplete) return;
 
     try {
-        await interaction.respond(await command.autocomplete());
+        await interaction.respond(await command.autocomplete(interaction.options.getSubcommand()));
     } catch (err) {
         console.error(err);
     }

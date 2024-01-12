@@ -1,5 +1,5 @@
 import { ActivityType, ClientPresenceStatus, Snowflake } from "discord.js";
-import { Document, MongooseError, connect } from "mongoose";
+import { Document, MongooseError, ObjectId, connect } from "mongoose";
 import secrets from "./utils/secrets";
 
 export const connectMongo = async () => {
@@ -25,6 +25,11 @@ interface IQuote extends Document, DocumentTimestamps {
 }
 
 export interface IMosesQuote extends IQuote {}
+
+export interface IMosesQuoteQueue extends Document, DocumentTimestamps {
+    quoteReference: ObjectId;
+    submitterId: Snowflake;
+}
 
 export interface IPtQuote extends IQuote {
     authorId: Snowflake;
@@ -57,11 +62,6 @@ export interface IPresence extends Document, DocumentTimestamps {
 }
 
 export interface IVoiceTime extends Document, DocumentTimestamps {
-    userId: string;
+    userId: Snowflake;
     time: number;
-}
-
-export interface SchemaWithMetadata<T> {
-    metadata: { totalDocuments: number }[];
-    data: T;
 }

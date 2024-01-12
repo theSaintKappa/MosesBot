@@ -7,7 +7,7 @@ interface CommandObject<TBuilder, TInteraction> {
 }
 
 interface Autocomplete {
-    autocomplete?: () => Promise<ApplicationCommandOptionChoiceData[]>;
+    autocomplete?: (subcommand: string) => Promise<ApplicationCommandOptionChoiceData[]>;
 }
 
 export interface SlashCommandObject extends CommandObject<SlashCommandBuilder, ChatInputCommandInteraction>, Autocomplete {}
