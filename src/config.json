@@ -16,5 +16,8 @@
     "roles": {
         "mosesEnjoyer": "980815178813820988",
         "mosesFan": "980814138869698641"
+    },
+    "messages": {
+        "togglePings": "980843266972999740"
     }
 }

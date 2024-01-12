@@ -15,13 +15,13 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.GuildVoiceStates,
     ],
-    partials: [Partials.Channel],
+    partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
 
 await connectMongo();
@@ -52,6 +52,19 @@ client.once(Events.ClientReady, async (client) => {
     // Add role to new members that accepted the rules
     client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (oldMember.pending !== newMember.pending) newMember.roles.add(config.roles.mosesFan);
+    });
+
+    client.on(Events.MessageReactionAdd, async (reaction, user) => {
+        if (reaction.message.id === config.messages.togglePings && reaction.emoji.name === "✅") {
+            const member = reaction.message.guild?.members.cache.get(user.id);
+            if (member) member.roles.add(config.roles.mosesEnjoyer);
+        }
+    });
+    client.on(Events.MessageReactionRemove, async (reaction, user) => {
+        if (reaction.message.id === config.messages.togglePings && reaction.emoji.name === "✅") {
+            const member = reaction.message.guild?.members.cache.get(user.id);
+            if (member) member.roles.remove(config.roles.mosesEnjoyer);
+        }
     });
 
     client.on(Events.MessageCreate, async (message) => {
