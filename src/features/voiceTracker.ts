@@ -47,10 +47,27 @@ export function getStateEmbed() {
     return embed;
 }
 
+async function getLeaderboardEmbed() {
+    const voiceTime = await VoiceTime.find({}).sort({ time: -1 });
+    const embed = new EmbedBuilder()
+        .setColor("Random")
+        .setTitle("> 💛 Current VoiceTime leaderboard:")
+        .setDescription(
+            voiceTime
+                .map((vt, i) => {
+                    const medals = ["🥇", "🥈", "🥉"];
+                    return `**${medals[i] ?? i + 1}.** <@${vt.userId}> **→** ${(vt.time / 1000 / 60 / 60).toFixed(2)} hours ${voiceStatesMap.has(vt.userId) ? "*and counting...*" : ""}`;
+                })
+                .join("\n"),
+        )
+        .setTimestamp();
+    return embed;
+}
+
 // Update state message if the user was not in incognito channel
 async function updateStateMessage(channel: SendableChannel) {
     const message = await channel.messages.fetch({ limit: 1 }).then((messages) => messages.first());
-    message ? message.edit({ embeds: [getStateEmbed()] }) : channel.send({ embeds: [getStateEmbed()] });
+    message ? message.edit({ embeds: [await getLeaderboardEmbed(), getStateEmbed()] }) : channel.send({ embeds: [await getLeaderboardEmbed(), getStateEmbed()] });
 }
 
 // Check if a voice channel is incognito or afk
