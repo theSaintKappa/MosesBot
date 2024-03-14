@@ -1,4 +1,4 @@
-import { EmbedBuilder, Events, type Client, type Snowflake, type VoiceBasedChannel } from "discord.js";
+import { type Client, EmbedBuilder, Events, type Snowflake, type VoiceBasedChannel } from "discord.js";
 import config from "../config.json";
 import VoiceTime from "../models/bot/voiceTime";
 import secrets from "../utils/secrets";
@@ -75,12 +75,7 @@ const isIncognitio = (channel: VoiceBasedChannel) => channel.name.includes("🥸
 const isAfk = (channel: VoiceBasedChannel) => channel.name.includes("💤");
 
 function joinEvent(userId: Snowflake, newChannel: VoiceBasedChannel) {
-    voiceStatesMap.set(userId, {
-        channelId: newChannel.id,
-        joinTime: new Date(),
-        incognito: isIncognitio(newChannel),
-        afk: isAfk(newChannel),
-    });
+    voiceStatesMap.set(userId, { channelId: newChannel.id, joinTime: new Date(), incognito: isIncognitio(newChannel), afk: isAfk(newChannel) });
 }
 
 async function leaveEvent(userId: Snowflake, oldChannel: VoiceBasedChannel) {
@@ -98,12 +93,7 @@ async function switchEvent(userId: Snowflake, newChannel: VoiceBasedChannel, old
 
     if (!isAfk(oldChannel)) await VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTime.getTime() } }, { upsert: true });
 
-    voiceStatesMap.set(userId, {
-        channelId: newChannel.id,
-        joinTime: new Date(),
-        incognito: isIncognitio(newChannel),
-        afk: isAfk(newChannel),
-    });
+    voiceStatesMap.set(userId, { channelId: newChannel.id, joinTime: new Date(), incognito: isIncognitio(newChannel), afk: isAfk(newChannel) });
 }
 
 export function initializeVoiceTime(client: Client) {
@@ -111,16 +101,10 @@ export function initializeVoiceTime(client: Client) {
 
     const infoChannel = client.channels.cache.get(config.channels.voiceTime) as SendableChannel;
 
-    // Initialize channel time map with all current guild voice states
-    // biome-ignore lint/complexity/noForEach: more readable code
-    client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache.forEach(({ id, channelId, channel }) => {
-        voiceStatesMap.set(id, {
-            channelId: channelId ?? "",
-            joinTime: new Date(),
-            incognito: isIncognitio(channel ?? ({} as VoiceBasedChannel)),
-            afk: isAfk(channel ?? ({} as VoiceBasedChannel)),
-        });
-    });
+    const voiceStates = client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache;
+    for (const { id, channelId, channel } of voiceStates?.values() ?? []) {
+        voiceStatesMap.set(id, { channelId: channelId as string, joinTime: new Date(), incognito: isIncognitio(channel as VoiceBasedChannel), afk: isAfk(channel as VoiceBasedChannel) });
+    }
 
     updateStateMessage(infoChannel);
 
@@ -148,22 +132,14 @@ export function initializeVoiceTime(client: Client) {
 
         const now = Date.now();
         const updates = [...voiceStatesMap].map(([userId, { joinTime }]) => {
-            return {
-                updateOne: {
-                    filter: { userId },
-                    update: { $inc: { time: now - joinTime.getTime() } },
-                    upsert: true,
-                },
-            };
+            return { updateOne: { filter: { userId }, update: { $inc: { time: now - joinTime.getTime() } }, upsert: true } };
         });
 
         await VoiceTime.bulkWrite(updates);
         process.exit(0);
     }
 
-    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"]) {
-        process.on(signal, cleanup.bind(null, signal));
-    }
+    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"]) process.on(signal, cleanup.bind(null, signal));
 
     console.log("╚ ☑️  \x1b[35mVoiceTime module has been initialized!\x1b[0m");
 }
