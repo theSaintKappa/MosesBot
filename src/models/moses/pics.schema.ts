@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IMosesPic } from "../../db";
+import type { IMosesPic } from "../../db";
 
 const schema = new Schema<IMosesPic>(
     {
@@ -14,7 +14,7 @@ const schema = new Schema<IMosesPic>(
         },
         contentType: { type: String, required: true },
     },
-    { timestamps: true, versionKey: false }
+    { timestamps: true, versionKey: false },
 );
 
 export default model<IMosesPic>("moses.pics", schema, "moses.pics");

@@ -1,6 +1,6 @@
-import { ChannelType, InteractionReplyOptions, PermissionFlagsBits, PermissionOverwrites, SlashCommandBuilder } from "discord.js";
+import { ChannelType, type InteractionReplyOptions, PermissionFlagsBits, type PermissionOverwrites, SlashCommandBuilder } from "discord.js";
 import { getNoticeReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -20,7 +20,8 @@ export default {
 
         if (channel?.type !== ChannelType.GuildText) return interaction.reply(getNoticeReply("This command can only be used in text channels.", true));
 
-        const permission = channel.permissionOverwrites.cache.get(channel.guild.roles.everyone.id)!!;
+        const permission = channel.permissionOverwrites.cache.get(channel.guild.roles.everyone.id);
+        if (!permission) throw new Error("Permission overwrite for @everyone not found.");
 
         switch (subcommand) {
             case "hide":

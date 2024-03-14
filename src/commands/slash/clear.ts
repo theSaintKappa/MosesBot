@@ -1,6 +1,6 @@
-import { ChannelType, CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ChannelType, type CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getNoticeReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
@@ -12,9 +12,9 @@ export default {
     scope: CommandScope.Global,
 
     run: async (interaction) => {
-        const qty = (<CommandInteractionOptionResolver>interaction.options).getNumber("qty")!!;
+        const qty = interaction.options?.getNumber("qty");
 
-        if (qty < 1 || qty > 100) return interaction.reply(getNoticeReply("You can only delete between 1 and 100 messages.", true));
+        if (!qty || qty < 1 || qty > 100) return interaction.reply(getNoticeReply("You can only delete between 1 and 100 messages.", true));
 
         const channel = interaction.channel as SendableChannel;
         if (!channel) return;

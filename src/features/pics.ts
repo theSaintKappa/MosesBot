@@ -1,4 +1,4 @@
-import { Message, MessageType, PartialMessage } from "discord.js";
+import { type Message, MessageType, type PartialMessage } from "discord.js";
 import MosesPic from "../models/moses/pics.schema";
 import MosesPicUploader from "../models/moses/pics.uploaders.schema";
 
@@ -20,9 +20,7 @@ export async function uploadPics(message: Message, logsChannel: SendableChannel)
         return;
     }
 
-    const pics = await MosesPic.insertMany(
-        message.attachments.toJSON().map(({ id, url, name, size, width, height, contentType }) => ({ id, url, submitterId: message.author.id, name, size, dimensions: { width, height }, contentType }))
-    );
+    const pics = await MosesPic.insertMany(message.attachments.toJSON().map(({ id, url, name, size, width, height, contentType }) => ({ id, url, submitterId: message.author.id, name, size, dimensions: { width, height }, contentType })));
 
     message.reply({ content: `> 🎉 Succesfully uploaded ${pics.length} Moses pic${pics.length !== 1 ? "s" : ""}!` });
 

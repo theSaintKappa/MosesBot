@@ -1,4 +1,4 @@
-import { Client, EmbedBuilder, Events, Snowflake, VoiceBasedChannel } from "discord.js";
+import { type Client, EmbedBuilder, Events, type Snowflake, type VoiceBasedChannel } from "discord.js";
 import config from "../config.json";
 import VoiceTime from "../models/bot/voiceTime";
 import secrets from "../utils/secrets";
@@ -19,9 +19,7 @@ const voiceStatesMap = new Map<Snowflake, UserVoiceState>();
 function groupVoiceStatesByChannel() {
     const channelGroups = new Map<Snowflake, ChannelVoiceStates>();
 
-    voiceStatesMap.forEach(({ channelId, joinTime, incognito, afk }, userId) =>
-        channelGroups.has(channelId) ? channelGroups.get(channelId)!.push({ userId, joinTime, incognito, afk }) : channelGroups.set(channelId, [{ userId, joinTime, incognito, afk }])
-    );
+    voiceStatesMap.forEach(({ channelId, joinTime, incognito, afk }, userId) => (channelGroups.has(channelId) ? channelGroups.get(channelId)?.push({ userId, joinTime, incognito, afk }) : channelGroups.set(channelId, [{ userId, joinTime, incognito, afk }])));
 
     return channelGroups;
 }
@@ -34,15 +32,15 @@ export function getStateEmbed() {
               [...groupVoiceStatesByChannel()].flatMap(([channelId, voiceStates]) =>
                   !voiceStates.some((voiceState) => voiceState.incognito)
                       ? {
-                            name: `> <#${channelId}> **(${voiceStates.length})**`,
-                            value: voiceStates
-                                .flatMap(({ userId, joinTime, incognito, afk }) => (!incognito ? `<@${userId}> **→** <t:${Math.floor(joinTime.getTime() / 1000)}:R> ${afk ? "💤" : ""}` : []))
-                                .concat("\u200B")
-                                .join("\n"),
-                            inline: false,
-                        }
-                      : []
-              )
+                              name: `> <#${channelId}> **(${voiceStates.length})**`,
+                              value: voiceStates
+                                  .flatMap(({ userId, joinTime, incognito, afk }) => (!incognito ? `<@${userId}> **→** <t:${Math.floor(joinTime.getTime() / 1000)}:R> ${afk ? "💤" : ""}` : []))
+                                  .concat("\u200B")
+                                  .join("\n"),
+                              inline: false,
+                          }
+                      : [],
+              ),
           )
         : embed.setDescription("***No server members are currently in a voice channel.***");
 
@@ -86,10 +84,10 @@ export function initializeVoiceTime(client: Client) {
 
     const infoChannel = client.channels.cache.get(config.channels.voiceTime) as SendableChannel;
 
-    // Initialize channel time map with all current guild voice states
-    client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache.forEach(({ id, channelId, channel }) => {
-        voiceStatesMap.set(id, { channelId: channelId!, joinTime: new Date(), incognito: isIncognitio(channel!), afk: isAfk(channel!) });
-    });
+    const voiceStates = client.guilds.cache.get(secrets.testGuildId)?.voiceStates.cache;
+    for (const { id, channelId, channel } of voiceStates?.values() ?? []) {
+        voiceStatesMap.set(id, { channelId: channelId as string, joinTime: new Date(), incognito: isIncognitio(channel as VoiceBasedChannel), afk: isAfk(channel as VoiceBasedChannel) });
+    }
 
     updateStateMessage(infoChannel);
 
@@ -124,7 +122,7 @@ export function initializeVoiceTime(client: Client) {
         process.exit(0);
     }
 
-    ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"].forEach((signal) => process.on(signal, cleanup.bind(null, signal)));
+    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"]) process.on(signal, cleanup.bind(null, signal));
 
     console.log("╚ ☑️  \x1b[35mVoiceTime module has been initialized!\x1b[0m");
 }

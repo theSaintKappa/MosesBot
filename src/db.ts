@@ -1,5 +1,5 @@
-import { ActivityType, ClientPresenceStatus, Snowflake } from "discord.js";
-import { Document, MongooseError, ObjectId, connect } from "mongoose";
+import type { ActivityType, ClientPresenceStatus, Snowflake } from "discord.js";
+import { type Document, type MongooseError, type ObjectId, connect } from "mongoose";
 import secrets from "./utils/secrets";
 
 export const connectMongo = async () => {

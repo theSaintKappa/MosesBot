@@ -1,7 +1,7 @@
-import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, Message, Partials } from "discord.js";
+import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, Partials } from "discord.js";
 import { autocomplete, executeCommand, registerCommands } from "./commands/register";
 import config from "./config.json";
-import { IPresence, connectMongo } from "./db";
+import { type IPresence, connectMongo } from "./db";
 import { deletePics, uploadPics } from "./features/pics";
 import { scheduleJobs } from "./features/scheduler";
 import { initializeVoiceTime } from "./features/voiceTracker";
@@ -11,16 +11,7 @@ import secrets from "./utils/secrets";
 console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
 
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildPresences,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.DirectMessages,
-    ],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages],
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
 
@@ -98,7 +89,7 @@ client.once(Events.ClientReady, async (client) => {
             .setThumbnail("https://cdn.discordapp.com/attachments/980813644948463656/986291948430164028/mosesSpinHD.gif")
             .setTitle(`> :wave: Greetings ${member.user.username}!`)
             .setDescription(
-                `My name is **\`${client.user.username}\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:00am** (GMT+1) a random Moses Quote will be sent to the <#${config.channels.quotes}> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#${config.channels.togglePings}>.\n\u200B`
+                `My name is **\`${client.user.username}\`** and I would like to welcome you to\n**The Moses** ~~Cult~~ ***Club of Mutual Adoration!*** Originally, the server started out as a joke, however with time it just grew an we decided to go with it.\n\n*Missing the* **context** *on why tf you got invited here and don't know what this is all about?*\n Very well then. Gino/Mojżesz/***Moses*** sometimes says some stupid shit, so some dumbass who clearly has too much free time decided to make a discord bot that would store all of Moses' stupid \"quotes\" in a database.\nEvery day at **7:00am** (GMT+1) a random Moses Quote will be sent to the <#${config.channels.quotes}> channel. The daily quote message contains a ping. Don't like pings? You can toggle them in <#${config.channels.togglePings}>.\n\u200B`,
             );
         member.send({ embeds: [dmWelcome] });
 

@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IPtQuote } from "../../db";
+import type { IPtQuote } from "../../db";
 
 const schema = new Schema<IPtQuote>(
     {
@@ -8,7 +8,7 @@ const schema = new Schema<IPtQuote>(
         authorId: { type: String, required: true },
         submitterId: { type: String, required: true },
     },
-    { timestamps: true, versionKey: false }
+    { timestamps: true, versionKey: false },
 );
 
 export default model<IPtQuote>("pt.quotes", schema, "pt.quotes");

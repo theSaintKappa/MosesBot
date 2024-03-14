@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
-import { Client, ColorResolvable, EmbedBuilder } from "discord.js";
+import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
 import config from "../config.json";
-import { IMosesPic, IMosesQuote, IMosesQuoteQueue } from "../db";
+import type { IMosesPic, IMosesQuote } from "../db";
 import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
 import MosesQuoteQueue from "../models/moses/quoteQueue.schema";
@@ -47,13 +47,13 @@ export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
 export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMosesPic) {
     const queue = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
 
-    quote ??= queue?.quoteReference ?? (await getRandomQuote());
-    pic ??= await getRandomPic();
+    const selectedQuote = quote ?? queue?.quoteReference ?? (await getRandomQuote());
+    const selectedPic = pic ?? (await getRandomPic());
 
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
     const message = await channel.send({
-        embeds: [getQuoteEmbed(quote, pic)],
-        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queue ? `*(from queue)*` : ""}}`,
+        embeds: [getQuoteEmbed(selectedQuote, selectedPic)],
+        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queue ? "*(from queue)*" : ""}}`,
     });
     message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
     message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");

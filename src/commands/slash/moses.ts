@@ -1,12 +1,12 @@
-import { ApplicationCommandOptionChoiceData, InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
+import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
 import config from "../../config.json";
-import { ILeaderboard, IMosesQuote, IMosesQuoteQueue } from "../../db";
+import type { ILeaderboard, IMosesQuote, IMosesQuoteQueue } from "../../db";
 import { getNextCronDates } from "../../features/scheduler";
 import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
 import MosesQuoteQueue from "../../models/moses/quoteQueue.schema";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
 
@@ -18,28 +18,26 @@ export default {
             subcommand
                 .setName("list")
                 .setDescription("List all stored Moses quotes (grouped by pages).")
-                .addNumberOption((option) =>
-                    option.setName("page").setDescription(`The page number you would like to see (there are ${pageSize} quotes per page).`).setRequired(true).setAutocomplete(true)
-                )
+                .addNumberOption((option) => option.setName("page").setDescription(`The page number you would like to see (there are ${pageSize} quotes per page).`).setRequired(true).setAutocomplete(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("add")
                 .setDescription("Add a new Moses quote.")
-                .addStringOption((option) => option.setName("quote").setDescription("The quote to add.").setRequired(true))
+                .addStringOption((option) => option.setName("quote").setDescription("The quote to add.").setRequired(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("edit")
                 .setDescription("Edit an existing Moses quote.")
                 .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to edit.").setRequired(true).setAutocomplete(true))
-                .addStringOption((option) => option.setName("new-quote").setDescription("The new edited quote.").setRequired(true))
+                .addStringOption((option) => option.setName("new-quote").setDescription("The new edited quote.").setRequired(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("delete")
                 .setDescription("Delete a Moses quote.")
-                .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to delete.").setRequired(true).setAutocomplete(true))
+                .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to delete.").setRequired(true).setAutocomplete(true)),
         )
         .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the Moses quote adders leaderboard."))
         .addSubcommandGroup((subcommandGroup) =>
@@ -50,10 +48,10 @@ export default {
                     subcommand
                         .setName("add")
                         .setDescription("Add a Moses quote to the queue.")
-                        .addNumberOption((option) => option.setName("id").setDescription("The id of the quote to queue up.").setRequired(true))
+                        .addNumberOption((option) => option.setName("id").setDescription("The id of the quote to queue up.").setRequired(true)),
                 )
                 .addSubcommand((subcommand) => subcommand.setName("clear").setDescription("Clear the Moses quote queue."))
-                .addSubcommand((subcommand) => subcommand.setName("display").setDescription("Display the Moses quote queue."))
+                .addSubcommand((subcommand) => subcommand.setName("display").setDescription("Display the Moses quote queue.")),
         ),
 
     autocomplete: async (subcommand) => {
@@ -63,7 +61,7 @@ export default {
                     content = `#${id} → ${content.replace(/\n/g, " ")}`;
                     const name = content.length > 100 ? `${content.substring(0, 97)}...` : content;
                     return { name, value: id };
-                })
+                }),
             );
 
         switch (subcommand) {
@@ -86,9 +84,12 @@ export default {
             if (!memberPermissions.has(PermissionsBitField.Flags.Administrator)) return getErrorReply("Only server administrators can use this command.");
 
             switch (subcommand) {
-                case "add":
-                    await interaction.reply(await queue.add(options.getNumber("id")!, user.id));
+                case "add": {
+                    const id = options.getNumber("id");
+                    if (!id) throw new Error("Queue add is missing the id argument.");
+                    await interaction.reply(await queue.add(id, user.id));
                     break;
+                }
                 case "clear":
                     await interaction.reply(await queue.clear());
                     break;
@@ -104,13 +105,13 @@ export default {
                 await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
-                await interaction.reply(await add(options.getString("quote")!, user.id));
+                await interaction.reply(await add(options.getString("quote") as string, user.id));
                 break;
             case "edit":
-                await interaction.reply(await edit(options.getNumber("id")!, options.getString("quote")!, memberPermissions, user.id));
+                await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, memberPermissions, user.id));
                 break;
             case "delete":
-                await interaction.reply(await drop(options.getNumber("id")!, memberPermissions, user.id));
+                await interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
                 break;
             case "leaderboard":
                 await interaction.reply(await leaderboard());
@@ -120,13 +121,13 @@ export default {
 } as SlashCommandObject;
 
 async function list(page: number): Promise<InteractionReplyOptions> {
-    if (page < 1) return getErrorReply(`Page number cannot be less than 1.`);
+    if (page < 1) return getErrorReply("Page number cannot be less than 1.");
 
     const documentCount = await MosesQuote.countDocuments();
     if (documentCount === 0) return getErrorReply("There are no Moses quotes stored in the database.");
 
     const totalPages = Math.ceil(documentCount / pageSize);
-    if (page > totalPages) return getErrorReply(totalPages === 1 ? `There is only 1 page of quotes available.` : `There are only ${totalPages} pages of quotes available.`);
+    if (page > totalPages) return getErrorReply(totalPages === 1 ? "There is only 1 page of quotes available." : `There are only ${totalPages} pages of quotes available.`);
 
     const quotes = await MosesQuote.aggregate<IMosesQuote>([{ $sort: { id: 1 } }, { $skip: (page - 1) * pageSize }, { $limit: pageSize }]);
 
@@ -134,11 +135,12 @@ async function list(page: number): Promise<InteractionReplyOptions> {
 }
 
 async function add(content: string, submitterId: string): Promise<InteractionReplyOptions> {
-    if (!content.endsWith(".") && !content.endsWith("?") && !content.endsWith("!")) content += ".";
+    let modifiedContent = content.trim();
+    if (!content.endsWith(".") && !content.endsWith("?") && !content.endsWith("!")) modifiedContent += ".";
 
     await MosesQuote.create({ id: 0, content, submitterId } as IMosesQuote);
 
-    return getSuccessReply(`Quote added!`, `**\`${content}\`**`);
+    return getSuccessReply("Quote added!", `**\`${content}\`**`);
 }
 
 async function edit(id: number, newQuote: string, memberPermissions: PermissionsBitField, userId: string): Promise<InteractionReplyOptions> {
@@ -146,18 +148,19 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
-    if (!newQuote.endsWith(".") && !newQuote.endsWith("?") && !newQuote.endsWith("!")) newQuote += ".";
+    let modifiedContent = newQuote.trim();
+    if (!newQuote.endsWith(".") && !newQuote.endsWith("?") && !newQuote.endsWith("!")) modifiedContent += ".";
 
-    if (quote.content === newQuote) return getErrorReply(`The new quote cannot be the same as the old one.`);
+    if (quote.content === newQuote) return getErrorReply("The new quote cannot be the same as the old one.");
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         await MosesQuote.updateOne({ id }, { content: newQuote });
-        return getSuccessReply(`Quote edited!`, `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
         await MosesQuote.updateOne({ id }, { content: newQuote });
-        return getSuccessReply(`Quote edited!`, `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
     }
 
     return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
@@ -169,12 +172,12 @@ async function drop(id: number, memberPermissions: PermissionsBitField, userId: 
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         await MosesQuote.deleteOne({ id });
-        return getSuccessReply(`Quote deleted!`, `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
+        return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
         await MosesQuote.deleteOne({ id });
-        return getSuccessReply(`Quote deleted!`, `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
+        return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
     }
 
     return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
@@ -185,7 +188,7 @@ async function leaderboard(): Promise<InteractionReplyOptions> {
 
     if (leaderboard.length === 0) return getErrorReply("The Moses leaderboard is empty.");
 
-    return getInfoReply(`Moses quote submiters leaderboard:`, leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
+    return getInfoReply("Moses quote submiters leaderboard:", leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
 }
 
 const queue = {
@@ -197,17 +200,14 @@ const queue = {
 
         const queueSize = await MosesQuoteQueue.countDocuments();
 
-        return getSuccessReply(
-            `Quote #${quote.id} added to the queue!`,
-            `**\`${quote.content}\`**\n<#${config.channels.quotes}> <t:${Math.floor(getNextCronDates(queueSize)[queueSize - 1].getTime() / 1000)}:R>`
-        );
+        return getSuccessReply(`Quote #${quote.id} added to the queue!`, `**\`${quote.content}\`**\n<#${config.channels.quotes}> <t:${Math.floor(getNextCronDates(queueSize)[queueSize - 1].getTime() / 1000)}:R>`);
     },
     clear: async (): Promise<InteractionReplyOptions> => {
         const { deletedCount } = await MosesQuoteQueue.deleteMany({});
 
         if (deletedCount === 0) return getNoticeReply("The Moses quote queue is already empty.");
 
-        return getSuccessReply(`Queue cleared!`, `🧹 **${deletedCount}**` + (deletedCount > 1 ? " quote(s) have " : " quote has ") + "been removed from the queue.");
+        return getSuccessReply("Queue cleared!", `🧹 **${deletedCount}**${deletedCount > 1 ? " quote(s) have " : " quote has "}been removed from the queue.`);
     },
     display: async (): Promise<InteractionReplyOptions> => {
         const queue = await MosesQuoteQueue.find().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
@@ -216,9 +216,6 @@ const queue = {
 
         const nextCronDates = getNextCronDates(queue.length);
 
-        return getInfoReply(
-            `Moses quote queue:`,
-            queue.map(({ quoteReference }, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n")
-        );
+        return getInfoReply("Moses quote queue:", queue.map(({ quoteReference }, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n"));
     },
 };

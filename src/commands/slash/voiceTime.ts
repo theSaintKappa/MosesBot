@@ -2,7 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getStateEmbed } from "../../features/voiceTracker";
 import VoiceTime from "../../models/bot/voiceTime";
 import { getInfoReply } from "../../utils/replyEmbeds";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()

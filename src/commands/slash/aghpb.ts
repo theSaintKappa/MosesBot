@@ -1,9 +1,13 @@
-import { AttachmentBuilder, CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
+import { AttachmentBuilder, type CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
 import secrets from "../../utils/secrets";
-import { CommandScope, SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "../types";
 
-interface UnknownObject {
-    [key: string]: any;
+interface LanguageApiObject {
+    type: string;
+    name: string;
+    url: string;
+    download_url: string;
+    [key: string]: unknown;
 }
 
 interface Language {
@@ -16,7 +20,7 @@ const languages: Language[] = [];
 const headers = { Authorization: `Bearer ${secrets.githubToken}` };
 
 try {
-    const data = (await fetch("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", { headers }).then((res) => res.json())) as UnknownObject[];
+    const data = (await fetch("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", { headers }).then((res) => res.json())) as LanguageApiObject[];
     for (const language of data) if (language.type !== "file") languages.push({ name: language.name, url: language.url });
 } catch (err) {
     console.error(err);
@@ -37,7 +41,7 @@ export default {
 
         if (!language) return interaction.reply({ content: "> I couldn't find that language.", ephemeral: true });
 
-        const data = (await fetch(language.url, { headers }).then((res) => res.json())) as UnknownObject[];
+        const data = (await fetch(language.url, { headers }).then((res) => res.json())) as LanguageApiObject[];
 
         interaction.reply({
             content: `> **Here is an anime girl holding a *\`${language.name}\`* book!**`,

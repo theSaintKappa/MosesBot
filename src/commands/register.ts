@@ -1,15 +1,14 @@
-//prettier-ignore
-import { AutocompleteInteraction, ChatInputCommandInteraction, ClientUser, ContextMenuCommandInteraction, EmbedBuilder, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
+import { type AutocompleteInteraction, type ChatInputCommandInteraction, type ClientUser, type ContextMenuCommandInteraction, EmbedBuilder, REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, type RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
 import { getErrorReply } from "../utils/replyEmbeds";
 import secrets from "../utils/secrets";
 import commandObjects from "./list";
-import { CommandScope, ContextMenuCommandObject, SlashCommandObject } from "./types";
+import { CommandScope, type ContextMenuCommandObject, type SlashCommandObject } from "./types";
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 
 // Register commands with REST client
 export async function registerCommands(clientUser: ClientUser) {
-    console.log(`╔ ⭐ \x1b[33mRegistering commands...\x1b[0m`);
+    console.log("╔ ⭐ \x1b[33mRegistering commands...\x1b[0m");
     try {
         const rest = new REST().setToken(secrets.discordToken);
 
@@ -18,7 +17,7 @@ export async function registerCommands(clientUser: ClientUser) {
                 acc[command.scope === CommandScope.Guild ? 1 : 0].push(command.builder.toJSON());
                 return acc;
             },
-            [[], []] as Array<RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody>[]
+            [[], []] as Array<RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody>[],
         );
 
         globalCommands && (await rest.put(Routes.applicationCommands(clientUser.id), { body: globalCommands }));
