@@ -1,4 +1,4 @@
-import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, User } from "discord.js";
+import { PermissionsBitField, SlashCommandBuilder, type ApplicationCommandOptionChoiceData, type InteractionReplyOptions } from "discord.js";
 import config from "../../config.json";
 import type { ILeaderboard, IMosesQuote, IMosesQuoteQueue } from "../../db";
 import { getNextCronDates } from "../../features/scheduler";
@@ -6,6 +6,7 @@ import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
 import MosesQuoteQueue from "../../models/moses/quoteQueue.schema";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
+import { updateMosesChannel } from "../../utils/updateChannel";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
@@ -105,13 +106,15 @@ export default {
                 await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
-                await interaction.reply(await add(options.getString("quote") as string, user.id));
+                interaction.reply(await add(options.getString("quote") as string, user.id));
+                await updateMosesChannel(interaction);
                 break;
             case "edit":
                 await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, memberPermissions, user.id));
                 break;
             case "delete":
-                await interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
+                interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
+                await updateMosesChannel(interaction);
                 break;
             case "leaderboard":
                 await interaction.reply(await leaderboard());
