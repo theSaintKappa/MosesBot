@@ -1,8 +1,9 @@
-import { type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, type User, type ApplicationCommandOptionChoiceData } from "discord.js";
+import { PermissionsBitField, SlashCommandBuilder, type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, type User } from "discord.js";
 import type { ILeaderboard, IPtQuote } from "../../db";
 import PtLeaderboard from "../../models/pt/leaderboard.schema";
 import PtQuote from "../../models/pt/quote.schema";
 import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
+import { updatePtChannel } from "../../utils/updateChannel";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
@@ -70,12 +71,14 @@ export default {
                 await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
+                updatePtChannel(interaction);
                 await interaction.reply(await add(options.getString("quote") as string, options.getUser("author") as User, interaction.user));
                 break;
             case "edit":
                 await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, interaction.memberPermissions, interaction.user));
                 break;
             case "delete":
+                updatePtChannel(interaction);
                 await interaction.reply(await drop(options.getNumber("id") as number, interaction.memberPermissions, interaction.user));
                 break;
             case "leaderboard":
