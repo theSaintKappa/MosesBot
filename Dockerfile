@@ -22,4 +22,4 @@ COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/ .
 
 USER bun
-ENTRYPOINT [ "bun", "run", "." ]
+ENTRYPOINT [ "bun", "start" ]
