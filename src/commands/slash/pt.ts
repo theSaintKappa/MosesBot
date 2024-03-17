@@ -50,12 +50,8 @@ export default {
                 }),
             );
 
-        switch (subcommand) {
-            case "list":
-                return Array.from({ length: Math.ceil((await PtQuote.countDocuments()) / pageSize) }, (_, i) => ({ name: `Page ${i + 1}`, value: i + 1 }));
-            case "edit" || "delete":
-                return await getRecentQuotesAutocomplete();
-        }
+        if (subcommand === "list") return Array.from({ length: Math.ceil((await PtQuote.countDocuments()) / pageSize) }, (_, i) => ({ name: i + 1, value: i + 1 }));
+        if (subcommand === "edit" || subcommand === "delete") return await getRecentQuotesAutocomplete();
     },
 
     scope: CommandScope.Guild,
