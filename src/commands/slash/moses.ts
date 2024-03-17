@@ -6,7 +6,6 @@ import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
 import MosesQuoteQueue from "../../models/moses/quoteQueue.schema";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { updateMosesChannel } from "../../utils/updateChannel";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
@@ -101,20 +100,25 @@ export default {
             return;
         }
 
+        async function updateCounter() {
+            if (!interaction.guild) return;
+            interaction.guild.channels.cache.get(config.channels.mosesCounter)?.edit({ name: `🟣 Moses Quotes ›› ${await MosesQuote.countDocuments()}` });
+        }
+
         switch (subcommand) {
             case "list":
                 await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
-                interaction.reply(await add(options.getString("quote") as string, user.id));
-                await updateMosesChannel(interaction);
+                await interaction.reply(await add(options.getString("quote") as string, user.id));
+                updateCounter();
                 break;
             case "edit":
                 await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, memberPermissions, user.id));
                 break;
             case "delete":
-                interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
-                await updateMosesChannel(interaction);
+                await interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
+                updateCounter();
                 break;
             case "leaderboard":
                 await interaction.reply(await leaderboard());

@@ -3,7 +3,7 @@ import type { ILeaderboard, IPtQuote } from "../../db";
 import PtLeaderboard from "../../models/pt/leaderboard.schema";
 import PtQuote from "../../models/pt/quote.schema";
 import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { updatePtChannel } from "../../utils/updateChannel";
+import config from "../../config.json";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
@@ -66,20 +66,25 @@ export default {
 
         if (!interaction.memberPermissions) throw new Error("Member permissions are not defined.");
 
+        async function updateCounter() {
+            if (!interaction.guild) return;
+            interaction.guild.channels.cache.get(config.channels.ptCounter)?.edit({ name: `🔴 3pT Quotes ›› ${await PtQuote.countDocuments()}` });
+        }
+
         switch (subcommand) {
             case "list":
                 await interaction.reply(await list(options.getNumber("page") ?? 1));
                 break;
             case "add":
-                updatePtChannel(interaction);
                 await interaction.reply(await add(options.getString("quote") as string, options.getUser("author") as User, interaction.user));
+                updateCounter();
                 break;
             case "edit":
                 await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, interaction.memberPermissions, interaction.user));
                 break;
             case "delete":
-                updatePtChannel(interaction);
                 await interaction.reply(await drop(options.getNumber("id") as number, interaction.memberPermissions, interaction.user));
+                updateCounter();
                 break;
             case "leaderboard":
                 await interaction.reply(await leaderboard());
