@@ -31,6 +31,10 @@ export interface IMosesQuoteQueue extends Document, DocumentTimestamps {
     submitterId: Snowflake;
 }
 
+export interface IMosesLastSentQuote extends Document, DocumentTimestamps {
+    quoteReference: ObjectId;
+}
+
 export interface IPtQuote extends IQuote {
     authorId: Snowflake;
 }

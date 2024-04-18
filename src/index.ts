@@ -7,6 +7,7 @@ import { scheduleJobs } from "./features/scheduler";
 import { initializeVoiceTime } from "./features/voiceTracker";
 import Presence from "./models/bot/presence";
 import secrets from "./utils/secrets";
+import { updateBotDescriptionQuote } from "./features/botDescription";
 
 console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
 
@@ -19,6 +20,8 @@ await connectMongo();
 
 client.once(Events.ClientReady, async (client) => {
     console.log(`═ 🟢 \x1b[42m${client.user.username} is now online!\x1b[0m`);
+
+    if (secrets.environment === "production") updateBotDescriptionQuote(client);
 
     // Schedule cron jobs
     scheduleJobs(client);

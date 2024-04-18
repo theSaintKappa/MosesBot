@@ -1,10 +1,12 @@
 import { CronJob } from "cron";
 import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
 import config from "../config.json";
-import type { IMosesPic, IMosesQuote } from "../db";
+import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "../db";
 import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
 import MosesQuoteQueue from "../models/moses/quoteQueue.schema";
+import MosesLastSentQuote from "../models/moses/lastSentQuote.schema";
+import { updateBotDescriptionQuote } from "./botDescription";
 
 const colors: ColorResolvable[] = ["#ff66ff", "#ff5e5e", "#ffa35d", "#fff75d", "#7dff5d", "#61ddff", "#bd6dff"];
 const greetings = ["Hi", "Hello", "Hey", "Hellow", "Hi there", "Hello there", "Hey there", "Hellow there"];
@@ -53,9 +55,23 @@ export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMose
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
     const message = await channel.send({
         embeds: [getQuoteEmbed(selectedQuote, selectedPic)],
-        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queue ? "*(from queue)*" : ""}}`,
+        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queue ? "*(from queue)*" : ""}`,
     });
     message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
     message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");
-    await queue?.deleteOne();
+
+    queue?.deleteOne();
+
+    updateLastSentQuote(selectedQuote);
+
+    updateBotDescriptionQuote(client, selectedQuote);
+}
+
+export async function updateLastSentQuote(quote: IMosesQuote) {
+    await MosesLastSentQuote.findOneAndUpdate({}, { quoteReference: quote._id } as IMosesLastSentQuote, { upsert: true });
+}
+
+export async function getLastSentQuote() {
+    const quote = await MosesLastSentQuote.findOne().populate<{ quoteReference: IMosesQuote }>("quoteReference");
+    return quote?.quoteReference ?? null;
 }
