@@ -1,13 +1,13 @@
-import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, Partials } from "discord.js";
+import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, MessageType, type PartialMessage, Partials } from "discord.js";
 import { autocomplete, executeCommand, registerCommands } from "./commands/register";
 import config from "./config.json";
 import { type IPresence, connectMongo } from "./db";
+import { updateBotDescriptionQuote } from "./features/botDescription";
 import { deletePics, uploadPics } from "./features/pics";
 import { scheduleJobs } from "./features/scheduler";
 import { initializeVoiceTime } from "./features/voiceTracker";
 import Presence from "./models/bot/presence";
 import secrets from "./utils/secrets";
-import { updateBotDescriptionQuote } from "./features/botDescription";
 
 console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
 
@@ -40,8 +40,13 @@ client.once(Events.ClientReady, async (client) => {
 
     // Upload and delete pics
     const picLogsChannel = client.channels.cache.get(config.channels.picsLog) as SendableChannel;
-    client.on(Events.MessageCreate, async (message) => await uploadPics(message, picLogsChannel));
-    client.on(Events.MessageDelete, async (message) => await deletePics(message, picLogsChannel));
+    const isUploadRequest = (message: Message | PartialMessage) => !message.guildId && message.attachments.size !== 0 && message.type === MessageType.Default && !message.author.bot;
+    client.on(Events.MessageCreate, async (message) => {
+        if (isUploadRequest(message)) await uploadPics(message, picLogsChannel);
+    });
+    client.on(Events.MessageDelete, async (message) => {
+        if (isUploadRequest(message)) await deletePics(message, picLogsChannel);
+    });
 
     // Add role to new members that accepted the rules
     client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
