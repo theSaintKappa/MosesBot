@@ -32,13 +32,13 @@ export function getStateEmbed() {
               [...groupVoiceStatesByChannel()].flatMap(([channelId, voiceStates]) =>
                   !voiceStates.some((voiceState) => voiceState.incognito)
                       ? {
-                              name: `> <#${channelId}> **(${voiceStates.length})**`,
-                              value: voiceStates
-                                  .flatMap(({ userId, joinTime, incognito, afk }) => (!incognito ? `<@${userId}> **→** <t:${Math.floor(joinTime.getTime() / 1000)}:R> ${afk ? "💤" : ""}` : []))
-                                  .concat("\u200B")
-                                  .join("\n"),
-                              inline: false,
-                          }
+                            name: `> <#${channelId}> **(${voiceStates.length})**`,
+                            value: voiceStates
+                                .flatMap(({ userId, joinTime, incognito, afk }) => (!incognito ? `<@${userId}> **→** <t:${Math.floor(joinTime.getTime() / 1000)}:R> ${afk ? "💤" : ""}` : []))
+                                .concat("\u200B")
+                                .join("\n"),
+                            inline: false,
+                        }
                       : [],
               ),
           )

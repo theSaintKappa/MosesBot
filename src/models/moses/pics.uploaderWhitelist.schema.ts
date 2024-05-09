@@ -9,4 +9,4 @@ const schema = new Schema<IMosesPicUploader>(
     { timestamps: true, versionKey: false },
 );
 
-export default model<IMosesPicUploader>("moses.pics.uploaders", schema, "moses.pics.uploaders");
+export default model<IMosesPicUploader>("moses.pics.uploaderWhitelist", schema, "moses.pics.uploaderWhitelist");

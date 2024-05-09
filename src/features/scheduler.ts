@@ -2,10 +2,10 @@ import { CronJob } from "cron";
 import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
 import config from "../config.json";
 import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "../db";
+import MosesLastSentQuote from "../models/bot/moses/lastSentQuote.schema";
+import MosesQuoteQueue from "../models/bot/moses/quoteQueue.schema";
 import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
-import MosesQuoteQueue from "../models/moses/quoteQueue.schema";
-import MosesLastSentQuote from "../models/moses/lastSentQuote.schema";
 import { updateBotDescriptionQuote } from "./botDescription";
 
 const colors: ColorResolvable[] = ["#ff66ff", "#ff5e5e", "#ffa35d", "#fff75d", "#7dff5d", "#61ddff", "#bd6dff"];

@@ -1,9 +1,9 @@
-import { PermissionsBitField, SlashCommandBuilder, type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, type User } from "discord.js";
+import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, type User } from "discord.js";
+import config from "../../config.json";
 import type { ILeaderboard, IPtQuote } from "../../db";
 import PtLeaderboard from "../../models/pt/leaderboard.schema";
 import PtQuote from "../../models/pt/quote.schema";
 import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
-import config from "../../config.json";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;

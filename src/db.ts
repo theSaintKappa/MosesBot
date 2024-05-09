@@ -48,7 +48,6 @@ export interface IMosesPic extends Document, DocumentTimestamps {
     id: string;
     url: string;
     submitterId: Snowflake;
-    name: string;
     size: number;
     dimensions: { width: number; height: number };
     contentType: string;

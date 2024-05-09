@@ -6,7 +6,6 @@ const schema = new Schema<IMosesPic>(
         id: { type: String, required: true, unique: true },
         url: { type: String, required: true },
         submitterId: { type: String, required: true },
-        name: { type: String, required: true },
         size: { type: Number, required: true },
         dimensions: {
             width: { type: Number, required: true },

@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
-import type { IMosesQuoteQueue } from "../../db";
-import MosesQuote from "./quote.schema";
+import type { IMosesQuoteQueue } from "../../../db";
+import MosesQuote from "../../moses/quote.schema";
 
 const schema = new Schema<IMosesQuoteQueue>(
     {
@@ -10,4 +10,4 @@ const schema = new Schema<IMosesQuoteQueue>(
     { timestamps: true, versionKey: false },
 );
 
-export default model<IMosesQuoteQueue>("moses.quoteQueue", schema, "moses.quoteQueue");
+export default model<IMosesQuoteQueue>("bot.moses.quoteQueue", schema, "bot.moses.quoteQueue");

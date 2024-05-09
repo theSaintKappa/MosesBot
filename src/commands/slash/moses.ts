@@ -1,10 +1,10 @@
-import { PermissionsBitField, SlashCommandBuilder, type ApplicationCommandOptionChoiceData, type InteractionReplyOptions } from "discord.js";
+import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import config from "../../config.json";
 import type { ILeaderboard, IMosesQuote, IMosesQuoteQueue } from "../../db";
 import { getNextCronDates } from "../../features/scheduler";
+import MosesQuoteQueue from "../../models/bot/moses/quoteQueue.schema";
 import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
-import MosesQuoteQueue from "../../models/moses/quoteQueue.schema";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
 import { CommandScope, type SlashCommandObject } from "../types";
 
