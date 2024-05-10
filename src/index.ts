@@ -3,7 +3,7 @@ import { autocomplete, executeCommand, registerCommands } from "./commands/regis
 import config from "./config.json";
 import { type IPresence, connectMongo } from "./db";
 import { updateBotDescriptionQuote } from "./features/botDescription";
-import { deletePics, uploadPics } from "./features/pics";
+import { uploadPics } from "./features/pics";
 import { scheduleJobs } from "./features/scheduler";
 import { initializeVoiceTime } from "./features/voiceTracker";
 import Presence from "./models/bot/presence";
@@ -42,10 +42,8 @@ client.once(Events.ClientReady, async (client) => {
     const picLogsChannel = client.channels.cache.get(config.channels.picsLog) as SendableChannel;
     const isUploadRequest = (message: Message | PartialMessage) => !message.guildId && message.attachments.size !== 0 && message.type === MessageType.Default && !message.author.bot;
     client.on(Events.MessageCreate, async (message) => {
-        if (isUploadRequest(message)) await uploadPics(message, picLogsChannel);
-    });
-    client.on(Events.MessageDelete, async (message) => {
-        if (isUploadRequest(message)) await deletePics(message, picLogsChannel);
+        const guildMember = await client.guilds.cache.get(secrets.testGuildId)?.members.fetch(message.author.id);
+        if (isUploadRequest(message)) await uploadPics(message, picLogsChannel, guildMember);
     });
 
     // Add role to new members that accepted the rules

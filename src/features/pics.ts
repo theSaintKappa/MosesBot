@@ -1,7 +1,9 @@
 import { Storage } from "@google-cloud/storage";
-import type { Message, PartialMessage, Snowflake } from "discord.js";
+import type { GuildMember, Message, PartialMessage } from "discord.js";
+import { customAlphabet } from "nanoid";
+import config from "../config.json";
+import type { IMosesPic } from "../db";
 import MosesPic from "../models/moses/pics.schema";
-import { messageReply } from "../utils/replyEmbeds";
 import secrets from "../utils/secrets";
 
 const storage = new Storage({
@@ -10,77 +12,64 @@ const storage = new Storage({
 });
 const bucket = storage.bucket(secrets.googleCredentials.bucket_name);
 
-const mimeTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"] as const;
-type AllowedMimeTypes = (typeof mimeTypes)[number];
+const mimeTypes: Readonly<string[]> = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+
+const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8);
+
+type Image = Pick<IMosesPic, "id" | "url" | "submitterId" | "size" | "dimensions" | "contentType">;
 
 // TODO: Seperate logger util function
-export async function uploadPics(uploadRequest: Message, logsChannel: SendableChannel) {
-    // const picUploader = await MosesPicUploader.find({ userId: message.author.id });
-    // if (!picUploader) {
-    //     message.reply({ content: "> ❌ You don't have permissions to upload Moses pics\n> Ask a server admin to add you to the list" });
-    //     return;
-    // }
-
-    const attachments = uploadRequest.attachments.toJSON();
-
-    if (attachments.some(({ contentType }) => !mimeTypes.includes(contentType as AllowedMimeTypes))) {
-        uploadRequest.reply(messageReply("error", null, "Only image files are allowed to be uploaded *(png, jpg, webp or gif)*"));
+export async function uploadPics(uploadRequest: Message, logsChannel: SendableChannel, guildMember?: GuildMember) {
+    if (!guildMember) {
+        uploadRequest.reply("> *Thou must be a member of **The Moses Cult** to be able to upload **Moses Pics:tm:***");
         return;
     }
 
-    const uploadMessage = uploadRequest.reply(messageReply("loading", null, `Uploading ${attachments.length} image${attachments.length !== 1 ? "s" : ""} \`${(attachments.reduce((acc, { size }) => acc + size, 0) / 1024 / 1024).toFixed(2)}MB\``));
-
-    const uploadedImages: Image[] = [];
-
-    interface Image {
-        id: string;
-        url: string;
-        submitterId: Snowflake;
-        name: string;
-        size: number;
-        dimensions: { width: number; height: number };
-        contentType: AllowedMimeTypes;
+    if (!guildMember.roles.cache.has(config.roles.pt)) {
+        const role = guildMember.guild.roles.cache.get(config.roles.pt);
+        uploadRequest.reply(`> *Thou must be in possession of the **${role?.name ?? "pt"}** role to be able to upload **Moses Pics:tm:***`);
+        return;
     }
 
-    for (const attachment of attachments) {
-        try {
-            const file = bucket.file(`moses/${attachment.id}`);
+    const attachments = uploadRequest.attachments.toJSON();
 
-            const stream = file.createWriteStream({ metadata: { contentType: attachment.contentType as AllowedMimeTypes, metadata: { uploaderId: uploadRequest.author.id } } });
-
-            const imageBuffer = await fetch(attachment.url).then((res) => res.arrayBuffer());
-
-            stream.end(Buffer.from(imageBuffer));
-
-            const url = `https://${secrets.googleCredentials.bucket_name}/moses/${attachment.id}`;
-
-            uploadedImages.push({ id: attachment.id, url, submitterId: uploadRequest.author.id, name: attachment.name, size: attachment.size, dimensions: { width: attachment.width ?? 0, height: attachment.height ?? 0 }, contentType: attachment.contentType as AllowedMimeTypes });
-        } catch (err) {
-            (await uploadMessage).delete();
-            uploadRequest.reply(messageReply("error", null, `Failed to upload image${attachments.length !== 1 ? "s" : ""}\nPlease try again later or contact a server admin`));
-            return;
-        }
+    if (attachments.some(({ contentType }) => !mimeTypes.includes(contentType as string))) {
+        uploadRequest.react("❌");
+        uploadRequest.reply(`> Only images are allowed to be uploaded (${mimeTypes.map((type) => type.split("/")[1]).join(", ")})`);
+        return;
     }
 
-    (await uploadMessage).edit(messageReply("success", null, `Succesfully uploaded ${attachments.length} image${attachments.length !== 1 ? "s" : ""}!`));
+    const loadingReaction = uploadRequest.react(uploadRequest.client.emojis.cache.get(config.emojis.loading) ?? "⏳");
 
-    MosesPic.insertMany(uploadedImages);
+    let uploadedImages: Image[];
+    try {
+        uploadedImages = await Promise.all(
+            attachments.map(async (attachment) => {
+                const buffer = await fetch(attachment.url).then((res) => res.arrayBuffer());
 
-    logsChannel.send({
-        content: `> ➕ <@${uploadRequest.author.id}> just **uploaded** ${uploadedImages.length} Moses pic${uploadedImages.length !== 1 ? "s" : ""}\n${uploadedImages.map(({ url }) => url).join("\n")}`,
-        allowedMentions: { users: [] },
-    });
-}
+                const id = nanoid();
 
-export async function deletePics(message: Message | PartialMessage, logsChannel: SendableChannel) {
-    const picIds = [...message.attachments.keys()];
+                await bucket.file(`moses/${id}`).save(Buffer.from(buffer), { metadata: { contentType: attachment.contentType as string, metadata: { uploaderId: uploadRequest.author.id } } });
 
-    const pics = await MosesPic.deleteMany({ id: { $in: picIds } });
+                const url = `https://${secrets.googleCredentials.bucket_name}/moses/${id}`;
 
-    message.channel.send({ content: `> 🗑️ Succesfully deleted ${pics.deletedCount} Moses pic${pics.deletedCount !== 1 ? "s" : ""}!` });
+                return { id, url, submitterId: uploadRequest.author.id, size: attachment.size, dimensions: { width: attachment.width ?? 0, height: attachment.height ?? 0 }, contentType: attachment.contentType as string };
+            }),
+        );
+    } catch (err) {
+        uploadRequest.react("❌");
+        uploadRequest.reply("> An error occurred while processing your request.\n> Try again later or contact a server admin.");
+        logsChannel.send({ content: `> <@${uploadRequest.author.id}> encountered an error while uploading images\n${err}`, allowedMentions: { users: [] } });
+        return;
+    }
 
-    logsChannel.send({
-        content: `> ➖ <@${message.author?.id}> just **deleted** ${pics.deletedCount} Moses pic${pics.deletedCount !== 1 ? "s" : ""}.\n> \`${picIds.join("`\n> `")}\``,
-        allowedMentions: { users: [] },
-    });
+    await MosesPic.insertMany<Image>(uploadedImages);
+
+    const urlsString = `**| ${uploadedImages.map(({ id, url }) => `[${id}](<${url}>)`).join(" | ")} |**`;
+    uploadRequest.reply(`> Succesfully uploaded ${uploadedImages.length} image${uploadedImages.length !== 1 ? "s" : ""}!\n\n> ${urlsString}`);
+
+    logsChannel.send({ content: `> <@${uploadRequest.author.id}> uploaded ${uploadedImages.length} new image${uploadedImages.length !== 1 ? "s" : ""}\n\n> ${urlsString}`, allowedMentions: { users: [] } });
+
+    await (await loadingReaction).users.remove(uploadRequest.client.user.id);
+    uploadRequest.react("✅");
 }
