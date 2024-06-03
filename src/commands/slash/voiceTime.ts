@@ -1,7 +1,6 @@
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getStateEmbed } from "../../features/voiceTracker";
+import { SlashCommandBuilder } from "discord.js";
+import { getLeaderboardEmbed, getStateEmbed } from "../../features/voiceTime";
 import VoiceTime from "../../models/bot/voiceTime";
-import { getInfoReply } from "../../utils/replyEmbeds";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
@@ -18,18 +17,15 @@ export default {
         const subcommand = options.getSubcommand() as "leaderboard" | "state";
 
         switch (subcommand) {
-            case "leaderboard":
-                await interaction.reply(await viewLeaderboard());
+            case "leaderboard": {
+                const voiceTime = await VoiceTime.find({}).sort({ time: -1 });
+                await interaction.reply({ embeds: [getLeaderboardEmbed(voiceTime)] });
                 break;
-            case "state":
+            }
+            case "state": {
                 await interaction.reply({ embeds: [getStateEmbed()] });
                 break;
+            }
         }
     },
 } as SlashCommandObject;
-
-async function viewLeaderboard() {
-    const voiceTime = await VoiceTime.find({}).sort({ time: -1 });
-
-    return getInfoReply("Voice Time Leaderboard", voiceTime.map((vt, i) => `**${i + 1}.** <@${vt.userId}> **→** ${(vt.time / 1000 / 60 / 60).toFixed(2)} hours`).join("\n"));
-}

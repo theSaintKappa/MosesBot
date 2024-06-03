@@ -5,7 +5,7 @@ import { type IPresence, connectMongo } from "./db";
 import { updateBotDescriptionQuote } from "./features/botDescription";
 import { uploadPics } from "./features/pics";
 import { scheduleJobs } from "./features/scheduler";
-import { initializeVoiceTime } from "./features/voiceTracker";
+import { initializeVoiceTime } from "./features/voiceTime";
 import Presence from "./models/bot/presence";
 import secrets from "./utils/secrets";
 
@@ -27,7 +27,7 @@ client.once(Events.ClientReady, async (client) => {
     scheduleJobs(client);
 
     // Initialize voice time tracking
-    initializeVoiceTime(client);
+    initializeVoiceTime(client, client.channels.cache.get(config.channels.voiceTime) as SendableChannel);
 
     // Register slash commands
     registerCommands(client.user);
