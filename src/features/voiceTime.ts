@@ -1,3 +1,4 @@
+import { type Interface, createInterface } from "node:readline/promises";
 import { type Client, EmbedBuilder, Events, type Message, type Snowflake, type VoiceBasedChannel } from "discord.js";
 import config from "../config.json";
 import type { IVoiceTime } from "../db";
@@ -102,20 +103,20 @@ function joinEvent(userId: Snowflake, newChannel: VoiceBasedChannel) {
     voiceStates.set(userId, { userId, channelId: newChannel.id, joinTimestamp: new Date(), isIncognito: isIncognitio(newChannel), isAfk: isAfk(newChannel) });
 }
 
-function leaveEvent(userId: Snowflake, oldChannel: VoiceBasedChannel) {
+async function leaveEvent(userId: Snowflake, oldChannel: VoiceBasedChannel) {
     const { ...voiceState } = voiceStates.get(userId);
     if (!voiceState) return;
 
     voiceStates.delete(userId);
-    if (!isAfk(oldChannel)) VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
+    if (!isAfk(oldChannel)) await VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
 }
 
-function switchEvent(userId: Snowflake, newChannel: VoiceBasedChannel, oldChannel: VoiceBasedChannel) {
+async function switchEvent(userId: Snowflake, newChannel: VoiceBasedChannel, oldChannel: VoiceBasedChannel) {
     const { ...voiceState } = voiceStates.get(userId);
     if (!voiceState) return;
 
     voiceStates.set(userId, { userId, channelId: newChannel.id, joinTimestamp: new Date(), isIncognito: isIncognitio(newChannel), isAfk: isAfk(newChannel) });
-    if (!isAfk(oldChannel)) VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
+    if (!isAfk(oldChannel)) await VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
 }
 
 export async function initializeVoiceTime(client: Client, displayChannel: SendableChannel) {
@@ -146,25 +147,37 @@ export async function initializeVoiceTime(client: Client, displayChannel: Sendab
         if (message.channelId === config.channels.voiceTime && message.author.id !== client.user?.id && message.deletable) message.delete();
     });
 
-    let cleanupInProgress = false;
-    async function cleanup(signal: string | NodeJS.Signals) {
-        if (cleanupInProgress) return;
-        cleanupInProgress = true;
+    console.log("[VoiceTime] ✅ Module initialized.");
+    voiceStates.size && console.log(`[VoiceTime] 🔷 Registered ${voiceStates.size} new voice state(s).`);
+}
 
-        console.log(`⛔ [VoiceTime] ${signal} received. Cleaning up...\x1b[0m`);
+async function cleanup(signal: NodeJS.Signals | string) {
+    console.log(`[VoiceTime] ⛔ ${signal} received. Running cleanup...\x1b[0m`);
 
-        const now = Date.now();
-        const updates = [...voiceStates].map(([userId, { joinTimestamp }]) => {
-            return { updateOne: { filter: { userId }, update: { $inc: { time: now - joinTimestamp.getTime() } }, upsert: true } };
-        });
+    const now = Date.now();
+    const updates = [...voiceStates].map(([userId, { joinTimestamp }]) => {
+        return { updateOne: { filter: { userId }, update: { $inc: { time: now - joinTimestamp.getTime() } }, upsert: true } };
+    });
+    if (!updates.length) return console.log("[VoiceTime] 🧹 Cleanup finished. No users to update.");
 
-        await VoiceTime.bulkWrite(updates);
-        process.exit(0);
+    try {
+        const result = await VoiceTime.bulkWrite(updates);
+        console.log(`[VoiceTime] 🧹 Cleanup updated ${result.modifiedCount + result.upsertedCount} user(s).`);
+    } catch (err) {
+        console.error(`[VoiceTime] ❌ Cleanup failed: ${err}`);
     }
-
-    for (const signal of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK", "SIGUSR1", "SIGUSR2"]) process.on(signal, cleanup.bind(null, signal));
-
-    console.log("✅ [VoiceTime] initialized.");
 }
 
 export const getStates = () => voiceStates as ReadonlyMap<Snowflake, VoiceState>;
+
+let processOrInterface: NodeJS.Process | Interface;
+
+if (process.platform === "win32") processOrInterface = createInterface({ input: process.stdin, output: process.stdout });
+else processOrInterface = process;
+
+for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+    processOrInterface.on(signal, async () => {
+        await cleanup(signal);
+        process.exit(0);
+    });
+}

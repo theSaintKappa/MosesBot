@@ -1,16 +1,11 @@
 import { Storage } from "@google-cloud/storage";
-import type { GuildMember, Message, PartialMessage } from "discord.js";
+import type { GuildMember, Message } from "discord.js";
 import { customAlphabet } from "nanoid";
 import config from "../config.json";
 import type { IMosesPic } from "../db";
 import MosesPic from "../models/moses/pics.schema";
 import secrets from "../utils/secrets";
-
-const storage = new Storage({
-    projectId: secrets.googleCredentials.project_id,
-    credentials: secrets.googleCredentials,
-});
-const bucket = storage.bucket(secrets.googleCredentials.bucket_name);
+import { bucket } from "./gcs";
 
 const mimeTypes: Readonly<string[]> = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 

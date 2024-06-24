@@ -10,7 +10,7 @@ const replyTypes: { [key in "info" | "success" | "error" | "notice" | "loading"]
 
 export const getInfoReply = (title: string, description: string): InteractionReplyOptions => ({ embeds: [new EmbedBuilder().setColor("#00c8ff").setTitle(`> 💛 ${title}`).setDescription(description)] });
 export const getSuccessReply = (title: string, description: string): InteractionReplyOptions => ({ embeds: [new EmbedBuilder().setColor("#00ff3c").setTitle(`> ✅ ${title}`).setDescription(description)] });
-export const getErrorReply = (error: string, ephemeral = true): InteractionReplyOptions => ({ embeds: [new EmbedBuilder().setColor("#ff2600").setDescription(`> ❌ ${error}`)], ephemeral });
+export const getErrorReply = (error: string, ephemeral = true): InteractionReplyOptions => ({ embeds: [new EmbedBuilder().setColor("#ff2600").setDescription(`❌ ${error}`)], ephemeral });
 export const getNoticeReply = (title: string, ephemeral = false): InteractionReplyOptions => ({ embeds: [new EmbedBuilder().setColor("#ffdd00").setTitle(`> ⚠️ ${title}`)], ephemeral });
 
 export const messageReply = (type: keyof typeof replyTypes, title?: string | null, description?: string | null) => {

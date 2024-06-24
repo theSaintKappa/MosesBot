@@ -6,6 +6,7 @@ export default {
     builder: new SlashCommandBuilder()
         .setName("channel")
         .setDescription("Channel managment related commands.")
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommand((subcommand) => subcommand.setName("hide").setDescription("Hide a channel"))
         .addSubcommand((subcommand) => subcommand.setName("unhide").setDescription("Unhide a channel"))
         .addSubcommand((subcommand) => subcommand.setName("lock").setDescription("Lock a channel"))

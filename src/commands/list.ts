@@ -3,8 +3,9 @@ import aghpb from "./slash/aghpb";
 import channel from "./slash/channel";
 import clear from "./slash/clear";
 import moses from "./slash/moses";
+import pics from "./slash/picsync";
 import presence from "./slash/presence";
 import pt from "./slash/pt";
 import voiceTime from "./slash/voiceTime";
 
-export default [reroll, aghpb, channel, clear, moses, presence, pt, voiceTime];
+export default [reroll, aghpb, channel, clear, moses, pics, presence, pt, voiceTime];
