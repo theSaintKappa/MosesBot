@@ -1,11 +1,10 @@
 import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 import config from "../../config.json";
-import type { ILeaderboard, IMosesQuote, IMosesQuoteQueue } from "../../db";
-import { getNextCronDates } from "../../features/scheduler";
-import MosesQuoteQueue from "../../models/bot/moses/quoteQueue.schema";
+import type { ILeaderboard, IMosesQuote } from "../../db";
 import MosesLeaderboard from "../../models/moses/leaderboard.schema";
 import MosesQuote from "../../models/moses/quote.schema";
-import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
+import { getRecentQuotesAutocomplete } from "../../utils/autocomplete";
+import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
 import { CommandScope, type SlashCommandObject } from "../types";
 
 const pageSize = 15;
@@ -39,31 +38,9 @@ export default {
                 .setDescription("Delete a Moses quote.")
                 .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to delete.").setRequired(true).setAutocomplete(true)),
         )
-        .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the Moses quote adders leaderboard."))
-        .addSubcommandGroup((subcommandGroup) =>
-            subcommandGroup
-                .setName("queue")
-                .setDescription("Moses quote queue related commands (admin only).")
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName("add")
-                        .setDescription("Add a Moses quote to the queue.")
-                        .addNumberOption((option) => option.setName("id").setDescription("The id of the quote to queue up.").setRequired(true)),
-                )
-                .addSubcommand((subcommand) => subcommand.setName("clear").setDescription("Clear the Moses quote queue."))
-                .addSubcommand((subcommand) => subcommand.setName("display").setDescription("Display the Moses quote queue.")),
-        ),
+        .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the Moses quote adders leaderboard.")),
 
     autocomplete: async (subcommand) => {
-        const getRecentQuotesAutocomplete = async (): Promise<ApplicationCommandOptionChoiceData[]> =>
-            MosesQuote.aggregate<IMosesQuote>([{ $sort: { id: -1 } }, { $limit: 25 }]).then((quotes) =>
-                quotes.map(({ content, id }) => {
-                    content = `#${id} → ${content.replace(/\n/g, " ")}`;
-                    const name = content.length > 100 ? `${content.substring(0, 97)}...` : content;
-                    return { name, value: id };
-                }),
-            );
-
         if (subcommand === "list") return Array.from({ length: Math.ceil((await MosesQuote.countDocuments()) / pageSize) }, (_, i) => ({ name: i + 1, value: i + 1 }));
         if (subcommand === "edit" || subcommand === "delete") return await getRecentQuotesAutocomplete();
     },
@@ -74,27 +51,6 @@ export default {
         const { options, memberPermissions, user } = interaction;
         if (!memberPermissions) throw new Error("Member permissions are null.");
         const subcommand = options.getSubcommand();
-        const subcommandGroup = options.getSubcommandGroup();
-
-        if (subcommandGroup === "queue") {
-            if (!memberPermissions.has(PermissionsBitField.Flags.Administrator)) return getErrorReply("Only server administrators can use this command.");
-
-            switch (subcommand) {
-                case "add": {
-                    const id = options.getNumber("id");
-                    if (!id) throw new Error("Queue add is missing the id argument.");
-                    await interaction.reply(await queue.add(id, user.id));
-                    break;
-                }
-                case "clear":
-                    await interaction.reply(await queue.clear());
-                    break;
-                case "display":
-                    await interaction.reply(await queue.display());
-                    break;
-            }
-            return;
-        }
 
         async function updateCounter() {
             if (!interaction.guild) return;
@@ -193,32 +149,3 @@ async function leaderboard(): Promise<InteractionReplyOptions> {
 
     return getInfoReply("Moses quote submiters leaderboard:", leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
 }
-
-const queue = {
-    add: async (id: number, submitterId: string): Promise<InteractionReplyOptions> => {
-        const quote = await MosesQuote.findOne<IMosesQuote>({ id });
-        if (!quote) return getErrorReply(`***Quote **\`#${id}\`** does not exist.***`);
-
-        await MosesQuoteQueue.create({ quoteReference: quote._id, submitterId } as IMosesQuoteQueue);
-
-        const queueSize = await MosesQuoteQueue.countDocuments();
-
-        return getSuccessReply(`Quote #${quote.id} added to the queue!`, `**\`${quote.content}\`**\n<#${config.channels.quotes}> <t:${Math.floor(getNextCronDates(queueSize)[queueSize - 1].getTime() / 1000)}:R>`);
-    },
-    clear: async (): Promise<InteractionReplyOptions> => {
-        const { deletedCount } = await MosesQuoteQueue.deleteMany({});
-
-        if (deletedCount === 0) return getNoticeReply("The Moses quote queue is already empty.");
-
-        return getSuccessReply("Queue cleared!", `🧹 **${deletedCount}**${deletedCount > 1 ? " quote(s) have " : " quote has "}been removed from the queue.`);
-    },
-    display: async (): Promise<InteractionReplyOptions> => {
-        const queue = await MosesQuoteQueue.find().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
-
-        if (queue.length === 0) return getNoticeReply("The Moses quote queue is empty.");
-
-        const nextCronDates = getNextCronDates(queue.length);
-
-        return getInfoReply("Moses quote queue:", queue.map(({ quoteReference }, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n"));
-    },
-};

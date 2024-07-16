@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
-import type { IMosesLastSentQuote } from "../../../db";
-import MosesQuote from "../../moses/quote.schema";
+import type { IMosesLastSentQuote } from "../../db";
+import MosesQuote from "./quote.schema";
 
 const schema = new Schema<IMosesLastSentQuote>(
     {
@@ -9,4 +9,4 @@ const schema = new Schema<IMosesLastSentQuote>(
     { timestamps: true, versionKey: false },
 );
 
-export default model<IMosesLastSentQuote>("bot.moses.lastSentQuote", schema, "bot.moses.lastSentQuote");
+export default model<IMosesLastSentQuote>("moses.lastSentQuote", schema, "moses.lastSentQuote");

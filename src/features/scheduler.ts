@@ -2,10 +2,10 @@ import { CronJob } from "cron";
 import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
 import config from "../config.json";
 import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "../db";
-import MosesLastSentQuote from "../models/bot/moses/lastSentQuote.schema";
-import MosesQuoteQueue from "../models/bot/moses/quoteQueue.schema";
+import MosesLastSentQuote from "../models/moses/lastSentQuote.schema";
 import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
+import MosesQuoteQueue from "../models/moses/quoteQueue.schema";
 import { logger } from "../utils/logger";
 import { updateBotDescriptionQuote } from "./botDescription";
 
@@ -44,30 +44,29 @@ export function getNextCronDates(n?: number) {
 export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
     return new EmbedBuilder()
         .setColor(colors[new Date().getDay()])
-        .setTitle(`**\`#${quote.id}\`** ${quote.content}`)
-        .setDescription(`\u200B\nUploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`)
+        .setDescription(`### \u201c\n**${quote.content.replace(/\\n/g, "\n")}**\n### \u201d\n\u200B\n-# **\`\#${quote.id}\`** · Uploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`)
         .setThumbnail(pic.url);
 }
 
 export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMosesPic) {
-    const queue = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
+    const queueEntry = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
 
-    const selectedQuote = quote ?? queue?.quoteReference ?? (await getRandomQuote());
+    const selectedQuote = quote ?? queueEntry?.quoteReference ?? (await getRandomQuote());
     const selectedPic = pic ?? (await getRandomPic());
 
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
     const message = await channel.send({
         embeds: [getQuoteEmbed(selectedQuote, selectedPic)],
-        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queue ? "*(from queue)*" : ""}`,
+        content: `${getRandomValue(greetings)}${getRandomValue(faces)} <@&${config.roles.mosesEnjoyer}>, ${getRandomValue(messages)} ${queueEntry ? "*(from queue)*" : ""}`,
     });
     message.react(client.emojis.cache.get(config.emojis.upvote) ?? "👍");
     message.react(client.emojis.cache.get(config.emojis.downvote) ?? "👎");
 
-    queue?.deleteOne();
-
     updateLastSentQuote(selectedQuote);
 
     updateBotDescriptionQuote(client, selectedQuote);
+
+    await queueEntry?.deleteOne();
 }
 
 export async function updateLastSentQuote(quote: IMosesQuote) {
