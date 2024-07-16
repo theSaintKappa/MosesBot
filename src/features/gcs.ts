@@ -1,9 +1,8 @@
 import { Storage } from "@google-cloud/storage";
 import secrets from "../utils/secrets";
 
-export const storage = new Storage({
-    projectId: secrets.googleCredentials.project_id,
-    credentials: secrets.googleCredentials,
-});
+const { project_id, client_email, private_key, bucket_name } = secrets.gcp;
 
-export const bucket = storage.bucket(secrets.googleCredentials.bucket_name);
+export const storage = new Storage({ credentials: { project_id, client_email, private_key } });
+
+export const bucket = storage.bucket(bucket_name);
