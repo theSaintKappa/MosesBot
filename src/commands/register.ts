@@ -1,4 +1,5 @@
 import { type AutocompleteInteraction, type ChatInputCommandInteraction, type ClientUser, type ContextMenuCommandInteraction, EmbedBuilder, REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, type RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
+import { logger } from "../utils/logger";
 import { getErrorReply } from "../utils/replyEmbeds";
 import secrets from "../utils/secrets";
 import commandObjects from "./list";
@@ -6,9 +7,10 @@ import { CommandScope, type ContextMenuCommandObject, type SlashCommandObject } 
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));
 
+const log = logger("Commands");
+
 // Register commands with REST client
 export async function registerCommands(clientUser: ClientUser) {
-    console.log("╔ ⭐ \x1b[33mRegistering commands...\x1b[0m");
     try {
         const rest = new REST().setToken(secrets.discordToken);
 
@@ -23,9 +25,9 @@ export async function registerCommands(clientUser: ClientUser) {
         globalCommands && (await rest.put(Routes.applicationCommands(clientUser.id), { body: globalCommands }));
         guildCommands && (await rest.put(Routes.applicationGuildCommands(clientUser.id, secrets.testGuildId), { body: guildCommands }));
 
-        console.log(`╚ ☑️  \x1b[35mSuccessfully registered ${globalCommands.length + guildCommands.length} commands!\x1b[0m`);
+        log.info(`Registered ${globalCommands.length + guildCommands.length} commands!`);
     } catch (err) {
-        console.error(err);
+        log.error(`Failed to register commands: ${err}`);
     }
 }
 
@@ -36,7 +38,7 @@ export async function executeCommand(interaction: ChatInputCommandInteraction | 
     try {
         await command.run(<ChatInputCommandInteraction & ContextMenuCommandInteraction>interaction);
     } catch (err) {
-        console.error(err);
+        log.error(`Failed to execute command: ${err}`);
 
         const errorReply = getErrorReply.bind(null, "An error occurred while processing your request.\nTry again later or contact a server admin.");
         interaction.replied || interaction.deferred ? await interaction.followUp(errorReply()) : await interaction.reply(errorReply());
@@ -50,6 +52,6 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     try {
         await interaction.respond(await command.autocomplete(interaction.options.getSubcommand()));
     } catch (err) {
-        console.error(err);
+        log.error(`Failed to autocomplete command: ${err}`);
     }
 }

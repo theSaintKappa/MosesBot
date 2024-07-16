@@ -15,12 +15,8 @@ const languages: Language[] = [];
 
 const headers = { Authorization: `Bearer ${secrets.githubToken}` };
 
-try {
-    const data = (await fetch("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", { headers }).then((res) => res.json())) as UnknownApiObject[];
-    for (const language of data) if (language.type !== "file") languages.push({ name: language.name, url: language.url });
-} catch (err) {
-    console.error(err);
-}
+const data = (await fetch("https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents/", { headers }).then((res) => res.json())) as UnknownApiObject[];
+for (const language of data) if (language.type !== "file") languages.push({ name: language.name, url: language.url });
 
 export default {
     builder: new SlashCommandBuilder()

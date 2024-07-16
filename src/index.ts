@@ -7,9 +7,12 @@ import { uploadPics } from "./features/pics";
 import { scheduleJobs } from "./features/scheduler";
 import { initializeVoiceTime } from "./features/voiceTime";
 import Presence from "./models/bot/presence";
+import { logger } from "./utils/logger";
 import secrets from "./utils/secrets";
 
-console.log(`═ ⚙️  \x1b[44mRunning in ${secrets.environment} mode\x1b[0m`);
+const log = logger("Client");
+
+log(`⚙️  Running in ${secrets.environment} mode`);
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages],
@@ -19,7 +22,7 @@ const client = new Client({
 await connectMongo();
 
 client.once(Events.ClientReady, async (client) => {
-    console.log(`═ 🟢 \x1b[42m${client.user.username} is now online!\x1b[0m`);
+    log(`🟢 ${client.user.username} is now online!`);
 
     if (secrets.environment === "production") updateBotDescriptionQuote(client);
 

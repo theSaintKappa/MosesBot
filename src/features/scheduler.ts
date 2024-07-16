@@ -6,7 +6,10 @@ import MosesLastSentQuote from "../models/bot/moses/lastSentQuote.schema";
 import MosesQuoteQueue from "../models/bot/moses/quoteQueue.schema";
 import MosesPic from "../models/moses/pics.schema";
 import MosesQuote from "../models/moses/quote.schema";
+import { logger } from "../utils/logger";
 import { updateBotDescriptionQuote } from "./botDescription";
+
+const log = logger("Scheduler");
 
 const colors: ColorResolvable[] = ["#ff66ff", "#ff5e5e", "#ffa35d", "#fff75d", "#7dff5d", "#61ddff", "#bd6dff"];
 const greetings = ["Hi", "Hello", "Hey", "Hellow", "Hi there", "Hello there", "Hey there", "Hellow there"];
@@ -31,7 +34,7 @@ export async function getRandomPic() {
 
 export function scheduleJobs(client: Client) {
     cronJob = new CronJob("0 7 * * *", async () => await sendQuote(client), null, true, "Europe/Warsaw");
-    console.log("═ ☑️  \x1b[35mQuote Cron Job has been scheduled!\x1b[0m");
+    log("⌚ Quote Cron Job has been scheduled!");
 }
 
 export function getNextCronDates(n?: number) {

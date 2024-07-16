@@ -3,6 +3,7 @@ import { type Client, EmbedBuilder, Events, type Message, type Snowflake, type V
 import config from "../config.json";
 import type { IVoiceTime } from "../db";
 import VoiceTime from "../models/bot/voiceTime";
+import { logger } from "../utils/logger";
 import secrets from "../utils/secrets";
 
 interface VoiceState {
@@ -12,6 +13,8 @@ interface VoiceState {
     isIncognito: boolean;
     isAfk: boolean;
 }
+
+const log = logger("VoiceTime");
 
 const voiceStates = new Map<Snowflake, VoiceState>();
 
@@ -147,24 +150,23 @@ export async function initializeVoiceTime(client: Client, displayChannel: Sendab
         if (message.channelId === config.channels.voiceTime && message.author.id !== client.user?.id && message.deletable) message.delete();
     });
 
-    console.log("[VoiceTime] ✅ Module initialized.");
-    voiceStates.size && console.log(`[VoiceTime] 🔷 Registered ${voiceStates.size} new voice state(s).`);
+    log.info(`Registered ${voiceStates.size} new voice state(s).`);
 }
 
 async function cleanup(signal: NodeJS.Signals | string) {
-    console.log(`[VoiceTime] ⛔ ${signal} received. Running cleanup...\x1b[0m`);
+    log.warn(`Received ${signal}. Running cleanup...`);
 
     const now = Date.now();
     const updates = [...voiceStates].map(([userId, { joinTimestamp }]) => {
         return { updateOne: { filter: { userId }, update: { $inc: { time: now - joinTimestamp.getTime() } }, upsert: true } };
     });
-    if (!updates.length) return console.log("[VoiceTime] 🧹 Cleanup finished. No users to update.");
+    if (!updates.length) return log.success("Cleanup finished. No users to update.");
 
     try {
         const result = await VoiceTime.bulkWrite(updates);
-        console.log(`[VoiceTime] 🧹 Cleanup updated ${result.modifiedCount + result.upsertedCount} user(s).`);
+        log.success(`Cleanup finished. Updated ${result.modifiedCount + result.upsertedCount} user(s).`);
     } catch (err) {
-        console.error(`[VoiceTime] ❌ Cleanup failed: ${err}`);
+        log.error(`Cleanup failed: ${err}`);
     }
 }
 
@@ -172,6 +174,7 @@ export const getStates = () => voiceStates as ReadonlyMap<Snowflake, VoiceState>
 
 let processOrInterface: NodeJS.Process | Interface;
 
+// @ts-expect-error
 if (process.platform === "win32") processOrInterface = createInterface({ input: process.stdin, output: process.stdout });
 else processOrInterface = process;
 

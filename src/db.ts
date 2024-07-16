@@ -1,16 +1,18 @@
 import type { ActivityType, ClientPresenceStatus, Snowflake } from "discord.js";
 import { type Document, type MongooseError, type ObjectId, connect } from "mongoose";
+import { logger } from "./utils/logger";
 import secrets from "./utils/secrets";
 
-export const connectMongo = async () => {
-    console.log("╔ 🥭 \x1b[33mConnecting to MongoDB...\x1b[0m");
+const log = logger("MosesDB");
 
-    await connect(secrets.mongoUri, { dbName: "MosesDB", serverSelectionTimeoutMS: 5000 })
-        .then(() => console.log("╚ ☑️  \x1b[35mConnected to MongoDB!\x1b[0m"))
-        .catch((err: MongooseError) => {
-            console.error("╚ ❌ Failed to connect to MongoDB!", err.message);
-            process.exit(1);
-        });
+export const connectMongo = async () => {
+    try {
+        await connect(secrets.mongoUri, { dbName: "MosesDB", serverSelectionTimeoutMS: 5000 });
+        log("🥭 Connected to Mongo!");
+    } catch (err) {
+        log.error(`Failed to connect to Mongo: ${(<MongooseError>err).message}`);
+        process.exit(1);
+    }
 };
 
 export interface DocumentTimestamps {
