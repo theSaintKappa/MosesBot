@@ -19,7 +19,7 @@ export default {
         const subcommand = options.getSubcommand();
         const channel = interaction.channel;
 
-        if (channel?.type !== ChannelType.GuildText) return interaction.reply(getNoticeReply("This command can only be used in text channels.", true));
+        if (!(channel?.type === ChannelType.GuildText || channel?.type === ChannelType.GuildAnnouncement)) return interaction.reply(getNoticeReply("This command can only be used in text channels.", true));
 
         const permission = channel.permissionOverwrites.cache.get(channel.guild.roles.everyone.id);
         if (!permission) throw new Error("Permission overwrite for @everyone not found.");

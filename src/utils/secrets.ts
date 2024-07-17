@@ -13,7 +13,7 @@ interface Secrets {
 }
 
 const secrets: Secrets = {
-    environment: process.env.NODE_ENV === "production" ? "production" : "development",
+    environment: process.env.NODE_ENV === "development" ? "development" : "production",
     discordToken: process.env.DISCORD_TOKEN ?? "",
     mongoUri: process.env.MONGO_URI ?? "",
     githubToken: process.env.GITHUB_TOKEN ?? "",

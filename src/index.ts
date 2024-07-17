@@ -45,8 +45,7 @@ client.once(Events.ClientReady, async (client) => {
     const picLogsChannel = client.channels.cache.get(config.channels.picsLog) as SendableChannel;
     const isUploadRequest = (message: Message | PartialMessage) => !message.guildId && message.attachments.size !== 0 && message.type === MessageType.Default && !message.author.bot;
     client.on(Events.MessageCreate, async (message) => {
-        const guildMember = await client.guilds.cache.get(secrets.testGuildId)?.members.fetch(message.author.id);
-        if (isUploadRequest(message)) await uploadPics(message, picLogsChannel, guildMember);
+        if (isUploadRequest(message)) await uploadPics(message, picLogsChannel, message.member ?? undefined);
     });
 
     // Add role to new members that accepted the rules

@@ -12,6 +12,7 @@ RUN bun build ./src/index.ts --compile --outfile cli
 
 FROM ubuntu:22.04
 WORKDIR /app
+ENV NODE_ENV=production
 
 COPY --from=build /app/cli /app/cli
 

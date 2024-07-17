@@ -44,12 +44,14 @@ export function getNextCronDates(n?: number) {
 export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
     return new EmbedBuilder()
         .setColor(colors[new Date().getDay()])
-        .setDescription(`### \u201c\n**${quote.content.replace(/\\n/g, "\n")}**\n### \u201d\n\u200B\n-# **\`\#${quote.id}\`** · Uploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`)
+        .setDescription(`### \u201c\n${quote.content.replace(/\\n/g, "\n")}\n### \u201d\n\u200B\n-# **\`\#${quote.id}\`** · Uploaded by <@${quote.submitterId}> on <t:${Math.floor(quote.createdAt.getTime() / 1000)}:d>`)
         .setThumbnail(pic.url);
 }
 
 export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMosesPic) {
     const queueEntry = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
+
+    if (!quote && queueEntry) await queueEntry.deleteOne();
 
     const selectedQuote = quote ?? queueEntry?.quoteReference ?? (await getRandomQuote());
     const selectedPic = pic ?? (await getRandomPic());
