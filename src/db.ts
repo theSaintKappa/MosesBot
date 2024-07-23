@@ -1,7 +1,7 @@
+import { logger } from "@/utils/logger";
+import secrets from "@/utils/secrets";
 import type { ActivityType, ClientPresenceStatus, Snowflake } from "discord.js";
 import { type Document, type MongooseError, type ObjectId, connect } from "mongoose";
-import { logger } from "./utils/logger";
-import secrets from "./utils/secrets";
 
 const log = logger("MosesDB");
 

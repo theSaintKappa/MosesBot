@@ -1,5 +1,5 @@
+import type { IMosesPic } from "@/db";
 import { Schema, model } from "mongoose";
-import type { IMosesPic } from "../../db";
 
 const schema = new Schema<IMosesPic>(
     {

@@ -1,8 +1,8 @@
+import commandObjects from "@/commands/list";
+import { logger } from "@/utils/logger";
+import { getErrorReply } from "@/utils/replyEmbeds";
+import secrets from "@/utils/secrets";
 import { type AutocompleteInteraction, type ChatInputCommandInteraction, type ClientUser, type ContextMenuCommandInteraction, EmbedBuilder, REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, type RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
-import { logger } from "../utils/logger";
-import { getErrorReply } from "../utils/replyEmbeds";
-import secrets from "../utils/secrets";
-import commandObjects from "./list";
 import { CommandScope, type ContextMenuCommandObject, type SlashCommandObject } from "./types";
 
 const commands = new Map<string, SlashCommandObject | ContextMenuCommandObject>([...commandObjects].map((command) => [command.builder.name, command]));

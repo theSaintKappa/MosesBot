@@ -1,11 +1,10 @@
-import { Storage } from "@google-cloud/storage";
+import config from "@/config.json";
+import type { IMosesPic } from "@/db";
+import { bucket } from "@/gcs";
+import MosesPic from "@/models/moses/pics.schema";
+import secrets from "@/utils/secrets";
 import type { GuildMember, Message } from "discord.js";
 import { customAlphabet } from "nanoid";
-import config from "../config.json";
-import type { IMosesPic } from "../db";
-import MosesPic from "../models/moses/pics.schema";
-import secrets from "../utils/secrets";
-import { bucket } from "./gcs";
 
 const mimeTypes: Readonly<string[]> = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
@@ -46,7 +45,7 @@ export async function uploadPics(uploadRequest: Message, logsChannel: SendableCh
 
                 await bucket.file(`moses/${id}`).save(Buffer.from(buffer), { metadata: { contentType: attachment.contentType as string, metadata: { uploaderId: uploadRequest.author.id } } });
 
-                const url = `https://${secrets.googleCredentials.bucket_name}/moses/${id}`;
+                const url = `https://${secrets.gcp.bucket_name}/moses/${id}`;
 
                 return { id, url, submitterId: uploadRequest.author.id, size: attachment.size, dimensions: { width: attachment.width ?? 0, height: attachment.height ?? 0 }, contentType: attachment.contentType as string };
             }),

@@ -1,5 +1,5 @@
+import secrets from "@/utils/secrets";
 import { Storage } from "@google-cloud/storage";
-import secrets from "../utils/secrets";
 
 const { project_id, client_email, private_key, bucket_name } = secrets.gcp;
 

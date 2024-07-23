@@ -1,11 +1,11 @@
-import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
-import config from "../../config.json";
-import type { ILeaderboard, IMosesQuote } from "../../db";
-import MosesLeaderboard from "../../models/moses/leaderboard.schema";
-import MosesQuote from "../../models/moses/quote.schema";
-import { getRecentQuotesAutocomplete } from "../../utils/autocomplete";
-import { getErrorReply, getInfoReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { CommandScope, type SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import config from "@/config.json";
+import type { ILeaderboard, IMosesQuote } from "@/db";
+import MosesLeaderboard from "@/models/moses/leaderboard.schema";
+import MosesQuote from "@/models/moses/quote.schema";
+import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
+import { getErrorReply, getInfoReply, getSuccessReply } from "@/utils/replyEmbeds";
+import { type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
 
 const pageSize = 15;
 

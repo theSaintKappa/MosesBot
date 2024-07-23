@@ -1,6 +1,6 @@
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import { getNoticeReply } from "@/utils/replyEmbeds";
 import { ChannelType, type InteractionReplyOptions, PermissionFlagsBits, type PermissionOverwrites, SlashCommandBuilder } from "discord.js";
-import { getNoticeReply } from "../../utils/replyEmbeds";
-import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()

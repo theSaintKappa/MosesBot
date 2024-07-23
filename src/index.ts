@@ -1,14 +1,14 @@
+import { autocomplete, executeCommand, registerCommands } from "@/commands/register";
+import config from "@/config.json";
+import { type IPresence, connectMongo } from "@/db";
+import { updateBotDescriptionQuote } from "@/features/botDescription";
+import { uploadPics } from "@/features/pics";
+import { scheduleJobs } from "@/features/scheduler";
+import { initializeVoiceTime } from "@/features/voiceTime";
+import Presence from "@/models/bot/presence";
+import { logger } from "@/utils/logger";
+import secrets from "@/utils/secrets";
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, MessageType, type PartialMessage, Partials } from "discord.js";
-import { autocomplete, executeCommand, registerCommands } from "./commands/register";
-import config from "./config.json";
-import { type IPresence, connectMongo } from "./db";
-import { updateBotDescriptionQuote } from "./features/botDescription";
-import { uploadPics } from "./features/pics";
-import { scheduleJobs } from "./features/scheduler";
-import { initializeVoiceTime } from "./features/voiceTime";
-import Presence from "./models/bot/presence";
-import { logger } from "./utils/logger";
-import secrets from "./utils/secrets";
 
 const log = logger("Client");
 

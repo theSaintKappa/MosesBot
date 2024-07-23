@@ -1,13 +1,13 @@
+import config from "@/config.json";
+import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "@/db";
+import { updateBotDescriptionQuote } from "@/features/botDescription";
+import MosesLastSentQuote from "@/models/moses/lastSentQuote.schema";
+import MosesPic from "@/models/moses/pics.schema";
+import MosesQuote from "@/models/moses/quote.schema";
+import MosesQuoteQueue from "@/models/moses/quoteQueue.schema";
+import { logger } from "@/utils/logger";
 import { CronJob } from "cron";
 import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
-import config from "../config.json";
-import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "../db";
-import MosesLastSentQuote from "../models/moses/lastSentQuote.schema";
-import MosesPic from "../models/moses/pics.schema";
-import MosesQuote from "../models/moses/quote.schema";
-import MosesQuoteQueue from "../models/moses/quoteQueue.schema";
-import { logger } from "../utils/logger";
-import { updateBotDescriptionQuote } from "./botDescription";
 
 const log = logger("Scheduler");
 

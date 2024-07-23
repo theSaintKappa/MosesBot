@@ -1,7 +1,7 @@
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import { getLeaderboardEmbed, getStateEmbed } from "@/features/voiceTime";
+import VoiceTime from "@/models/bot/voiceTime";
 import { SlashCommandBuilder } from "discord.js";
-import { getLeaderboardEmbed, getStateEmbed } from "../../features/voiceTime";
-import VoiceTime from "../../models/bot/voiceTime";
-import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()

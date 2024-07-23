@@ -1,4 +1,4 @@
-import { type ColorResolvable, EmbedBuilder, type InteractionReplyOptions, type MessageCreateOptions } from "discord.js";
+import { type ColorResolvable, EmbedBuilder, type InteractionReplyOptions } from "discord.js";
 
 const replyTypes: { [key in "info" | "success" | "error" | "notice" | "loading"]: { color: ColorResolvable; icon: string } } = {
     info: { color: "#00c8ff", icon: "💛" },

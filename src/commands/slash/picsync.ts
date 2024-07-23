@@ -1,7 +1,7 @@
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import { bucket } from "@/gcs";
+import MosesPic from "@/models/moses/pics.schema";
 import { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { bucket } from "../../features/gcs";
-import MosesPic from "../../models/moses/pics.schema";
-import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder().setName("picsync").setDescription("Check sync between MongoDB and Google Storage").setDefaultMemberPermissions(PermissionFlagsBits.Administrator),

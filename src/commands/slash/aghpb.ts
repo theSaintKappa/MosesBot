@@ -1,6 +1,6 @@
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import secrets from "@/utils/secrets";
 import { AttachmentBuilder, type CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
-import secrets from "../../utils/secrets";
-import { CommandScope, type SlashCommandObject } from "../types";
 
 interface UnknownApiObject {
     [key: string]: string;

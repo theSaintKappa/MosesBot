@@ -1,6 +1,6 @@
+import type { IMosesQuoteQueue } from "@/db";
+import MosesQuote from "@/models/moses/quote.schema";
 import { Schema, model } from "mongoose";
-import type { IMosesQuoteQueue } from "../../db";
-import MosesQuote from "./quote.schema";
 
 const schema = new Schema<IMosesQuoteQueue>(
     {

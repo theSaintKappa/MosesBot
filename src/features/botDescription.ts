@@ -1,6 +1,6 @@
+import type { IMosesQuote } from "@/db";
+import { getLastSentQuote, getRandomQuote } from "@/features/scheduler";
 import type { Client } from "discord.js";
-import type { IMosesQuote } from "../db";
-import { getLastSentQuote, getRandomQuote } from "./scheduler";
 
 export async function updateBotDescriptionQuote(client: Client, quote?: IMosesQuote) {
     const targetQuote = quote ?? (await getLastSentQuote()) ?? (await getRandomQuote());

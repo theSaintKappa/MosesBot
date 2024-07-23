@@ -1,6 +1,6 @@
-import { ChannelType, type CommandInteractionOptionResolver, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { getNoticeReply } from "../../utils/replyEmbeds";
-import { CommandScope, type SlashCommandObject } from "../types";
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import { getNoticeReply } from "@/utils/replyEmbeds";
+import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export default {
     builder: new SlashCommandBuilder()

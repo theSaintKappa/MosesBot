@@ -1,8 +1,8 @@
+import { CommandScope, type ContextMenuCommandObject } from "@/commands/types";
+import config from "@/config.json";
+import { updateBotDescriptionQuote } from "@/features/botDescription";
+import { getQuoteEmbed, getRandomPic, getRandomQuote, updateLastSentQuote } from "@/features/scheduler";
 import { ApplicationCommandType, ContextMenuCommandBuilder, PermissionFlagsBits } from "discord.js";
-import config from "../../config.json";
-import { updateBotDescriptionQuote } from "../../features/botDescription";
-import { getQuoteEmbed, getRandomPic, getRandomQuote, updateLastSentQuote } from "../../features/scheduler";
-import { CommandScope, type ContextMenuCommandObject } from "../types";
 
 export default {
     builder: new ContextMenuCommandBuilder().setName("Reroll Moses quote").setType(ApplicationCommandType.Message).setDMPermission(false).setDefaultMemberPermissions(PermissionFlagsBits.Administrator),

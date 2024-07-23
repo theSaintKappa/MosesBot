@@ -1,12 +1,12 @@
+import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import config from "@/config.json";
+import type { IMosesQuote, IMosesQuoteQueue } from "@/db";
+import { getNextCronDates } from "@/features/scheduler";
+import MosesQuote from "@/models/moses/quote.schema";
+import MosesQuoteQueue from "@/models/moses/quoteQueue.schema";
+import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
+import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type InteractionReplyOptions, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import config from "../../config.json";
-import type { IMosesQuote, IMosesQuoteQueue } from "../../db";
-import { getNextCronDates } from "../../features/scheduler";
-import MosesQuote from "../../models/moses/quote.schema";
-import MosesQuoteQueue from "../../models/moses/quoteQueue.schema";
-import { getRecentQuotesAutocomplete } from "../../utils/autocomplete";
-import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "../../utils/replyEmbeds";
-import { CommandScope, type SlashCommandObject } from "../types";
 
 export default {
     builder: new SlashCommandBuilder()
