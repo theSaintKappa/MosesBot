@@ -1,12 +1,12 @@
 {
   "name": "mosesbot",
-  "version": "3.7.1",
+  "version": "3.9.5",
   "description": "A Discord bot named after my friend Moses",
   "author": {
     "name": "SaintKappa",
     "url": "https://github.com/theSaintKappa"
   },
-  "license": "BSD-2-Clause",
+  "license": "MIT",
   "module": "./src/index.ts",
   "type": "module",
   "scripts": {
