@@ -27,15 +27,10 @@ const displayEmbeds = {
 };
 
 export function getLeaderboardEmbed(voiceTime: IVoiceTime[]) {
-    const medals = ["🥇", "🥈", "🥉"];
     const embed = new EmbedBuilder()
         .setColor("#ffc70e")
         .setTitle("> 🏆 Voice time leaderboard:")
-        .addFields(
-            { name: "\u200B", value: `${voiceTime.map((_, i) => medals[i] ?? `**\`${i + 1}\`**`).join("\n")}\n\u200B`, inline: true },
-            { name: "\u200B", value: voiceTime.map(({ userId }) => `\`\u200B\`<@${userId}>`).join("\n"), inline: true },
-            { name: "\u200B", value: voiceTime.map(({ time }) => `**\`${(time / 1000 / 60 / 60).toFixed(2)} hours\`**`).join("\n"), inline: true },
-        )
+        .setDescription(voiceTime.map(({ userId, time }, i) => `**\`${i + 1}\`** <@${userId}> **➜** \`${(time / 1000 / 60 / 60).toFixed(2)} hours\``).join("\n"))
         .setTimestamp();
 
     return embed;
@@ -47,11 +42,10 @@ function getFactsEmbed(voiceTime: IVoiceTime[]) {
     const embed = new EmbedBuilder()
         .setColor("#1869ff")
         .setTitle("> 📊 Stats:")
-        .setDescription(`***### As <@${voiceTime[0].userId}> was connected to a voice channel:***
-        🌍 The earth has traveled **\`${Number.parseFloat(((time / 1000) * 29.78).toFixed(2)).toLocaleString()} km\`** around the sun
+        .setDescription(`***### As <@${voiceTime[0].userId}> was connected to a voice channel:***🌍 The earth has traveled **\`${Number.parseFloat(((time / 1000) * 29.78).toFixed(2)).toLocaleString()} km\`** around the sun
         👁️ The average human has blinked **\`${Math.ceil((time / 1000) * 0.28).toLocaleString()} times\`**
         🍼 Around **\`${Math.ceil((time / 1000) * 4.32).toLocaleString()}\`** babies were born in the world
-        🥴 Moses has drunken approximately **\`${((time / 1000 / 60 / 60 / 24) * 2).toFixed(2)} liters\`** of vodka\n\u200B`)
+        🥴 Moses has drunken approximately **\`${((time / 1000 / 60 / 60 / 24) * 2).toFixed(2)} liters\`** of vodka\n-# Source: trust me bro + wikipedia`)
         .setTimestamp();
 
     return embed;
