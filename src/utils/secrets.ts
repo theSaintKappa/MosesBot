@@ -1,5 +1,5 @@
 interface Secrets {
-    environment: "production" | "development";
+    environment: "production" | "development" | string;
     discordToken: string;
     mongoUri: string;
     githubToken: string;
@@ -13,7 +13,7 @@ interface Secrets {
 }
 
 const secrets: Secrets = {
-    environment: process.env.NODE_ENV === "development" ? "development" : "production",
+    environment: process.env.NODE_ENV ?? "production",
     discordToken: process.env.DISCORD_TOKEN ?? "",
     mongoUri: process.env.MONGO_URI ?? "",
     githubToken: process.env.GITHUB_TOKEN ?? "",
