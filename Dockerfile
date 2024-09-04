@@ -4,8 +4,10 @@ WORKDIR /app
 COPY bun.lockb .
 COPY package.json .
 
+ENV NODE_ENV=production
 RUN bun install --frozen-lockfile
 
+COPY tsconfig.json .
 COPY src ./src
 
 RUN bun build ./src/index.ts --compile --outfile cli
