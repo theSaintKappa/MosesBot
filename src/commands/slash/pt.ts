@@ -1,6 +1,6 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import { type IPtLeaderboard, PtLeaderboard } from "@/models/pt/leaderboard";
+import { PTLeaderboard } from "@/models/pt/leaderboard";
 import { type IPTQuote, PTQuote } from "@/models/pt/quote";
 import { getErrorReply, getInfoReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, type User } from "discord.js";
@@ -115,6 +115,7 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
+    const previousContent = quote.content;
     let modifiedContent = newQuote.trim();
     if (!newQuote.endsWith(".") && !newQuote.endsWith("?") && !newQuote.endsWith("!")) modifiedContent += ".";
 
@@ -123,13 +124,13 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         quote.content = newQuote;
         await quote.save();
-        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${previousContent}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === user.id) {
         quote.content = newQuote;
         await quote.save();
-        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${previousContent}\`**\n**to:** **\`${newQuote}\`**`);
     }
 
     return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
@@ -141,12 +142,14 @@ async function drop(id: number, memberPermissions: PermissionsBitField, user: Us
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
-        await quote.deleteOne();
+        quote._deleting = true;
+        await quote.save();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === user.id) {
-        await quote.deleteOne();
+        quote._deleting = true;
+        await quote.save();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
     }
 
@@ -154,7 +157,7 @@ async function drop(id: number, memberPermissions: PermissionsBitField, user: Us
 }
 
 async function leaderboard(): Promise<InteractionReplyOptions> {
-    const leaderboard = await PtLeaderboard.find();
+    const leaderboard = await PTLeaderboard.find();
 
     if (leaderboard.length === 0) return getErrorReply("The 3pT leaderboard is empty.");
 

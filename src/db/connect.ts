@@ -13,3 +13,5 @@ export const connectMongo = async () => {
         process.exit(1);
     }
 };
+
+export const initChangeStream = async () => {};

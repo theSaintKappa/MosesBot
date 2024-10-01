@@ -7,6 +7,7 @@ export interface IPTQuote extends Document, DocumentTimestamps {
     content: string;
     authorId: Snowflake;
     submitterId: Snowflake;
+    _deleting?: boolean;
 }
 
 const schema = new Schema<IPTQuote>(
@@ -15,6 +16,7 @@ const schema = new Schema<IPTQuote>(
         content: { type: String, required: true },
         authorId: { type: String, required: true },
         submitterId: { type: String, required: true },
+        _deleting: { type: Boolean },
     },
     { timestamps: true, versionKey: false },
 );

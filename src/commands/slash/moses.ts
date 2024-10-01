@@ -1,6 +1,5 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import type { IMosesLeaderboard } from "@/models/moses/leaderboard";
 import { MosesLeaderboard } from "@/models/moses/leaderboard";
 import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
 import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
@@ -66,7 +65,7 @@ export default {
                 updateCounter();
                 break;
             case "edit":
-                await interaction.reply(await edit(options.getNumber("id") as number, options.getString("quote") as string, memberPermissions, user.id));
+                await interaction.reply(await edit(options.getNumber("id") as number, options.getString("new-quote") as string, memberPermissions, user.id));
                 break;
             case "delete":
                 await interaction.reply(await drop(options.getNumber("id") as number, memberPermissions, user.id));
@@ -107,6 +106,7 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
+    const previousContent = quote.content;
     let modifiedContent = newQuote.trim();
     if (!newQuote.endsWith(".") && !newQuote.endsWith("?") && !newQuote.endsWith("!")) modifiedContent += ".";
 
@@ -115,13 +115,13 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
         quote.content = newQuote;
         await quote.save();
-        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${previousContent}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
         quote.content = newQuote;
         await quote.save();
-        return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
+        return getSuccessReply("Quote edited!", `**from:** **\`${previousContent}\`**\n**to:** **\`${newQuote}\`**`);
     }
 
     return getErrorReply(`Quote **\`#${id}\`** was submitted by <@${quote.submitterId}>.\nIf you want it edited ask them or a server admin.`);
@@ -132,12 +132,14 @@ async function drop(id: number, memberPermissions: PermissionsBitField, userId: 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
-        await quote.deleteOne();
+        quote._deleting = true;
+        await quote.save();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
-        await quote.deleteOne();
+        quote._deleting = true;
+        await quote.save();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
     }
 

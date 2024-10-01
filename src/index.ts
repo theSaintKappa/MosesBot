@@ -1,6 +1,6 @@
 import { autocomplete, executeCommand, registerCommands } from "@/commands/register";
 import config from "@/config.json";
-import { connectMongo } from "@/db";
+import { connectMongo } from "@/db/connect";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
 import { uploadPics } from "@/features/pics";
 import { scheduleJobs } from "@/features/scheduler";
@@ -11,6 +11,7 @@ import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import secrets from "@/utils/secrets";
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, MessageType, type PartialMessage, Partials } from "discord.js";
+import { watchMosesQuotes, watchPTQuotes } from "./db/change-streams";
 
 const log = logger("Client");
 
@@ -22,6 +23,8 @@ const client = new Client({
 });
 
 await connectMongo();
+watchMosesQuotes();
+watchPTQuotes();
 
 client.once(Events.ClientReady, async (client) => {
     log(`🟢 ${client.user.username} is now online!`);

@@ -1,12 +1,18 @@
 import { type Document, Schema, model } from "mongoose";
 
 export interface ICounter extends Document {
-    coll: string;
+    namespace: {
+        db: string;
+        coll: string;
+    };
     sequence: number;
 }
 
 const schema = new Schema<ICounter>({
-    coll: { type: String, required: true },
+    namespace: {
+        db: { type: String, required: true },
+        coll: { type: String, required: true },
+    },
     sequence: { type: Number, default: 0 },
 });
 
