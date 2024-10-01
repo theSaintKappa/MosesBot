@@ -2,6 +2,7 @@ import { CommandScope, type ContextMenuCommandObject } from "@/commands/types";
 import config from "@/config.json";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
 import { getQuoteEmbed, getRandomPic, getRandomQuote, updateLastSentQuote } from "@/features/scheduler";
+import type { SendableChannel } from "@/types";
 import { ApplicationCommandType, ContextMenuCommandBuilder, PermissionFlagsBits } from "discord.js";
 
 export default {

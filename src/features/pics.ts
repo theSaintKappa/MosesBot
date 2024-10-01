@@ -1,7 +1,8 @@
 import config from "@/config.json";
-import type { IMosesPic } from "@/db";
 import { bucket } from "@/gcs";
-import MosesPic from "@/models/moses/pics.schema";
+import type { IMosesPic } from "@/models/moses/pics";
+import { MosesPic } from "@/models/moses/pics";
+import type { SendableChannel } from "@/types";
 import secrets from "@/utils/secrets";
 import type { GuildMember, Message } from "discord.js";
 import { customAlphabet } from "nanoid";

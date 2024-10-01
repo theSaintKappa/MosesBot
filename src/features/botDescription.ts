@@ -1,5 +1,5 @@
-import type { IMosesQuote } from "@/db";
 import { getLastSentQuote, getRandomQuote } from "@/features/scheduler";
+import type { IMosesQuote } from "@/models/moses/quote";
 import type { Client } from "discord.js";
 
 export async function updateBotDescriptionQuote(client: Client, quote?: IMosesQuote) {

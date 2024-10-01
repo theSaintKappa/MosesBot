@@ -1,11 +1,13 @@
 import { autocomplete, executeCommand, registerCommands } from "@/commands/register";
 import config from "@/config.json";
-import { type IPresence, connectMongo } from "@/db";
+import { connectMongo } from "@/db";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
 import { uploadPics } from "@/features/pics";
 import { scheduleJobs } from "@/features/scheduler";
 import { initializeVoiceTime } from "@/features/voiceTime";
-import Presence from "@/models/bot/presence";
+import type { IPresence } from "@/models/bot/presence";
+import { Presence } from "@/models/bot/presence";
+import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import secrets from "@/utils/secrets";
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, MessageType, type PartialMessage, Partials } from "discord.js";

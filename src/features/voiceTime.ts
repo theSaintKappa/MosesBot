@@ -1,7 +1,7 @@
 import { type Interface, createInterface } from "node:readline/promises";
 import config from "@/config.json";
-import type { IVoiceTime } from "@/db";
-import VoiceTime from "@/models/bot/voiceTime";
+import { type IVoiceTime, VoiceTime } from "@/models/bot/voiceTime";
+import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import secrets from "@/utils/secrets";
 import { type Client, EmbedBuilder, Events, type Message, type Snowflake, type VoiceBasedChannel } from "discord.js";

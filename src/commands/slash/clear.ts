@@ -1,4 +1,5 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
+import type { SendableChannel } from "@/types";
 import { getNoticeReply } from "@/utils/replyEmbeds";
 import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 

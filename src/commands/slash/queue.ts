@@ -1,9 +1,8 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import type { IMosesQuote, IMosesQuoteQueue } from "@/db";
 import { getNextCronDates } from "@/features/scheduler";
-import MosesQuote from "@/models/moses/quote.schema";
-import MosesQuoteQueue from "@/models/moses/quoteQueue.schema";
+import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
+import { type IMosesQuoteQueue, MosesQuoteQueue } from "@/models/moses/quoteQueue";
 import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type InteractionReplyOptions, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
@@ -52,7 +51,7 @@ export default {
 } as SlashCommandObject;
 
 async function add(id: number, submitterId: string): Promise<InteractionReplyOptions> {
-    const quote = await MosesQuote.findOne<IMosesQuote>({ id });
+    const quote = await MosesQuote.findOne({ id });
     if (!quote) return getErrorReply(`***Quote **\`#${id}\`** does not exist.***`);
 
     await MosesQuoteQueue.create({ quoteReference: quote._id, submitterId } as IMosesQuoteQueue);
@@ -77,5 +76,5 @@ async function display(): Promise<InteractionReplyOptions> {
 
     const nextCronDates = getNextCronDates(queue.length);
 
-    return getInfoReply("Moses quote queue:", queue.map(({ quoteReference }, i) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n"));
+    return getInfoReply("Moses quote queue:", queue.map(({ quoteReference }: { quoteReference: IMosesQuote }, i: number) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n"));
 }

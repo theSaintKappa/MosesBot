@@ -1,6 +1,6 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import { bucket } from "@/gcs";
-import MosesPic from "@/models/moses/pics.schema";
+import { MosesPic } from "@/models/moses/pics";
 import { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 export default {

@@ -1,8 +1,8 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import type { ILeaderboard, IMosesQuote } from "@/db";
-import MosesLeaderboard from "@/models/moses/leaderboard.schema";
-import MosesQuote from "@/models/moses/quote.schema";
+import type { IMosesLeaderboard } from "@/models/moses/leaderboard";
+import { MosesLeaderboard } from "@/models/moses/leaderboard";
+import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
 import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
 import { getErrorReply, getInfoReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
@@ -113,12 +113,14 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
     if (quote.content === newQuote) return getErrorReply("The new quote cannot be the same as the old one.");
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
-        await MosesQuote.updateOne({ id }, { content: newQuote });
+        quote.content = newQuote;
+        await quote.save();
         return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
-        await MosesQuote.updateOne({ id }, { content: newQuote });
+        quote.content = newQuote;
+        await quote.save();
         return getSuccessReply("Quote edited!", `**from:** **\`${quote.content}\`**\n**to:** **\`${newQuote}\`**`);
     }
 
@@ -130,12 +132,12 @@ async function drop(id: number, memberPermissions: PermissionsBitField, userId: 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
     if (memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
-        await MosesQuote.deleteOne({ id });
+        await quote.deleteOne();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.\n***(Admin mode)***`);
     }
 
     if (quote.submitterId === userId) {
-        await MosesQuote.deleteOne({ id });
+        await quote.deleteOne();
         return getSuccessReply("Quote deleted!", `**\`${quote.id}\`** **\`${quote.content}\`** has been deleted.`);
     }
 
@@ -143,7 +145,7 @@ async function drop(id: number, memberPermissions: PermissionsBitField, userId: 
 }
 
 async function leaderboard(): Promise<InteractionReplyOptions> {
-    const leaderboard = await MosesLeaderboard.find<ILeaderboard>();
+    const leaderboard = await MosesLeaderboard.find();
 
     if (leaderboard.length === 0) return getErrorReply("The Moses leaderboard is empty.");
 

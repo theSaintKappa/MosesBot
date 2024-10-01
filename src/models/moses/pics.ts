@@ -1,5 +1,15 @@
-import type { IMosesPic } from "@/db";
-import { Schema, model } from "mongoose";
+import type { DocumentTimestamps } from "@/types";
+import type { Snowflake } from "discord.js";
+import { type Document, Schema, model } from "mongoose";
+
+export interface IMosesPic extends Document, DocumentTimestamps {
+    id: string;
+    url: string;
+    submitterId: Snowflake;
+    size: number;
+    dimensions: { width: number; height: number };
+    contentType: string;
+}
 
 const schema = new Schema<IMosesPic>(
     {
@@ -16,4 +26,4 @@ const schema = new Schema<IMosesPic>(
     { timestamps: true, versionKey: false },
 );
 
-export default model<IMosesPic>("moses.pics", schema, "moses.pics");
+export const MosesPic = model<IMosesPic>("moses.pics", schema, "moses.pics");

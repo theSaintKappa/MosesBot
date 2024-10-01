@@ -1,10 +1,10 @@
 import config from "@/config.json";
-import type { IMosesLastSentQuote, IMosesPic, IMosesQuote } from "@/db";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
-import MosesLastSentQuote from "@/models/moses/lastSentQuote.schema";
-import MosesPic from "@/models/moses/pics.schema";
-import MosesQuote from "@/models/moses/quote.schema";
-import MosesQuoteQueue from "@/models/moses/quoteQueue.schema";
+import { type IMosesLastSentQuote, MosesLastSentQuote } from "@/models/moses/lastSentQuote";
+import { type IMosesPic, MosesPic } from "@/models/moses/pics";
+import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
+import { MosesQuoteQueue } from "@/models/moses/quoteQueue";
+import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import { CronJob } from "cron";
 import { type Client, type ColorResolvable, EmbedBuilder } from "discord.js";
