@@ -1,6 +1,6 @@
 import { type Interface, createInterface } from "node:readline/promises";
 import config from "@/config.json";
-import { type IVoiceTime, VoiceTime } from "@/models/bot/voiceTime";
+import { BotVoiceTimeLeaderboard, type IBotVoiceTimeLeaderboard } from "@/models/BotVoiceTimeLeaderboard";
 import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import secrets from "@/utils/secrets";
@@ -26,7 +26,7 @@ const displayEmbeds = {
     state: new EmbedBuilder().setDescription("***Loading state...***"),
 };
 
-export function getLeaderboardEmbed(voiceTime: IVoiceTime[]) {
+export function getLeaderboardEmbed(voiceTime: IBotVoiceTimeLeaderboard[]) {
     const embed = new EmbedBuilder()
         .setColor("#ffc70e")
         .setTitle("> 🏆 Voice time leaderboard:")
@@ -36,7 +36,7 @@ export function getLeaderboardEmbed(voiceTime: IVoiceTime[]) {
     return embed;
 }
 
-function getFactsEmbed(voiceTime: IVoiceTime[]) {
+function getFactsEmbed(voiceTime: IBotVoiceTimeLeaderboard[]) {
     const time = voiceTime[0].time + (Date.now() - (voiceStates.get(voiceTime[0].userId)?.joinTimestamp.getTime() ?? Date.now()));
 
     const embed = new EmbedBuilder()
@@ -85,7 +85,7 @@ async function updateStateDisplay(message: Message<true>) {
 }
 
 async function updateLeaderboardDisplay(message: Message<true>) {
-    const voiceTime = await VoiceTime.find().sort({ time: -1 });
+    const voiceTime = await BotVoiceTimeLeaderboard.find().sort({ time: -1 });
 
     displayEmbeds.leaderboard = getLeaderboardEmbed(voiceTime);
     displayEmbeds.facts = getFactsEmbed(voiceTime);
@@ -105,7 +105,7 @@ async function leaveEvent(userId: Snowflake, oldChannel: VoiceBasedChannel) {
     if (!voiceState) return;
 
     voiceStates.delete(userId);
-    if (!isAfk(oldChannel)) await VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
+    if (!isAfk(oldChannel)) await BotVoiceTimeLeaderboard.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
 }
 
 async function switchEvent(userId: Snowflake, newChannel: VoiceBasedChannel, oldChannel: VoiceBasedChannel) {
@@ -113,7 +113,7 @@ async function switchEvent(userId: Snowflake, newChannel: VoiceBasedChannel, old
     if (!voiceState) return;
 
     voiceStates.set(userId, { userId, channelId: newChannel.id, joinTimestamp: new Date(), isIncognito: isIncognitio(newChannel), isAfk: isAfk(newChannel) });
-    if (!isAfk(oldChannel)) await VoiceTime.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
+    if (!isAfk(oldChannel)) await BotVoiceTimeLeaderboard.updateOne({ userId }, { $inc: { time: Date.now() - voiceState.joinTimestamp.getTime() } }, { upsert: true });
 }
 
 export async function initializeVoiceTime(client: Client, displayChannel: SendableChannel) {
@@ -157,7 +157,7 @@ async function cleanup(signal: NodeJS.Signals | string) {
     if (!updates.length) return log.success("Cleanup finished. No users to update.");
 
     try {
-        const result = await VoiceTime.bulkWrite(updates);
+        const result = await BotVoiceTimeLeaderboard.bulkWrite(updates);
         log.success(`Cleanup finished. Updated ${result.modifiedCount + result.upsertedCount} user(s).`);
     } catch (err) {
         log.error(`Cleanup failed: ${err}`);

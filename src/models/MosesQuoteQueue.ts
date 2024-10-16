@@ -1,4 +1,4 @@
-import { MosesQuote } from "@/models/moses/quote";
+import { MosesQuote } from "@/models/MosesQuote";
 import type { DocumentTimestamps } from "@/types";
 import type { Snowflake } from "discord.js";
 import { type Document, type ObjectId, Schema, model } from "mongoose";
@@ -16,4 +16,4 @@ const schema = new Schema<IMosesQuoteQueue>(
     { timestamps: true, versionKey: false },
 );
 
-export const MosesQuoteQueue = model<IMosesQuoteQueue>("moses.quoteQueue", schema, "moses.quoteQueue");
+export const MosesQuoteQueue = model<IMosesQuoteQueue>("moses.quotesQueue", schema, "moses.quotesQueue");

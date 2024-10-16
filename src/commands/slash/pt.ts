@@ -1,7 +1,7 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import { PTLeaderboard } from "@/models/pt/leaderboard";
-import { type IPTQuote, PTQuote } from "@/models/pt/quote";
+import { type IPtQuote, PtQuote } from "@/models/PtQuote";
+import { PtQuoteLeaderboard } from "@/models/PtQuoteLeaderboard";
 import { getErrorReply, getInfoReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type ApplicationCommandOptionChoiceData, type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder, type User } from "discord.js";
 
@@ -41,7 +41,7 @@ export default {
 
     autocomplete: async (subcommand) => {
         const getRecentQuotesAutocomplete = async (): Promise<ApplicationCommandOptionChoiceData[]> =>
-            PTQuote.aggregate<IPTQuote>([{ $sort: { id: -1 } }, { $limit: 25 }]).then((quotes) =>
+            PtQuote.aggregate<IPtQuote>([{ $sort: { id: -1 } }, { $limit: 25 }]).then((quotes) =>
                 quotes.map(({ content, id }) => {
                     content = `#${id} → ${content.replace(/\n/g, " ")}`;
                     const name = content.length > 100 ? `${content.substring(0, 97)}...` : content;
@@ -49,7 +49,7 @@ export default {
                 }),
             );
 
-        if (subcommand === "list") return Array.from({ length: Math.ceil((await PTQuote.countDocuments()) / pageSize) }, (_, i) => ({ name: i + 1, value: i + 1 }));
+        if (subcommand === "list") return Array.from({ length: Math.ceil((await PtQuote.countDocuments()) / pageSize) }, (_, i) => ({ name: i + 1, value: i + 1 }));
         if (subcommand === "edit" || subcommand === "delete") return await getRecentQuotesAutocomplete();
     },
 
@@ -63,7 +63,7 @@ export default {
 
         async function updateCounter() {
             if (!interaction.guild) return;
-            interaction.guild.channels.cache.get(config.channels.ptCounter)?.edit({ name: `🔴 3pT Quotes ›› ${await PTQuote.countDocuments()}` });
+            interaction.guild.channels.cache.get(config.channels.ptCounter)?.edit({ name: `🔴 3pT Quotes ›› ${await PtQuote.countDocuments()}` });
         }
 
         switch (subcommand) {
@@ -91,13 +91,13 @@ export default {
 async function list(page: number): Promise<InteractionReplyOptions> {
     if (page < 1) return getErrorReply("Page number cannot be less than 1.");
 
-    const documentCount = await PTQuote.countDocuments();
+    const documentCount = await PtQuote.countDocuments();
     if (documentCount === 0) return getErrorReply("There are no 3pT quotes stored in the database.");
 
     const totalPages = Math.ceil(documentCount / pageSize);
     if (page > totalPages) return getErrorReply(totalPages === 1 ? "There is only 1 page of quotes available." : `There are only ${totalPages} pages of quotes available.`);
 
-    const quotes = await PTQuote.aggregate<IPTQuote>([{ $sort: { id: 1 } }, { $skip: (page - 1) * pageSize }, { $limit: pageSize }]);
+    const quotes = await PtQuote.aggregate<IPtQuote>([{ $sort: { id: 1 } }, { $skip: (page - 1) * pageSize }, { $limit: pageSize }]);
     return getInfoReply(`3pT quotes *(page ${page} of ${totalPages})*:`, quotes.map((quote) => `**#${quote.id}** \`${quote.content.replace(/\n/, " ")}\`\n***— <@${quote.authorId}>***`).join("\n"));
 }
 
@@ -105,13 +105,13 @@ async function add(quote: string, author: User, user: User): Promise<Interaction
     let modifiedContent = quote.trim();
     if (!quote.endsWith(".") && !quote.endsWith("?") && !quote.endsWith("!")) modifiedContent += ".";
 
-    await PTQuote.create({ id: 0, content: quote, authorId: author.id, submitterId: user.id });
+    await PtQuote.create({ id: 0, content: quote, authorId: author.id, submitterId: user.id });
 
     return getSuccessReply("Quote added!", `**\`${quote}\`**\n*Said by: <@${author.id}>*`);
 }
 
 async function edit(id: number, newQuote: string, memberPermissions: PermissionsBitField, user: User): Promise<InteractionReplyOptions> {
-    const quote = await PTQuote.findOne({ id });
+    const quote = await PtQuote.findOne({ id });
 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
@@ -137,7 +137,7 @@ async function edit(id: number, newQuote: string, memberPermissions: Permissions
 }
 
 async function drop(id: number, memberPermissions: PermissionsBitField, user: User): Promise<InteractionReplyOptions> {
-    const quote = await PTQuote.findOne({ id });
+    const quote = await PtQuote.findOne({ id });
 
     if (!quote) return getErrorReply(`Quote **\`#${id}\`** does not exist.`);
 
@@ -157,7 +157,7 @@ async function drop(id: number, memberPermissions: PermissionsBitField, user: Us
 }
 
 async function leaderboard(): Promise<InteractionReplyOptions> {
-    const leaderboard = await PTLeaderboard.find();
+    const leaderboard = await PtQuoteLeaderboard.find();
 
     if (leaderboard.length === 0) return getErrorReply("The 3pT leaderboard is empty.");
 

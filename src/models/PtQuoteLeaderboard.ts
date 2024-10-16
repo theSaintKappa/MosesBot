@@ -2,12 +2,12 @@ import type { DocumentTimestamps } from "@/types";
 import type { Snowflake } from "discord.js";
 import { type Document, Schema, model } from "mongoose";
 
-export interface IPTLeaderboard extends Document, DocumentTimestamps {
+export interface IPtQuoteLeaderboard extends Document, DocumentTimestamps {
     userId: Snowflake;
     count: number;
 }
 
-const schema = new Schema<IPTLeaderboard>(
+const schema = new Schema<IPtQuoteLeaderboard>(
     {
         userId: { type: String, required: true },
         count: { type: Number, required: true },
@@ -15,4 +15,4 @@ const schema = new Schema<IPTLeaderboard>(
     { timestamps: true, versionKey: false },
 );
 
-export const PTLeaderboard = model<IPTLeaderboard>("pt.leaderboard", schema, "pt.leaderboard");
+export const PtQuoteLeaderboard = model<IPtQuoteLeaderboard>("pt.quotesLeaderboard", schema, "pt.quotesLeaderboard");

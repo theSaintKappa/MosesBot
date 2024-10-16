@@ -2,12 +2,12 @@ import type { DocumentTimestamps } from "@/types";
 import type { Snowflake } from "discord.js";
 import { type Document, Schema, model } from "mongoose";
 
-export interface IVoiceTime extends Document, DocumentTimestamps {
+export interface IBotVoiceTimeLeaderboard extends Document, DocumentTimestamps {
     userId: Snowflake;
     time: number;
 }
 
-const schema = new Schema<IVoiceTime>(
+const schema = new Schema<IBotVoiceTimeLeaderboard>(
     {
         userId: { type: String, required: true },
         time: { type: Number, required: true },
@@ -15,4 +15,4 @@ const schema = new Schema<IVoiceTime>(
     { timestamps: true, versionKey: false },
 );
 
-export const VoiceTime = model<IVoiceTime>("bot.voiceTime", schema, "bot.voiceTime");
+export const BotVoiceTimeLeaderboard = model<IBotVoiceTimeLeaderboard>("bot.voiceTimeLeaderboard", schema, "bot.voiceTimeLeaderboard");

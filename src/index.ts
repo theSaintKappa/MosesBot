@@ -1,17 +1,16 @@
 import { autocomplete, executeCommand, registerCommands } from "@/commands/register";
 import config from "@/config.json";
+import { watchMosesQuotes, watchPtQuotes } from "@/db/change-streams";
 import { connectMongo } from "@/db/connect";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
 import { uploadPics } from "@/features/pics";
 import { scheduleJobs } from "@/features/scheduler";
 import { initializeVoiceTime } from "@/features/voiceTime";
-import type { IPresence } from "@/models/bot/presence";
-import { Presence } from "@/models/bot/presence";
+import { BotPresence } from "@/models/BotPresence";
 import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import secrets from "@/utils/secrets";
 import { ActivityType, AttachmentBuilder, Client, EmbedBuilder, Events, GatewayIntentBits, type Message, MessageType, type PartialMessage, Partials } from "discord.js";
-import { watchMosesQuotes, watchPTQuotes } from "./db/change-streams";
 
 const log = logger("Client");
 
@@ -24,7 +23,7 @@ const client = new Client({
 
 await connectMongo();
 watchMosesQuotes();
-watchPTQuotes();
+watchPtQuotes();
 
 client.once(Events.ClientReady, async (client) => {
     log(`🟢 ${client.user.username} is now online!`);
@@ -119,7 +118,7 @@ client.once(Events.ClientReady, async (client) => {
 
     // Set bot presence based on environment
     if (secrets.environment === "production") {
-        const presence = await Presence.findOne<IPresence>();
+        const presence = await BotPresence.findOne();
         if (presence) client.user.setPresence({ activities: [{ type: presence.type, name: presence.name }], status: presence.status });
         return;
     }

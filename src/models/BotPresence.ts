@@ -2,13 +2,13 @@ import type { DocumentTimestamps } from "@/types";
 import type { ActivityType, ClientPresenceStatus } from "discord.js";
 import { type Document, Schema, model } from "mongoose";
 
-export interface IPresence extends Document, DocumentTimestamps {
+export interface IBotPresence extends Document, DocumentTimestamps {
     type: ActivityType;
     name: string;
     status: ClientPresenceStatus;
 }
 
-const schema = new Schema<IPresence>(
+const schema = new Schema<IBotPresence>(
     {
         type: { type: Number, required: true },
         name: { type: String, required: true },
@@ -17,4 +17,4 @@ const schema = new Schema<IPresence>(
     { timestamps: true, versionKey: false },
 );
 
-export const Presence = model<IPresence>("bot.presence", schema, "bot.presence");
+export const BotPresence = model<IBotPresence>("bot.presence", schema, "bot.presence");

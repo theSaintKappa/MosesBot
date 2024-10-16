@@ -1,8 +1,8 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
 import { getNextCronDates } from "@/features/scheduler";
-import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
-import { type IMosesQuoteQueue, MosesQuoteQueue } from "@/models/moses/quoteQueue";
+import { type IMosesQuote, MosesQuote } from "@/models/MosesQuote";
+import { type IMosesQuoteQueue, MosesQuoteQueue } from "@/models/MosesQuoteQueue";
 import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
 import { getErrorReply, getInfoReply, getNoticeReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type InteractionReplyOptions, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";

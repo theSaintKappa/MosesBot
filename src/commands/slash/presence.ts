@@ -1,5 +1,5 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
-import { Presence } from "@/models/bot/presence";
+import { BotPresence } from "@/models/BotPresence";
 import { ActivityType, type ClientPresenceStatus, type CommandInteractionOptionResolver, SlashCommandBuilder } from "discord.js";
 
 export default {
@@ -22,7 +22,7 @@ export default {
 
         interaction.client.user?.setPresence({ activities: [{ type, name }], status });
 
-        await Presence.updateOne({}, { type, name, status }, { upsert: true });
+        await BotPresence.updateOne({}, { type, name, status }, { upsert: true });
 
         await interaction.reply({ content: `> Client presence set to "**${type !== ActivityType.Custom ? `${ActivityType[type]} ` : ""}${name}**" (${status})` });
     },

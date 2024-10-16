@@ -1,16 +1,16 @@
-import { MosesQuote } from "@/models/moses/quote";
+import { MosesQuote } from "@/models/MosesQuote";
 import type { DocumentTimestamps } from "@/types";
 import { type Document, type ObjectId, Schema, model } from "mongoose";
 
-export interface IMosesLastSentQuote extends Document, DocumentTimestamps {
+export interface IBotLastRolledQuote extends Document, DocumentTimestamps {
     quoteReference: ObjectId;
 }
 
-const schema = new Schema<IMosesLastSentQuote>(
+const schema = new Schema<IBotLastRolledQuote>(
     {
         quoteReference: { type: Schema.Types.ObjectId, ref: MosesQuote.modelName, required: true },
     },
     { timestamps: true, versionKey: false },
 );
 
-export const MosesLastSentQuote = model<IMosesLastSentQuote>("moses.lastSentQuote", schema, "moses.lastSentQuote");
+export const BotLastRolledQuote = model<IBotLastRolledQuote>("bot.lastRolledQuote", schema, "bot.lastRolledQuote");

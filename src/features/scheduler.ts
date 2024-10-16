@@ -1,9 +1,9 @@
 import config from "@/config.json";
 import { updateBotDescriptionQuote } from "@/features/botDescription";
-import { type IMosesLastSentQuote, MosesLastSentQuote } from "@/models/moses/lastSentQuote";
-import { type IMosesPic, MosesPic } from "@/models/moses/pics";
-import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
-import { MosesQuoteQueue } from "@/models/moses/quoteQueue";
+import { BotLastRolledQuote } from "@/models/BotLastRolledQuote";
+import { type IMosesPic, MosesPic } from "@/models/MosesPic";
+import { type IMosesQuote, MosesQuote } from "@/models/MosesQuote";
+import { MosesQuoteQueue } from "@/models/MosesQuoteQueue";
 import type { SendableChannel } from "@/types";
 import { logger } from "@/utils/logger";
 import { CronJob } from "cron";
@@ -72,10 +72,10 @@ export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMose
 }
 
 export async function updateLastSentQuote(quote: IMosesQuote) {
-    await MosesLastSentQuote.findOneAndUpdate({}, { quoteReference: quote._id } as IMosesLastSentQuote, { upsert: true });
+    await BotLastRolledQuote.findOneAndUpdate({}, { quoteReference: quote._id }, { upsert: true });
 }
 
 export async function getLastSentQuote() {
-    const quote = await MosesLastSentQuote.findOne().populate<{ quoteReference: IMosesQuote }>("quoteReference");
+    const quote = await BotLastRolledQuote.findOne().populate<{ quoteReference: IMosesQuote }>("quoteReference");
     return quote?.quoteReference ?? null;
 }

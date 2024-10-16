@@ -1,5 +1,5 @@
-import type { IMosesQuote } from "@/models/moses/quote";
-import { MosesQuote } from "@/models/moses/quote";
+import type { IMosesQuote } from "@/models/MosesQuote";
+import { MosesQuote } from "@/models/MosesQuote";
 import type { ApplicationCommandOptionChoiceData } from "discord.js";
 
 export async function getRecentQuotesAutocomplete(): Promise<ApplicationCommandOptionChoiceData[]> {

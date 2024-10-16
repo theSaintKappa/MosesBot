@@ -1,6 +1,6 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import { getLeaderboardEmbed, getStateEmbed } from "@/features/voiceTime";
-import { VoiceTime } from "@/models/bot/voiceTime";
+import { BotVoiceTimeLeaderboard } from "@/models/BotVoiceTimeLeaderboard";
 import { SlashCommandBuilder } from "discord.js";
 
 export default {
@@ -18,7 +18,7 @@ export default {
 
         switch (subcommand) {
             case "leaderboard": {
-                const voiceTime = await VoiceTime.find({}).sort({ time: -1 });
+                const voiceTime = await BotVoiceTimeLeaderboard.find({}).sort({ time: -1 });
                 await interaction.reply({ embeds: [getLeaderboardEmbed(voiceTime)] });
                 break;
             }

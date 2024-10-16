@@ -1,7 +1,7 @@
 import { CommandScope, type SlashCommandObject } from "@/commands/types";
 import config from "@/config.json";
-import { MosesLeaderboard } from "@/models/moses/leaderboard";
-import { type IMosesQuote, MosesQuote } from "@/models/moses/quote";
+import { type IMosesQuote, MosesQuote } from "@/models/MosesQuote";
+import { MosesQuoteLeaderboard } from "@/models/MosesQuoteLeaderboard";
 import { getRecentQuotesAutocomplete } from "@/utils/autocomplete";
 import { getErrorReply, getInfoReply, getSuccessReply } from "@/utils/replyEmbeds";
 import { type InteractionReplyOptions, PermissionsBitField, SlashCommandBuilder } from "discord.js";
@@ -147,7 +147,7 @@ async function drop(id: number, memberPermissions: PermissionsBitField, userId: 
 }
 
 async function leaderboard(): Promise<InteractionReplyOptions> {
-    const leaderboard = await MosesLeaderboard.find();
+    const leaderboard = await MosesQuoteLeaderboard.find();
 
     if (leaderboard.length === 0) return getErrorReply("The Moses leaderboard is empty.");
 
