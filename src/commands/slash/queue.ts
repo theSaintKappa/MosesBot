@@ -54,7 +54,7 @@ async function add(id: number, submitterId: string): Promise<InteractionReplyOpt
     const quote = await MosesQuote.findOne({ id });
     if (!quote) return getErrorReply(`***Quote **\`#${id}\`** does not exist.***`);
 
-    await MosesQuoteQueue.create({ quoteReference: quote._id, submitterId } as IMosesQuoteQueue);
+    await MosesQuoteQueue.create({ quoteId: quote._id, submitterId } as IMosesQuoteQueue);
 
     const queueSize = await MosesQuoteQueue.countDocuments();
 
@@ -70,11 +70,11 @@ async function clear(): Promise<InteractionReplyOptions> {
 }
 
 async function display(): Promise<InteractionReplyOptions> {
-    const queue = await MosesQuoteQueue.find().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
+    const queue = await MosesQuoteQueue.find().sort({ createdAt: 1 }).populate<{ quote: IMosesQuote }>("quote");
 
     if (queue.length === 0) return getNoticeReply("The Moses quote queue is empty.");
 
     const nextCronDates = getNextCronDates(queue.length);
 
-    return getInfoReply("Moses quote queue:", queue.map(({ quoteReference }: { quoteReference: IMosesQuote }, i: number) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quoteReference.id}** **\`${quoteReference.content.replace(/\n/g, " ")}\`**`).join("\n"));
+    return getInfoReply("Moses quote queue:", queue.map(({ quote }: { quote: IMosesQuote }, i: number) => `<t:${Math.floor(nextCronDates[i].getTime() / 1000)}:R> → #**${quote.id}** **\`${quote.content.replace(/\n/g, " ")}\`**`).join("\n"));
 }

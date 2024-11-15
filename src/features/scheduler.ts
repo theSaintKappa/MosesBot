@@ -49,11 +49,11 @@ export function getQuoteEmbed(quote: IMosesQuote, pic: IMosesPic) {
 }
 
 export async function sendQuote(client: Client, quote?: IMosesQuote, pic?: IMosesPic) {
-    const queueEntry = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quoteReference: IMosesQuote }>("quoteReference");
+    const queueEntry = await MosesQuoteQueue.findOne().sort({ createdAt: 1 }).populate<{ quote: IMosesQuote }>("quote");
 
     if (!quote && queueEntry) await queueEntry.deleteOne();
 
-    const selectedQuote = quote ?? queueEntry?.quoteReference ?? (await getRandomQuote());
+    const selectedQuote = quote ?? queueEntry?.quote ?? (await getRandomQuote());
     const selectedPic = pic ?? (await getRandomPic());
 
     const channel = client.channels.cache.get(config.channels.quotes) as SendableChannel;
