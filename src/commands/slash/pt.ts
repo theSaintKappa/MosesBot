@@ -9,35 +9,35 @@ const pageSize = 15;
 
 export default {
     builder: new SlashCommandBuilder()
-        .setName("3pt")
-        .setDescription("All of the 3pT quotes related commands.")
+        .setName("4pt")
+        .setDescription("All of the 4pT quotes related commands.")
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("list")
-                .setDescription("List all stored 3pT quotes (grouped by pages).")
+                .setDescription("List all stored 4pT quotes (grouped by pages).")
                 .addNumberOption((option) => option.setName("page").setDescription(`The page number you would like to see (there are ${pageSize} quotes per page).`).setRequired(true).setAutocomplete(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("add")
-                .setDescription("Add a new 3pT quote.")
+                .setDescription("Add a new 4pT quote.")
                 .addUserOption((option) => option.setName("author").setDescription("The author of the quote.").setRequired(true))
                 .addStringOption((option) => option.setName("quote").setDescription("The quote to add.").setRequired(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("edit")
-                .setDescription("Edit an existing 3pT quote.")
+                .setDescription("Edit an existing 4pT quote.")
                 .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to edit.").setRequired(true).setAutocomplete(true))
                 .addStringOption((option) => option.setName("quote").setDescription("The new edited quote.").setRequired(true)),
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("delete")
-                .setDescription("Delete a 3pT quote.")
+                .setDescription("Delete a 4pT quote.")
                 .addNumberOption((option) => option.setName("id").setDescription("The id number of the quote you would like to delete.").setRequired(true).setAutocomplete(true)),
         )
-        .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the 3pT quote authors leaderboard.")),
+        .addSubcommand((subcommand) => subcommand.setName("leaderboard").setDescription("Check the 4pT quote authors leaderboard.")),
 
     autocomplete: async (subcommand) => {
         const getRecentQuotesAutocomplete = async (): Promise<ApplicationCommandOptionChoiceData[]> =>
@@ -63,7 +63,7 @@ export default {
 
         async function updateCounter() {
             if (!interaction.guild) return;
-            interaction.guild.channels.cache.get(config.channels.ptCounter)?.edit({ name: `🔴 3pT Quotes ›› ${await PtQuote.countDocuments()}` });
+            interaction.guild.channels.cache.get(config.channels.ptCounter)?.edit({ name: `🔴 4pT Quotes ›› ${await PtQuote.countDocuments()}` });
         }
 
         switch (subcommand) {
@@ -92,13 +92,13 @@ async function list(page: number): Promise<InteractionReplyOptions> {
     if (page < 1) return getErrorReply("Page number cannot be less than 1.");
 
     const documentCount = await PtQuote.countDocuments();
-    if (documentCount === 0) return getErrorReply("There are no 3pT quotes stored in the database.");
+    if (documentCount === 0) return getErrorReply("There are no 4pT quotes stored in the database.");
 
     const totalPages = Math.ceil(documentCount / pageSize);
     if (page > totalPages) return getErrorReply(totalPages === 1 ? "There is only 1 page of quotes available." : `There are only ${totalPages} pages of quotes available.`);
 
     const quotes = await PtQuote.aggregate<IPtQuote>([{ $sort: { id: 1 } }, { $skip: (page - 1) * pageSize }, { $limit: pageSize }]);
-    return getInfoReply(`3pT quotes *(page ${page} of ${totalPages})*:`, quotes.map((quote) => `**#${quote.id}** \`${quote.content.replace(/\n/, " ")}\`\n***— <@${quote.authorId}>***`).join("\n"));
+    return getInfoReply(`4pT quotes *(page ${page} of ${totalPages})*:`, quotes.map((quote) => `**#${quote.id}** \`${quote.content.replace(/\n/, " ")}\`\n***— <@${quote.authorId}>***`).join("\n"));
 }
 
 async function add(quote: string, author: User, user: User): Promise<InteractionReplyOptions> {
@@ -159,7 +159,7 @@ async function drop(id: number, memberPermissions: PermissionsBitField, user: Us
 async function leaderboard(): Promise<InteractionReplyOptions> {
     const leaderboard = await PtQuoteLeaderboard.find();
 
-    if (leaderboard.length === 0) return getErrorReply("The 3pT leaderboard is empty.");
+    if (leaderboard.length === 0) return getErrorReply("The 4pT leaderboard is empty.");
 
-    return getInfoReply("3pT quote authors leaderboard:", leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
+    return getInfoReply("4pT quote authors leaderboard:", leaderboard.map((user, i) => `**#${i + 1}** <@${user.userId}> **→** **\`${user.count}\`**`).join("\n"));
 }
